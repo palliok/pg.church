@@ -51,7 +51,6 @@ Object.entries(trStories).forEach(([slug, tr]) => {
 
 // Only keys missing from the main dictionaries are added (see i18n.js).
 export const EN_EXTRA = {
-  'ул.': 'St.',
   ...storyEN,
   'Рождество': 'Christmas',
   'Пасха': 'Easter',
@@ -71,7 +70,6 @@ export const EN_EXTRA = {
 };
 
 export const KY_EXTRA = {
-  'ул.': 'көч.',
   'Поклонная': 'Поклонная',
   'Читать как комикс': 'Комикс катары окуу',
   'Фото · общение': 'Сүрөт · баарлашуу',

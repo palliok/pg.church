@@ -1,11 +1,26 @@
 import { t, getLang, langPath } from '../i18n.js';
 import { Link } from 'react-router-dom';
+import { useLayoutEffect, useRef } from 'react';
 import ArrowKnob from '../components/ArrowKnob.jsx';
 import ChurchBrand from '../components/ChurchBrand.jsx';
 import ContactsCard from '../components/ContactsCard.jsx';
-import { duty, homeEvents, news } from '../data/mockData.js';
+import { duty, homeEvents } from '../data/mockData.js';
 
 export default function Home() {
+  const donationRef = useRef(null);
+  const scheduleColumnRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const donation = donationRef.current;
+    const updateHeight = () => {
+      scheduleColumnRef.current.style.setProperty('--donation-height', `${donation.getBoundingClientRect().height}px`);
+    };
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(donation);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="home-wrap page-enter container" style={{ paddingLeft: 0, paddingRight: 0, maxWidth: 'var(--content-max)' }}>
       <div className="home-mobile">
@@ -56,30 +71,12 @@ export default function Home() {
           <span className="home-mobile-arrow">↗</span>
         </Link>
 
-        <div className="home-mobile-section">
-          <div className="home-mobile-section-head">
-            <div className="home-mobile-section-title">Новости</div>
-            <Link to="/media" className="home-mobile-section-arrow" aria-label={t('Все новости')}>↗</Link>
-          </div>
-
-          <div className="home-mobile-news-list">
-            {news.slice(0, 2).map((n) => (
-              <Link key={n.id} to="/media" className="home-mobile-news-item">
-                <span className="home-mobile-news-thumb" style={{ backgroundImage: n.gradient }} />
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  <span className="home-mobile-news-title">{n.title}</span>
-                  <span className="home-mobile-news-date">{n.date}</span>
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-
         <ContactsCard />
       </div>
 
       <div className="home-grid" style={{ padding: '0 18px' }}>
 
+        <div className="home-left">
         {/* Евангелие */}
         <div
           className="home-hero"
@@ -115,10 +112,16 @@ export default function Home() {
           </a>
         </div>
 
+        {/* Адрес */}
+        <ContactsCard className="home-address" />
+        </div>
+
         {/* Пожертвование */}
+        <div className="home-donate-column">
         <Link
           to="/donate"
           className="home-donate"
+          ref={donationRef}
           style={{
             position: 'relative',
             overflow: 'hidden',
@@ -142,27 +145,13 @@ export default function Home() {
             </span>
           </div>
         </Link>
+        <img className="home-church-people" src="/church-people-details.png" alt="" />
+        </div>
 
-        {/* Адрес */}
-        {/* Адрес */}
-        <ContactsCard className="home-address" />
-        {/* Адрес */}
-
-        {/* Новости */}
-        <Link to="/media" className="home-news" style={{ borderRadius: 24, background: 'var(--c-panel)', color: '#0d0d0d', padding: '20px 22px', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-            <div className="h-display" style={{ fontSize: 26 }}>Новости</div>
-            <ArrowKnob size={38} />
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginTop: 12 }}>
-            {news.slice(0, 3).map((n) => (
-              <div key={n.id} style={{ padding: '7px 0', borderTop: '1px solid var(--c-line-soft)' }}>
-                <div style={{ fontFamily: 'var(--f-head)', fontWeight: 600, fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--c-gray-text-soft)' }}>{n.date}</div>
-                <div style={{ fontFamily: 'var(--f-head)', fontWeight: 600, fontSize: 14, lineHeight: 1.2, marginTop: 5 }}>{n.title}</div>
-              </div>
-            ))}
-          </div>
-        </Link>
+        <div className="home-schedule-column" ref={scheduleColumnRef}>
+        <div className="home-church">
+          <img src="/church-with-people-details.png" alt="" />
+        </div>
 
         {/* Расписание */}
         <div className="home-schedule" style={{ borderRadius: 24, background: 'var(--c-panel)', padding: '20px 20px 16px', display: 'flex', flexDirection: 'column' }}>
@@ -189,24 +178,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Блог */}
-        <Link to="/media" className="home-blog" style={{ borderRadius: 24, background: 'var(--c-panel)', color: '#0d0d0d', padding: '20px 22px', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-            <div className="h-display" style={{ fontSize: 26 }}>Блог</div>
-            <ArrowKnob size={38} />
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginTop: 10 }}>
-            {news.slice(0, 3).map((n, i) => (
-              <div key={n.id} className="card-row" style={{ padding: '7px 0', borderTop: '1px solid var(--c-line-soft)' }}>
-                <span style={{ flex: '0 0 26px', font: '600 10px var(--f-head)', color: 'var(--c-gray-text-mute)' }}>{`0${i + 1} /`}</span>
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: 'block', fontFamily: 'var(--f-head)', fontWeight: 600, fontSize: 15 }}>{n.title}</span>
-                </span>
-                <span style={{ flex: '0 0 auto', width: 40, height: 30, borderRadius: 9, backgroundImage: n.gradient }} />
-              </div>
-            ))}
-          </div>
-        </Link>
+        </div>
 
         {/* Кто мы */}
         <Link

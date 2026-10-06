@@ -9,8 +9,13 @@ export const church = {
   city: tx('Санкт-Петербург'),
   address: tx('Большая Озёрная, 27'),
   metro: tx('Озерки · 7 минут пешком'),
-  phone: '+7 812 000-00-00',
-  phoneHref: 'tel:+78120000000',
+  phone: '+7 911 123-43-43',
+  phoneHref: 'tel:+79111234343',
+  social: [
+    { code: 'TG', label: 'Telegram', href: '#' },
+    { code: 'YT', label: 'YouTube', href: '#' },
+    { code: 'IG', label: 'Instagram', href: '#' },
+  ],
 };
 
 export const duty = [
@@ -196,3 +201,16 @@ export const donationTargets = [
 ];
 
 export const donationAmounts = [500, 1000, 3000];
+
+export const donationBankDetails = {
+  fields: [
+    { key: 'inn', label: 'ИНН', value: '7802038805' },
+    { key: 'kpp', label: 'КПП', value: '780201001' },
+    { key: 'bank', label: 'Банк', value: 'СЕВЕРО-ЗАПАДНЫЙ БАНК ПАО СБЕРБАНК' },
+    { key: 'account', label: 'Расчётный счёт', value: '40703810555000000365' },
+    { key: 'correspondentAccount', label: 'Корреспондентский счёт', value: '30101810500000000653' },
+    { key: 'bic', label: 'БИК', value: '044030653' },
+  ],
+  paymentPurpose: 'Пожертвование на уставную деятельность',
+  qrCode: '/donation-qr.svg',
+};

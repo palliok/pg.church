@@ -1,84 +1,49 @@
 .contacts-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: 244px;
-  min-width: 0;
-  padding: 12px;
   border-radius: 24px;
   overflow: hidden;
   background: var(--c-panel);
+  min-width: 0;
 }
 
-@media (min-width: 1081px) {
-  .home-address .contact-map img { transform: scale(1.3); transform-origin: right bottom; }
+.contacts-card-map { position: relative; width: 100%; height: 150px; overflow: hidden; }
+.contacts-card-map iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+.contacts-card-map .contacts-card-button {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 2;
 }
 
-.contacts-card-body {
-  position: relative;
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, .8);
-  border-radius: 16px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, .82), rgba(255, 255, 255, .68));
-  -webkit-backdrop-filter: blur(14px) saturate(1.35);
-  backdrop-filter: blur(14px) saturate(1.35);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), inset 0 -1px 0 rgba(255, 255, 255, .35), 0 8px 24px rgba(0, 0, 0, .12);
-  pointer-events: none;
-}
+.contacts-card-body { padding: 18px; }
 
-.contacts-card-address {
-  font: 700 16px/1.2 var(--f-body);
-  letter-spacing: -.015em;
-  white-space: nowrap;
-}
+.contacts-card-info { font: 500 14px var(--f-body); color: var(--c-gray-text); display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
 
-.contacts-card-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-top: 6px;
-  font: 400 14px/1.4 var(--f-body);
-  color: #343a40;
-}
-
-.contacts-card-metro { display: flex; align-items: center; gap: 8px; }
-
+.contacts-card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
+.contacts-card-socials { display: flex; gap: 7px; flex: 0 1 128px; min-width: 0; }
+.contacts-card-social.icon-circle { width: 38px; height: auto; aspect-ratio: 1; flex: 1; min-width: 0; background: #fff; font-family: var(--f-head); font-weight: 700; font-size: 10px; }
+.contacts-card-phone { width: fit-content; white-space: nowrap; font-family: var(--f-head); font-weight: 700; font-size: 19px; color: var(--c-ink); }
 .contacts-card-metro-icon {
-  flex: 0 0 18px;
+  width: 18px;
   height: 18px;
   border-radius: 99px;
   background: #0078d7;
   color: #fff;
   font: 700 10px var(--f-body);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.contacts-card-phone {
-  pointer-events: auto;
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  width: fit-content;
-  border-radius: 6px;
-  font: 400 16px/1.3 var(--f-body);
-  color: var(--c-ink);
-  text-decoration: none;
+.contacts-card-address {
+  font-family: var(--f-head);
+  font-weight: 800;
+  font-size: 26px;
+  line-height: .94;
+  letter-spacing: -.03em;
+  text-transform: uppercase;
 }
 
-.contacts-card-phone:focus-visible { outline: 2px solid var(--c-ink); outline-offset: 3px; }
+.contacts-card-metro { display: flex; align-items: center; gap: 10px; }
 
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .contacts-card-body { background: rgba(255, 255, 255, .94); }
-}
-
-@media (max-width: 860px) {
-  .contacts-card { min-height: 300px; }
-  .contacts-card .contact-map img { transform: scale(1.45); transform-origin: right bottom; }
-  .contacts-card-body { padding: 16px; }
-  .contacts-card-address, .contacts-card-phone { font-size: clamp(17px, 4.8vw, 20px); }
-  .contacts-card-info { margin-top: 10px; gap: 8px; font-size: 16px; }
-  .contacts-card-metro-icon { flex-basis: 20px; height: 20px; font-size: 11px; }
-}
+.contacts-card-button { background: var(--c-ink); color: #fff; display: inline-flex; align-items: center; gap: 10px; padding: 7px 7px 7px 18px; border-radius: 99px; font-family: var(--f-head); font-weight: 700; font-size: 12px; }
+.contacts-card-button-arrow { width: 34px; height: 34px; border-radius: 99px; background: #fff; color: var(--c-ink); display: flex; align-items: center; justify-content: center; }

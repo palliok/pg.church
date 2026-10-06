@@ -8,7 +8,6 @@ const NAV_ITEMS = [
   { to: '/', label: t('Главная'), end: true },
   { to: '/schedule', label: t('Расписание') },
   { to: '/songs', label: t('Песни') },
-  { to: '/media', label: t('Новости') },
   { to: '/about', label: t('О церкви') },
 ];
 

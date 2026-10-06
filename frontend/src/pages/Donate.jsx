@@ -1,10 +1,32 @@
 import { useState } from 'react';
 import { t } from '../i18n.js';
 import ArrowKnob from '../components/ArrowKnob.jsx';
-import { donationAmounts, donationTargets } from '../data/mockData.js';
+import { donationAmounts, donationBankDetails, donationTargets } from '../data/mockData.js';
+
+function CopyIndicator({ state }) {
+  const message = state === 'success' ? 'Скопировано' : state === 'error' ? 'Не удалось скопировать. Скопируйте текст вручную.' : state === 'pending' ? 'Копирование' : '';
+  return (
+    <span className="donate-bank-indicator" data-state={state} role="status" title={message}>
+      <span aria-hidden="true">{state === 'success' ? '✓' : state === 'error' ? '!' : state === 'pending' ? '…' : ''}</span>
+      <span className="visually-hidden">{message}</span>
+    </span>
+  );
+}
 
 export default function Donate() {
   const [amount, setAmount] = useState(donationAmounts[1]);
+  const [copyStatus, setCopyStatus] = useState({ key: '', state: '' });
+  const copying = copyStatus.state === 'pending';
+
+  async function copyDetails(key, value) {
+    setCopyStatus({ key, state: 'pending' });
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopyStatus({ key, state: 'success' });
+    } catch {
+      setCopyStatus({ key, state: 'error' });
+    }
+  }
 
   return (
     <div className="page-enter container" style={{ padding: '26px 16px 48px' }}>
@@ -56,6 +78,42 @@ export default function Donate() {
           </div>
         </div>
       </div>
+
+      <section className="donate-bank card" aria-labelledby="donate-bank-title">
+        <div className="donate-bank-main">
+          <div className="eyebrow">Банковский перевод</div>
+          <h2 id="donate-bank-title" className="h-display">Реквизиты для пожертвований</h2>
+          <dl className="donate-bank-details">
+            {donationBankDetails.fields.map(({ key, label, value }) => (
+              <div key={key} className={`donate-bank-field-${key}`}>
+                <dt>{t(label)}</dt>
+                <dd>
+                  <button type="button" className={`donate-bank-value${key === 'bank' ? '' : ' donate-bank-number'}`} aria-label={`Копировать ${label}: ${value}`} title="Нажмите, чтобы скопировать" disabled={copying} onClick={() => copyDetails(key, value)}>
+                    <span>{value}</span>
+                    <CopyIndicator state={copyStatus.key === key ? copyStatus.state : ''} />
+                  </button>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <div className="donate-bank-purpose">
+          <div>Назначение платежа</div>
+          <p>
+            <button type="button" className="donate-bank-value" aria-label={`Копировать назначение платежа: ${donationBankDetails.paymentPurpose}`} title="Нажмите, чтобы скопировать" disabled={copying} onClick={() => copyDetails('purpose', donationBankDetails.paymentPurpose)}>
+              <span>«{donationBankDetails.paymentPurpose}»</span>
+              <CopyIndicator state={copyStatus.key === 'purpose' ? copyStatus.state : ''} />
+            </button>
+          </p>
+        </div>
+
+        <figure className="donate-bank-qr">
+          <img src={donationBankDetails.qrCode} alt="QR-код для пожертвования" width="1068" height="1068" />
+          <figcaption>Отсканируйте QR-код в приложении банка</figcaption>
+          <a href={donationBankDetails.qrCode} download="donation-qr.svg" className="pill-btn donate-bank-qr-download">Скачать QR-код</a>
+        </figure>
+      </section>
     </div>
   );
 }
