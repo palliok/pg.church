@@ -1,20 +1,16 @@
 import { t, getLang, langPath } from '../i18n.js';
 import { Link } from 'react-router-dom';
 import ArrowKnob from '../components/ArrowKnob.jsx';
-import { church, duty, homeEvents, news } from '../data/mockData.js';
+import ChurchBrand from '../components/ChurchBrand.jsx';
+import ContactsCard from '../components/ContactsCard.jsx';
+import { duty, homeEvents, news } from '../data/mockData.js';
 
 export default function Home() {
   return (
     <div className="home-wrap page-enter container" style={{ paddingLeft: 0, paddingRight: 0, maxWidth: 'var(--content-max)' }}>
       <div className="home-mobile">
         <div className="home-mobile-header">
-          <div className="home-mobile-logo">
-            <div className="home-mobile-logo-main">
-              <strong>Поклонная</strong>
-              <span>гора</span>
-            </div>
-            <div className="home-mobile-city">{church.city}</div>
-          </div>
+          <ChurchBrand />
 
           <div className="home-mobile-lang">
             {['RU', 'EN', 'KY'].map((lng) => {
@@ -79,56 +75,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="home-mobile-map">
-          <div className="home-mobile-map-view">
-            <iframe
-              src="https://yandex.ru/map-widget/v1/?um=constructor%3A406ce76e3eab2cea5d9dd707c1d06b8a569aac16f7129a3526693a2407a42d39&source=constructor"
-              title="Яндекс Карта"
-            />
-            <div className="home-mobile-map-label">Мы здесь</div>
-          </div>
-
-          <div className="home-mobile-map-body">
-            <div className="home-mobile-address">
-              Большая<br />Озёрная, 27
-            </div>
-
-            <div className="home-mobile-map-info">
-              <div className="home-mobile-map-metro">
-                <span className="home-mobile-map-metro-icon">М</span>
-                {church.metro}
-              </div>
-
-              <a href={church.phoneHref} className="home-mobile-phone">
-                {church.phone}
-              </a>
-            </div>
-
-            <div className="home-mobile-map-bottom">
-              <a
-                href="https://yandex.ru/maps/-/CXEZRW61"
-                target="_blank"
-                rel="noreferrer"
-                className="home-mobile-map-button"
-              >
-                На карте
-                <span style={{ width: 34, height: 34, borderRadius: 99, background: '#fff', color: '#0d0d0d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M6 18 18 6M8 6h10v10" />
-                  </svg>
-                </span>
-              </a>
-
-              <div className="home-mobile-socials">
-                {church.social.map((s) => (
-                  <a key={s.code} href={s.href} title={s.label} className="home-mobile-social">
-                    {s.code}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+        <ContactsCard />
       </div>
 
       <div className="home-grid" style={{ padding: '0 18px' }}>
@@ -198,126 +145,7 @@ export default function Home() {
 
         {/* Адрес */}
         {/* Адрес */}
-<div
-  className="home-address"
-  style={{
-    borderRadius: 24,
-    overflow: 'hidden',
-    background: 'var(--c-panel)',
-    minWidth: 0,
-  }}
->
-  <div
-    style={{
-      position: 'relative',
-      width: '100%',
-      height: 140,
-      overflow: 'hidden',
-    }}
-  >
-    <iframe
-      src="https://yandex.ru/map-widget/v1/?um=constructor%3A406ce76e3eab2cea5d9dd707c1d06b8a569aac16f7129a3526693a2407a42d39&source=constructor"
-      title="Яндекс Карта"
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        border: 0,
-        display: 'block',
-      }}
-    />
-
-    <div
-      style={{
-        position: 'absolute',
-        top: 14,
-        left: 14,
-        zIndex: 2,
-        background: '#fff',
-        padding: '8px 13px',
-        borderRadius: 10,
-        fontFamily: 'var(--f-head)',
-        fontWeight: 700,
-        fontSize: 10,
-        letterSpacing: '.08em',
-        textTransform: 'uppercase',
-      }}
-    >
-      Мы здесь
-    </div>
-  </div>
-
-  <div style={{ padding: '18px' }}>
-    <div
-      className="h-display"
-      style={{ fontSize: 22 }}
-    >
-      {church.address}
-    </div>
-
-    <div
-      style={{
-        font: '500 13px var(--f-body)',
-        color: 'var(--c-gray-text)',
-        marginTop: 8,
-      }}
-    >
-      {church.metro}
-    </div>
-
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginTop: 16,
-      }}
-    >
-      <a
-        href="https://yandex.ru/maps/-/CXEZRW61"
-        target="_blank"
-        rel="noreferrer"
-        className="pill-btn"
-        style={{
-          padding: '6px 6px 6px 14px',
-          background: '#0d0d0d',
-          color: '#fff',
-          fontSize: 10,
-        }}
-      >
-        На карте
-        <ArrowKnob
-          size={30}
-          bg="#fff"
-          fg="#0d0d0d"
-        />
-      </a>
-
-      <div style={{ display: 'flex', gap: 6 }}>
-        {church.social.map((s) => (
-          <a
-            key={s.code}
-            href={s.href}
-            title={s.label}
-            className="icon-circle"
-            style={{
-              width: 34,
-              height: 34,
-              background: '#fff',
-              fontFamily: 'var(--f-head)',
-              fontWeight: 700,
-              fontSize: 9,
-            }}
-          >
-            {s.code}
-          </a>
-        ))}
-      </div>
-    </div>
-  </div>
-</div>
+        <ContactsCard className="home-address" />
         {/* Адрес */}
 
         {/* Новости */}
@@ -420,9 +248,6 @@ export default function Home() {
         </Link>
       </div>
 
-      <div className="home-tagline" style={{ fontFamily: 'var(--f-head)', fontWeight: 600, fontSize: 11, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--c-gray-text-mute)', padding: '0 18px' }}>
-        Двери открыты для каждого — будем рады видеть тебя
-      </div>
     </div>
   );
 }

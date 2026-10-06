@@ -1,4 +1,3 @@
-import { t } from '../i18n.js';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
@@ -29,41 +28,39 @@ export default function AppLayout() {
 
       <Header />
 
-      <main style={{ flex: 1, paddingBottom: 24 }}>
+      <main style={{ flex: 1 }}>
         <Outlet />
       </main>
 
       <TabBar />
 
       <footer
-        className="desktop-only container"
-        style={{
-          padding: '28px 32px 40px',
-        }}
+        className="site-footer container"
       >
+        <div className="site-footer-desktop desktop-only">
+            <p lang="ru" className="site-footer-legal">
+              <span>Местная религиозная организация «Санкт-Петербургская церковь евангельских христиан-баптистов».</span>
+              <span>ИНН 7802038805 · КПП 780201001 · ОГРН 1027800013768 · Юридический адрес: 194214, г. Санкт-Петербург, ул. Большая Озёрная, д. 27.</span>
+            </p>
+        </div>
         <div
+          className="mobile-only container"
           style={{
-            borderTop: '1px solid var(--c-line)',
-            paddingTop: 20,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 16,
-            flexWrap: 'wrap',
+            paddingTop: 12,
           }}
         >
-          <span className="eyebrow">
-            © {new Date().getFullYear()} {t('Церковь «Поклонная гора»')}
-          </span>
+          <div>
+            <p lang="ru" style={{ margin: 0, fontSize: 12, lineHeight: 1.5 }}>
+              Местная религиозная организация «Санкт-Петербургская церковь евангельских христиан-баптистов»
+            </p>
+          </div>
 
-          <span
-            className="eyebrow"
-            style={{
-              color: 'var(--c-gray-text)',
-            }}
-          >
-            Большая Озёрная, 27 · Санкт-Петербург
-          </span>
+          <div lang="ru" style={{ marginTop: 4, color: 'var(--c-gray-text)', fontSize: 12, lineHeight: 1.5 }}>
+            <p style={{ margin: 0 }}>ИНН 7802038805 · КПП 780201001 · ОГРН 1027800013768</p>
+            <p style={{ margin: '2px 0 0' }}>
+              Юридический адрес: 194214, г. Санкт-Петербург, ул. Большая Озёрная, д. 27
+            </p>
+          </div>
         </div>
       </footer>
     </div>

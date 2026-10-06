@@ -1,4 +1,4 @@
-import { church } from '../data/mockData.js';
+import ContactsCard from '../components/ContactsCard.jsx';
 
 export default function About() {
   return (
@@ -117,113 +117,7 @@ export default function About() {
           </div>
 
           {/* Яндекс Карта */}
-          <div
-            style={{
-              borderRadius: 24,
-              overflow: 'hidden',
-              background: 'var(--c-panel)',
-            }}
-          >
-            <div
-              style={{
-                position: 'relative',
-                width: '100%',
-                height: 170,
-                overflow: 'hidden',
-              }}
-            >
-              <iframe
-                src="https://yandex.ru/map-widget/v1/?um=constructor%3A406ce76e3eab2cea5d9dd707c1d06b8a569aac16f7129a3526693a2407a42d39&source=constructor"
-                title="Яндекс Карта"
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  border: 0,
-                  display: 'block',
-                }}
-              />
-            </div>
-
-            <div style={{ padding: '22px 24px' }}>
-              <div
-                className="h-display"
-                style={{ fontSize: 26 }}
-              >
-                {church.address}
-              </div>
-
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 10,
-                  marginTop: 14,
-                  font: '500 14px var(--f-body)',
-                  color: 'var(--c-gray-text)',
-                }}
-              >
-                <div className="card-row">
-                  <span
-                    className="icon-circle"
-                    style={{
-                      width: 19,
-                      height: 19,
-                      background: 'var(--c-purple)',
-                      color: '#fff',
-                      font: '700 10px var(--f-body)',
-                    }}
-                  >
-                    М
-                  </span>
-
-                  {church.metro}
-                </div>
-
-                <a
-                  href={church.phoneHref}
-                  style={{
-                    fontFamily: 'var(--f-head)',
-                    fontWeight: 700,
-                    fontSize: 19,
-                    color: '#0d0d0d',
-                    width: 'fit-content',
-                  }}
-                >
-                  {church.phone}
-                </a>
-              </div>
-
-              <div
-                style={{
-                  display: 'flex',
-                  gap: 7,
-                  marginTop: 16,
-                }}
-              >
-                {church.social.map((s) => (
-                  <a
-                    key={s.code}
-                    href={s.href}
-                    title={s.label}
-                    className="icon-circle"
-                    style={{
-                      width: 38,
-                      height: 38,
-                      background: '#fff',
-                      fontFamily: 'var(--f-head)',
-                      fontWeight: 700,
-                      fontSize: 10,
-                    }}
-                  >
-                    {s.code}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
+          <ContactsCard />
         </div>
       </div>
     </div>

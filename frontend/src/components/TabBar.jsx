@@ -64,7 +64,6 @@ export default function TabBar() {
         right: 0,
         bottom: 20,
         zIndex: 30,
-        display: 'flex',
         justifyContent: 'center',
         padding: '0 12px',
         pointerEvents: 'none',

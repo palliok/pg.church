@@ -1,5 +1,6 @@
 import { t, getLang, langPath } from '../i18n.js';
 import { NavLink, useNavigate } from 'react-router-dom';
+import ChurchBrand from './ChurchBrand.jsx';
 
 const CURRENT_LANG = getLang();
 
@@ -31,9 +32,6 @@ export default function Header() {
       <button
         onClick={() => navigate('/')}
         style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          gap: 10,
           border: 'none',
           background: 'none',
           padding: 0,
@@ -41,10 +39,7 @@ export default function Header() {
           color: 'var(--c-ink)',
         }}
       >
-        <span style={{ fontFamily: 'var(--f-head)', fontWeight: 800, fontSize: 24, letterSpacing: '-.025em' }}>
-          Поклонная
-        </span>
-        <span style={{ font: '500 17px var(--f-body)', color: 'var(--c-gray-text)' }}>гора</span>
+        <ChurchBrand />
       </button>
 
       <nav

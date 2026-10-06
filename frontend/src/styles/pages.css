@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 18px 32px;
+  padding: 16px 18px 0;
 }
 
 .home-grid {
@@ -16,11 +16,22 @@
 
 .home-hero { grid-column: 1 / 6; grid-row: 1 / 3; }
 .home-donate { grid-column: 1 / 3; grid-row: 3 / 4; }
-.home-address { grid-column: 3 / 6; grid-row: 3 / 4; }
+.home-address { grid-column: 3 / 6; grid-row: 3 / 4; align-self: start; }
 .home-news { grid-column: 6 / 9; grid-row: 1 / 2; }
 .home-schedule { grid-column: 6 / 9; grid-row: 2 / 4; }
 .home-blog { grid-column: 9 / 13; grid-row: 1 / 2; }
 .home-about { grid-column: 9 / 13; grid-row: 2 / 4; }
+
+@media (min-width: 1081px) {
+  .home-grid {
+    min-height: max(664px, calc(100dvh - 104px));
+    grid-template-rows: auto minmax(min-content, 1fr) auto;
+  }
+  .home-hero { min-height: min-content; padding: 68px 32px 32px !important; }
+  .home-schedule { padding: 16px !important; }
+  .home-about { padding: 20px !important; }
+  .home-address { align-self: stretch; }
+}
 
 @media (max-width: 1080px) {
   .home-grid {
@@ -126,7 +137,7 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
-    padding: 0 14px 118px;
+    padding: 0 14px;
   }
 
   .home-mobile-header {
@@ -134,35 +145,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 18px 18px 14px;
-  }
-
-  .home-mobile-logo {
-    min-width: 0;
-  }
-
-  .home-mobile-logo-main {
-    display: flex;
-    align-items: baseline;
-    gap: 7px;
-    font-family: var(--f-head);
-  }
-
-  .home-mobile-logo-main strong {
-    font-size: 17px;
-    font-weight: 800;
-    letter-spacing: -.02em;
-  }
-
-  .home-mobile-logo-main span {
-    font: 500 13px var(--f-body);
-    color: var(--c-gray-text);
-  }
-
-  .home-mobile-city {
-    font: 500 11.5px var(--f-body);
-    color: var(--c-gray-text-mute);
-    margin-top: 3px;
+    padding: 18px 4px 14px;
   }
 
   .home-mobile-lang {
@@ -383,144 +366,15 @@
     margin-top: 4px;
   }
 
-  .home-mobile-map {
-    border-radius: 24px;
-    overflow: hidden;
-    background: var(--c-panel);
-  }
-
-  .home-mobile-map-view {
-    position: relative;
-    height: 150px;
-    overflow: hidden;
-  }
-
-  .home-mobile-map-view iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-    display: block;
-  }
-
-  .home-mobile-map-label {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    z-index: 2;
-    display: inline-flex;
-    background: #fff;
-    padding: 8px 13px;
-    border-radius: 10px;
-    font-family: var(--f-head);
-    font-weight: 700;
-    font-size: 10px;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-  }
-
-  .home-mobile-map-body {
-    padding: 18px;
-  }
-
-  .home-mobile-address {
-    font-family: var(--f-head);
-    font-weight: 800;
-    font-size: 26px;
-    line-height: .94;
-    letter-spacing: -.03em;
-    text-transform: uppercase;
-  }
-
-  .home-mobile-map-info {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 14px;
-    font: 500 14px var(--f-body);
-    color: var(--c-gray-text);
-  }
-
-  .home-mobile-map-metro {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .home-mobile-map-metro-icon {
-    width: 18px;
-    height: 18px;
-    border-radius: 99px;
-    background: var(--c-purple);
-    color: #fff;
-    font: 700 10px var(--f-body);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .home-mobile-phone {
-    width: fit-content;
-    font-family: var(--f-head);
-    font-weight: 700;
-    font-size: 19px;
-  }
-
-  .home-mobile-map-bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-top: 18px;
-  }
-
-  .home-mobile-map-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 7px 7px 7px 18px;
-    border-radius: 99px;
-    background: var(--c-ink);
-    color: #fff;
-    font-family: var(--f-head);
-    font-weight: 700;
-    font-size: 12px;
-  }
-
-  .home-mobile-socials {
-    display: flex;
-    gap: 7px;
-  }
-
-  .home-mobile-social {
-    width: 38px;
-    height: 38px;
-    border-radius: 99px;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--f-head);
-    font-weight: 700;
-    font-size: 10px;
-  }
 }
 
 /* Mobile home: tighter top spacing (equal gap above and below the logo row),
-   no tagline and no extra empty space under the map */
+   no extra empty space under the map */
 @media (max-width: 860px) {
   .home-wrap.page-enter.container {
-    padding: 10px 18px 0 !important;
+    padding: 10px 0 0 !important;
   }
 
-  .home-mobile {
-    padding-bottom: 96px;
-  }
-
-  .home-tagline {
-    display: none !important;
-  }
 }
 
 @media (max-width: 370px) {

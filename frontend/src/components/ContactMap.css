@@ -1,0 +1,43 @@
+.contact-map {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: var(--c-panel);
+}
+
+.contact-map img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right bottom;
+}
+
+.contact-map-label {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  max-width: calc(100% - 156px);
+  background: #fff;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font: 400 14px/1.3 var(--f-body);
+}
+
+.contact-map-button.pill-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 6px 6px 14px;
+  background: var(--c-ink);
+  color: #fff;
+  min-height: 44px;
+  font: 400 14px/1.3 var(--f-body);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.contact-map:focus-visible {
+  outline: 3px solid var(--c-purple);
+  outline-offset: -3px;
+}

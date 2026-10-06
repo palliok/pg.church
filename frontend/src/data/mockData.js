@@ -11,11 +11,6 @@ export const church = {
   metro: tx('Озерки · 7 минут пешком'),
   phone: '+7 812 000-00-00',
   phoneHref: 'tel:+78120000000',
-  social: [
-    { code: 'TG', label: 'Telegram', href: '#' },
-    { code: 'YT', label: 'YouTube', href: '#' },
-    { code: 'IG', label: 'Instagram', href: '#' },
-  ],
 };
 
 export const duty = [
