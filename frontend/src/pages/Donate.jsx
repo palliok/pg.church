@@ -31,7 +31,7 @@ export default function Donate() {
   return (
     <div className="page-enter container" style={{ padding: '26px 16px 48px' }}>
       <div className="donate-layout">
-        <div style={{ borderRadius: 24, background: 'var(--c-yellow)', color: '#0d0d0d', padding: 'clamp(24px, 4vw, 40px)' }}>
+        <div style={{ borderRadius: 24, background: 'var(--c-main)', color: '#0d0d0d', padding: 'clamp(24px, 4vw, 40px)' }}>
           <div style={{ display: 'inline-flex', background: '#0d0d0d', color: '#fff', padding: '8px 13px', borderRadius: 9, fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase' }}>
             Пожертвование
           </div>
@@ -56,7 +56,7 @@ export default function Donate() {
 
           <a href="#pay" className="pill-btn" style={{ marginTop: 16, padding: '8px 8px 8px 26px', background: '#0d0d0d', color: '#fff' }}>
             <span style={{ fontSize: 15 }}>{t('Пожертвовать')} {amount.toLocaleString('ru-RU')} ₽</span>
-            <ArrowKnob size={44} bg="var(--c-yellow)" fg="#0d0d0d" />
+            <ArrowKnob size={44} bg="var(--c-main)" fg="#0d0d0d" />
           </a>
         </div>
 

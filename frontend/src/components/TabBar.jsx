@@ -94,7 +94,7 @@ export default function TabBar() {
               gap: 7,
               flex: '0 0 auto',
               transition: 'background .25s, color .25s',
-              background: isActive ? 'var(--c-yellow)' : 'transparent',
+              background: isActive ? 'var(--c-main)' : 'transparent',
               color: isActive ? 'var(--c-ink)' : 'rgba(255,255,255,.55)',
             })}
           >

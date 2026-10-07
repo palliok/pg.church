@@ -99,7 +99,7 @@ export default function Home() {
           </div>
           <div className="h-display" style={{ fontSize: 38 }}>
             Кто такой
-            <span style={{ display: 'block', fontWeight: 900, fontSize: 'clamp(48px, 8vw, 112px)', lineHeight: 0.8, letterSpacing: '-.05em', marginTop: 8, color: 'var(--c-yellow)' }}>
+            <span style={{ display: 'block', fontWeight: 900, fontSize: 'clamp(48px, 8vw, 112px)', lineHeight: 0.8, letterSpacing: '-.05em', marginTop: 8, color: 'var(--c-main)' }}>
               Иисус?
             </span>
           </div>
@@ -126,7 +126,7 @@ export default function Home() {
             position: 'relative',
             overflow: 'hidden',
             borderRadius: 24,
-            background: 'var(--c-yellow)',
+            background: 'var(--c-main)',
             color: '#0d0d0d',
             display: 'flex',
             flexDirection: 'column',
@@ -141,7 +141,7 @@ export default function Home() {
             <div className="h-display" style={{ fontSize: 24, lineHeight: 0.92 }}>Поддержать<br />служение</div>
             <span className="pill-btn" style={{ marginTop: 16, padding: '6px 6px 6px 20px', background: '#0d0d0d', color: '#fff' }}>
               <span style={{ fontSize: 11.5 }}>Пожертвовать</span>
-              <ArrowKnob size={34} bg="var(--c-yellow)" fg="#0d0d0d" />
+              <ArrowKnob size={34} bg="var(--c-main)" fg="#0d0d0d" />
             </span>
           </div>
         </Link>

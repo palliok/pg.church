@@ -66,7 +66,7 @@ export default function Header() {
               fontSize: 12,
               letterSpacing: '.02em',
               textTransform: 'uppercase',
-              background: isActive ? 'var(--c-yellow)' : 'transparent',
+              background: isActive ? 'var(--c-main)' : 'transparent',
               color: 'var(--c-ink)',
               boxShadow: 'none',
               transition: 'background .18s ease',
@@ -101,7 +101,7 @@ export default function Header() {
             );
           })}
         </div>
-        <NavLink to="/donate" className="pill-btn" style={{ background: 'var(--c-yellow)', color: 'var(--c-ink)', fontSize: 11.5, padding: '11px 20px' }}>
+        <NavLink to="/donate" className="pill-btn" style={{ background: 'var(--c-main)', color: 'var(--c-ink)', fontSize: 11.5, padding: '11px 20px' }}>
           Поддержать
         </NavLink>
       </div>

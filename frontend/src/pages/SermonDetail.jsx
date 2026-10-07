@@ -26,7 +26,7 @@ export default function SermonDetail() {
       <div className="split-layout" style={{ marginTop: 20 }}>
         <div>
           <div className="card-row">
-            <span className="icon-circle" style={{ width: 58, height: 58, background: 'var(--c-purple)', color: '#fff', fontFamily: 'var(--f-head)', fontWeight: 800, fontSize: 22 }}>
+            <span className="icon-circle" style={{ width: 58, height: 58, background: 'var(--c-second)', color: '#fff', fontFamily: 'var(--f-head)', fontWeight: 800, fontSize: 22 }}>
               {sermon.initial}
             </span>
             <span>
@@ -38,7 +38,7 @@ export default function SermonDetail() {
           </div>
 
           <div className="h-display" style={{ fontSize: 'clamp(32px, 5vw, 52px)', marginTop: 22, maxWidth: 760 }}>{sermon.topic}</div>
-          <div style={{ display: 'inline-flex', background: 'var(--c-yellow)', padding: '8px 13px', borderRadius: 8, fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 10.5, letterSpacing: '.08em', textTransform: 'uppercase', marginTop: 16 }}>
+          <div style={{ display: 'inline-flex', background: 'var(--c-main)', padding: '8px 13px', borderRadius: 8, fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 10.5, letterSpacing: '.08em', textTransform: 'uppercase', marginTop: 16 }}>
             {sermon.ref}
           </div>
           <p style={{ font: '500 17px/1.65 var(--f-body)', color: '#3a3a3a', margin: '18px 0 0', maxWidth: 720 }}>{sermon.intro}</p>
@@ -60,13 +60,13 @@ export default function SermonDetail() {
           <div style={{ borderRadius: 22, background: 'var(--c-panel)', padding: '24px 26px' }}>
             <div className="eyebrow">Ключевой стих</div>
             <div style={{ font: 'italic 500 19px/1.55 var(--f-body)', marginTop: 12 }}>{sermon.verse}</div>
-            <div style={{ fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--c-purple)', marginTop: 12 }}>
+            <div style={{ fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--c-second)', marginTop: 12 }}>
               {sermon.verseRef}
             </div>
           </div>
           <a href="#listen" className="pill-btn" style={{ padding: '8px 8px 8px 22px', background: '#0d0d0d', color: '#fff' }}>
             <span style={{ flex: 1, fontSize: 13 }}>{sermon.durationLabel}</span>
-            <ArrowKnob size={40} bg="var(--c-yellow)" fg="#0d0d0d" symbol="▶" />
+            <ArrowKnob size={40} bg="var(--c-main)" fg="#0d0d0d" symbol="▶" />
           </a>
         </div>
       </div>

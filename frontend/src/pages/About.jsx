@@ -81,7 +81,7 @@ export default function About() {
           <div
             style={{
               borderRadius: 24,
-              background: 'var(--c-purple)',
+              background: 'var(--c-second)',
               color: '#fff',
               padding: 26,
             }}

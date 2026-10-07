@@ -40,7 +40,7 @@ export default function EventDetail() {
                 {ev.tag}
               </span>
               {ev.main && (
-                <span style={{ background: 'var(--c-yellow)', color: '#0d0d0d', padding: '7px 13px', borderRadius: 8, fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase' }}>
+                <span style={{ background: 'var(--c-main)', color: '#0d0d0d', padding: '7px 13px', borderRadius: 8, fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase' }}>
                   Главное
                 </span>
               )}
@@ -68,7 +68,7 @@ export default function EventDetail() {
                 style={{ display: 'block', borderRadius: 22, background: 'var(--c-panel)', padding: '24px 26px', color: '#0d0d0d', marginTop: 12 }}
               >
                 <div className="card-row">
-                  <span className="icon-circle" style={{ width: 48, height: 48, background: 'var(--c-purple)', color: '#fff', fontFamily: 'var(--f-head)', fontWeight: 800, fontSize: 18 }}>
+                  <span className="icon-circle" style={{ width: 48, height: 48, background: 'var(--c-second)', color: '#fff', fontFamily: 'var(--f-head)', fontWeight: 800, fontSize: 18 }}>
                     {preacher.initial}
                   </span>
                   <span style={{ flex: 1, minWidth: 0 }}>
@@ -101,7 +101,7 @@ export default function EventDetail() {
             </div>
             <div className="card-row" style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid var(--c-line-soft)' }}>
               <span className="icon-circle" style={{ width: 52, height: 52, background: '#fff', flex: '0 0 auto' }}>
-                <span style={{ width: 15, height: 15, background: 'var(--c-red)', borderRadius: '50% 50% 50% 0', transform: 'rotate(-45deg)' }} />
+                <span style={{ width: 15, height: 15, background: 'var(--c-signal)', borderRadius: '50% 50% 50% 0', transform: 'rotate(-45deg)' }} />
               </span>
               <span style={{ flex: 1, minWidth: 0 }}>
                 <div className="eyebrow">Где</div>
@@ -112,7 +112,7 @@ export default function EventDetail() {
             <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
               <a href="#calendar" className="pill-btn" style={{ flex: 1, padding: '7px 7px 7px 20px', background: '#0d0d0d', color: '#fff' }}>
                 <span style={{ flex: 1, fontSize: 12 }}>В календарь</span>
-                <ArrowKnob size={36} bg="var(--c-yellow)" fg="#0d0d0d" symbol="＋" />
+                <ArrowKnob size={36} bg="var(--c-main)" fg="#0d0d0d" symbol="＋" />
               </a>
               <ArrowKnob as="a" href="#share" size={50} bg="#fff" fg="#0d0d0d" />
             </div>

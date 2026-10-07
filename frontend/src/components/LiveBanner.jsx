@@ -37,7 +37,7 @@ export default function LiveBanner() {
       <a
         href="#watch"
         className="pill-btn"
-        style={{ background: 'var(--c-yellow)', color: 'var(--c-ink)', fontSize: 10, padding: '8px 15px' }}
+        style={{ background: 'var(--c-main)', color: 'var(--c-ink)', fontSize: 10, padding: '8px 15px' }}
       >
         <span className="live-play-d">▶ </span>
         <span className="play-dot" aria-hidden="true">

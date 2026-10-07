@@ -96,7 +96,7 @@ export default function Songs() {
                 <button
                   onClick={() => toggleFav(s.id)}
                   aria-label={t('В избранное')}
-                  style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: favs.has(s.id) ? 'var(--c-yellow-dark)' : 'var(--c-gray-text-mute)' }}
+                  style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: favs.has(s.id) ? 'var(--c-second)' : 'var(--c-gray-text-mute)' }}
                 >
                   {favs.has(s.id) ? '★' : '☆'}
                 </button>

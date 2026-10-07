@@ -12,13 +12,11 @@
   --c-panel-hover: #eaeaec;
   --c-line: rgba(13, 13, 13, 0.12);
   --c-line-soft: rgba(13, 13, 13, 0.14);
-  --c-purple: #7c4dff;
-  --c-purple-dark: #4a1fd6;
-  --c-yellow: rgb(0, 183, 227);
-  --c-yellow-dark: rgb(2, 64, 125);
-  --c-salmon: #f9c9a5;
-  --c-salmon-dark: #ef8f5a;
-  --c-red: #ec3a2f;
+  --c-main: rgb(0, 183, 227);
+  --c-second: rgb(2, 64, 125);
+  --c-third: #f9c9a5;
+  --c-third-dark: #ef8f5a;
+  --c-signal: #ec3a2f;
   --c-white-70: rgba(255, 255, 255, 0.7);
   --c-white-55: rgba(255, 255, 255, 0.55);
   --c-white-45: rgba(255, 255, 255, 0.45);
@@ -114,7 +112,7 @@ input, textarea, select { font-family: inherit; }
   width: 8px;
   height: 8px;
   border-radius: 99px;
-  background: var(--c-red);
+  background: var(--c-signal);
   animation: livePulse 1.8s ease-out infinite;
 }
 

@@ -30,8 +30,8 @@ export const news = [
     id: 'n1',
     date: tx('14 июня'),
     title: tx('Как прошёл выезд молодёжи на природу'),
-    tags: [{ label: tx('Вера'), color: '#fff' }, { label: tx('Новичкам'), color: 'var(--c-yellow)' }],
-    gradient: 'linear-gradient(150deg, #7c4dff, #4a1fd6)',
+    tags: [{ label: tx('Вера'), color: '#fff' }, { label: tx('Новичкам'), color: 'var(--c-main)' }],
+    gradient: 'linear-gradient(150deg, var(--c-second), var(--c-ink))',
     excerpt: tx('Молодёжка выбралась на выходные за город: разговоры у костра, игры и время в слове.'),
   },
   {
@@ -39,14 +39,14 @@ export const news = [
     date: tx('9 июня'),
     title: tx('Запустили курс для тех, кто только начинает'),
     tags: [{ label: tx('Вопросы'), color: '#fff' }, { label: tx('Церковь'), color: '#f9c9a5' }],
-    gradient: 'linear-gradient(150deg, var(--c-yellow), var(--c-yellow-dark))',
+    gradient: 'linear-gradient(150deg, var(--c-main), var(--c-second))',
     excerpt: tx('Шестинедельный курс об основах веры для новых прихожан и всех, кто хочет разобраться.'),
   },
   {
     id: 'n3',
     date: tx('1 июня'),
     title: tx('Детский праздник ко Дню защиты детей'),
-    tags: [{ label: tx('Семья'), color: '#fff' }, { label: tx('Отношения'), color: '#7c4dff', text: '#fff' }],
+    tags: [{ label: tx('Семья'), color: '#fff' }, { label: tx('Отношения'), color: 'var(--c-second)', text: '#fff' }],
     gradient: 'linear-gradient(150deg, #f9c9a5, #ef8f5a)',
     excerpt: tx('Игры, мастер-классы и много смеха — детский двор церкви устроил праздник для всех семей.'),
   },
@@ -56,19 +56,19 @@ export const blog = [
   {
     id: 'b1',
     title: tx('Как читать Библию, если только начал'),
-    tags: [{ label: tx('Вера'), color: '#fff' }, { label: tx('Новичкам'), color: 'var(--c-yellow)' }],
-    gradient: 'linear-gradient(150deg, #7c4dff, #4a1fd6)',
+    tags: [{ label: tx('Вера'), color: '#fff' }, { label: tx('Новичкам'), color: 'var(--c-main)' }],
+    gradient: 'linear-gradient(150deg, var(--c-second), var(--c-ink))',
   },
   {
     id: 'b2',
     title: tx('Зачем вообще нужна церковь'),
     tags: [{ label: tx('Вопросы'), color: '#fff' }, { label: tx('Церковь'), color: '#f9c9a5' }],
-    gradient: 'linear-gradient(150deg, var(--c-yellow), var(--c-yellow-dark))',
+    gradient: 'linear-gradient(150deg, var(--c-main), var(--c-second))',
   },
   {
     id: 'b3',
     title: tx('О прощении — простыми словами'),
-    tags: [{ label: tx('Семья'), color: '#fff' }, { label: tx('Отношения'), color: '#7c4dff', text: '#fff' }],
+    tags: [{ label: tx('Семья'), color: '#fff' }, { label: tx('Отношения'), color: 'var(--c-second)', text: '#fff' }],
     gradient: 'linear-gradient(150deg, #f9c9a5, #ef8f5a)',
   },
 ];
@@ -195,9 +195,9 @@ export const songs = Array.from({ length: 24 }).map((_, i) => {
 });
 
 export const donationTargets = [
-  { title: tx('Служение и аренда зала'), desc: tx('Воскресные богослужения и будние встречи'), color: '#7c4dff' },
+  { title: tx('Служение и аренда зала'), desc: tx('Воскресные богослужения и будние встречи'), color: 'var(--c-second)' },
   { title: tx('Помощь нуждающимся'), desc: tx('Продукты, лекарства, адресная поддержка'), color: '#f9c9a5' },
-  { title: tx('Детское и молодёжное служение'), desc: tx('Выезды, материалы, лагеря'), color: 'var(--c-yellow)' },
+  { title: tx('Детское и молодёжное служение'), desc: tx('Выезды, материалы, лагеря'), color: 'var(--c-main)' },
 ];
 
 export const donationAmounts = [500, 1000, 3000];
