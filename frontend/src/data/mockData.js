@@ -30,7 +30,7 @@ export const news = [
     id: 'n1',
     date: tx('14 июня'),
     title: tx('Как прошёл выезд молодёжи на природу'),
-    tags: [{ label: tx('Вера'), color: '#fff' }, { label: tx('Новичкам'), color: '#ffd60a' }],
+    tags: [{ label: tx('Вера'), color: '#fff' }, { label: tx('Новичкам'), color: 'var(--c-yellow)' }],
     gradient: 'linear-gradient(150deg, #7c4dff, #4a1fd6)',
     excerpt: tx('Молодёжка выбралась на выходные за город: разговоры у костра, игры и время в слове.'),
   },
@@ -39,7 +39,7 @@ export const news = [
     date: tx('9 июня'),
     title: tx('Запустили курс для тех, кто только начинает'),
     tags: [{ label: tx('Вопросы'), color: '#fff' }, { label: tx('Церковь'), color: '#f9c9a5' }],
-    gradient: 'linear-gradient(150deg, #ffd60a, #f0a500)',
+    gradient: 'linear-gradient(150deg, var(--c-yellow), var(--c-yellow-dark))',
     excerpt: tx('Шестинедельный курс об основах веры для новых прихожан и всех, кто хочет разобраться.'),
   },
   {
@@ -56,14 +56,14 @@ export const blog = [
   {
     id: 'b1',
     title: tx('Как читать Библию, если только начал'),
-    tags: [{ label: tx('Вера'), color: '#fff' }, { label: tx('Новичкам'), color: '#ffd60a' }],
+    tags: [{ label: tx('Вера'), color: '#fff' }, { label: tx('Новичкам'), color: 'var(--c-yellow)' }],
     gradient: 'linear-gradient(150deg, #7c4dff, #4a1fd6)',
   },
   {
     id: 'b2',
     title: tx('Зачем вообще нужна церковь'),
     tags: [{ label: tx('Вопросы'), color: '#fff' }, { label: tx('Церковь'), color: '#f9c9a5' }],
-    gradient: 'linear-gradient(150deg, #ffd60a, #f0a500)',
+    gradient: 'linear-gradient(150deg, var(--c-yellow), var(--c-yellow-dark))',
   },
   {
     id: 'b3',
@@ -197,7 +197,7 @@ export const songs = Array.from({ length: 24 }).map((_, i) => {
 export const donationTargets = [
   { title: tx('Служение и аренда зала'), desc: tx('Воскресные богослужения и будние встречи'), color: '#7c4dff' },
   { title: tx('Помощь нуждающимся'), desc: tx('Продукты, лекарства, адресная поддержка'), color: '#f9c9a5' },
-  { title: tx('Детское и молодёжное служение'), desc: tx('Выезды, материалы, лагеря'), color: '#ffd60a' },
+  { title: tx('Детское и молодёжное служение'), desc: tx('Выезды, материалы, лагеря'), color: 'var(--c-yellow)' },
 ];
 
 export const donationAmounts = [500, 1000, 3000];

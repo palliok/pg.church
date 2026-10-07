@@ -28,16 +28,19 @@
 
 @media (min-width: 1081px) {
   .home-grid {
+    grid-template-columns: minmax(0, 5fr) repeat(2, minmax(0, 3.5fr));
     min-height: max(664px, calc(100dvh - 104px));
     grid-template-rows: auto minmax(0, 1fr) auto;
   }
-  .home-left { display: flex; flex-direction: column; grid-column: 1 / 6; grid-row: 1 / 4; gap: inherit; min-height: 0; }
+  .home-left { display: flex; flex-direction: column; grid-column: 1 / 2; grid-row: 1 / 4; gap: inherit; min-height: 0; }
+  .home-schedule-column { grid-column: 2 / 3; }
+  .home-donate-column, .home-about { grid-column: 3 / 4; }
   .home-left > .home-address { flex-shrink: 0; align-self: stretch; }
   .home-hero { flex: 1; min-height: min-content; padding: 60px 32px 16px !important; }
   .home-schedule { min-height: min-content; padding: 16px !important; }
-  .home-church { position: relative; height: calc(var(--donation-height, 190px) - 14px); flex-shrink: 0; transform: translateY(-60px); }
+  .home-church { position: relative; z-index: 1; height: calc(var(--donation-height, 190px) - 14px); flex-shrink: 0; transform: translateY(-60px); }
   .home-church img { position: absolute; bottom: 0; transform: translateY(38%); pointer-events: none; }
-  .home-church-people { display: block; width: 100%; height: clamp(100px, 9vw, 130px); object-fit: cover; object-position: center 55%; }
+  .home-church-people { display: block; width: 100%; height: auto; flex-shrink: 0; }
   .home-donate { padding: 16px 18px !important; gap: 14px; }
   .home-about { min-height: min-content; padding: 20px !important; }
 }

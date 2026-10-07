@@ -145,12 +145,12 @@ export default function Home() {
             </span>
           </div>
         </Link>
-        <img className="home-church-people" src="/church-people-details.png" alt="" />
+        <img className="home-church-people" src="/church-people-details-v3.png" alt="" />
         </div>
 
         <div className="home-schedule-column" ref={scheduleColumnRef}>
         <div className="home-church">
-          <img src="/church-with-people-details.png" alt="" />
+          <img src="/church-with-people-details-v6.png" alt="" />
         </div>
 
         {/* Расписание */}

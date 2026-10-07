@@ -14,8 +14,8 @@
   --c-line-soft: rgba(13, 13, 13, 0.14);
   --c-purple: #7c4dff;
   --c-purple-dark: #4a1fd6;
-  --c-yellow: #ffd60a;
-  --c-yellow-dark: #f0a500;
+  --c-yellow: rgb(0, 183, 227);
+  --c-yellow-dark: rgb(2, 64, 125);
   --c-salmon: #f9c9a5;
   --c-salmon-dark: #ef8f5a;
   --c-red: #ec3a2f;
