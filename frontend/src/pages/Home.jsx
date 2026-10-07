@@ -116,38 +116,6 @@ export default function Home() {
         <ContactsCard className="home-address" />
         </div>
 
-        {/* Пожертвование */}
-        <div className="home-donate-column">
-        <Link
-          to="/donate"
-          className="home-donate"
-          ref={donationRef}
-          style={{
-            position: 'relative',
-            overflow: 'hidden',
-            borderRadius: 24,
-            background: 'var(--c-main)',
-            color: '#0d0d0d',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: '22px 18px',
-          }}
-        >
-          <div style={{ alignSelf: 'flex-start', background: '#0d0d0d', color: '#fff', padding: '7px 12px', borderRadius: 9, fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase' }}>
-            Пожертвование
-          </div>
-          <div>
-            <div className="h-display" style={{ fontSize: 24, lineHeight: 0.92 }}>Поддержать<br />служение</div>
-            <span className="pill-btn" style={{ marginTop: 16, padding: '6px 6px 6px 20px', background: '#0d0d0d', color: '#fff' }}>
-              <span style={{ fontSize: 11.5 }}>Пожертвовать</span>
-              <ArrowKnob size={34} bg="var(--c-main)" fg="#0d0d0d" />
-            </span>
-          </div>
-        </Link>
-        <img className="home-church-people" src="/church-people-details-v3.png" alt="" />
-        </div>
-
         <div className="home-schedule-column" ref={scheduleColumnRef}>
         <div className="home-church">
           <img src="/church-with-people-details-v6.png" alt="" />
@@ -178,6 +146,39 @@ export default function Home() {
           </div>
         </div>
 
+        </div>
+
+        <div className="home-right">
+        {/* Пожертвование */}
+        <div className="home-donate-column">
+        <Link
+          to="/donate"
+          className="home-donate"
+          ref={donationRef}
+          style={{
+            position: 'relative',
+            overflow: 'hidden',
+            borderRadius: 24,
+            background: 'var(--c-main)',
+            color: '#0d0d0d',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            padding: '22px 18px',
+          }}
+        >
+          <div style={{ alignSelf: 'flex-start', background: '#0d0d0d', color: '#fff', padding: '7px 12px', borderRadius: 9, fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase' }}>
+            Пожертвование
+          </div>
+          <div>
+            <div className="h-display" style={{ fontSize: 24, lineHeight: 0.92 }}>Поддержать<br />служение</div>
+            <span className="pill-btn" style={{ marginTop: 16, padding: '6px 6px 6px 20px', background: '#0d0d0d', color: '#fff' }}>
+              <span style={{ fontSize: 11.5 }}>Пожертвовать</span>
+              <ArrowKnob size={34} bg="var(--c-main)" fg="#0d0d0d" />
+            </span>
+          </div>
+        </Link>
+        <img className="home-church-people" src="/church-people-details-v3.png" alt="" />
         </div>
 
         {/* Кто мы */}
@@ -218,6 +219,7 @@ export default function Home() {
             </div>
           </div>
         </Link>
+        </div>
       </div>
 
     </div>
