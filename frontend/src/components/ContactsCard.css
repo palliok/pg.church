@@ -19,8 +19,8 @@
 .contacts-card-info { font: 500 14px var(--f-body); color: var(--c-gray-text); display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
 
 .contacts-card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
-.contacts-card-socials { display: flex; gap: 7px; flex: 0 1 128px; min-width: 0; }
-.contacts-card-social.icon-circle { width: 38px; height: auto; aspect-ratio: 1; flex: 1; min-width: 0; background: #fff; font-family: var(--f-head); font-weight: 700; font-size: 10px; }
+.contacts-card-socials { display: flex; justify-content: flex-end; gap: 7px; flex: 0 1 128px; min-width: 0; }
+.contacts-card-social.icon-circle { width: 38px; max-width: 38px; height: auto; aspect-ratio: 1; flex: 1; min-width: 0; background: #fff; font-family: var(--f-head); font-weight: 700; font-size: 10px; }
 .contacts-card-phone { width: fit-content; white-space: nowrap; font-family: var(--f-head); font-weight: 700; font-size: 19px; color: var(--c-ink); }
 .contacts-card-metro-icon {
   width: 18px;

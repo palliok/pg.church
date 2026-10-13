@@ -1,10 +1,14 @@
-import { church } from '../data/mockData.js';
+import { useChurch } from '../api/church.js';
 import './ContactsCard.css';
 
 const MAP_URL = 'https://yandex.ru/maps/-/CXeDE0zH';
 const MAP_EMBED_URL = 'https://yandex.ru/map-widget/v1/?um=constructor%3A406ce76e3eab2cea5d9dd707c1d06b8a569aac16f7129a3526693a2407a42d39&source=constructor';
 
 export default function ContactsCard({ className = '' }) {
+  const church = useChurch();
+  // Адрес набран крупно в две строки: первое слово и всё остальное.
+  const [addressStart, ...addressRest] = (church?.address ?? '').split(' ');
+
   return (
     <div className={`contacts-card ${className}`}>
       <div className="contacts-card-map">
@@ -21,21 +25,24 @@ export default function ContactsCard({ className = '' }) {
 
       <div className="contacts-card-body">
         <div className="contacts-card-address">
-          Большая<br />Озёрная, 27
+          {addressStart}
+          {addressRest.length > 0 && <><br />{addressRest.join(' ')}</>}
         </div>
 
-        <div className="contacts-card-info">
-          <div className="contacts-card-metro">
-            <span className="contacts-card-metro-icon">М</span>
-            {church.metro}
+        {church?.metro && (
+          <div className="contacts-card-info">
+            <div className="contacts-card-metro">
+              <span className="contacts-card-metro-icon">М</span>
+              {church.metro}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="contacts-card-bottom">
-          <a href={church.phoneHref} className="contacts-card-phone">{church.phone}</a>
+          {church?.phone && <a href={church.phoneHref} className="contacts-card-phone">{church.phone}</a>}
           <div className="contacts-card-socials">
-            {church.social.map((s) => (
-              <a key={s.code} href={s.href} title={s.label} className="contacts-card-social icon-circle">
+            {(church?.social ?? []).map((s) => (
+              <a key={s.code} href={s.href} title={s.label} target="_blank" rel="noreferrer" className="contacts-card-social icon-circle">
                 {s.code}
               </a>
             ))}

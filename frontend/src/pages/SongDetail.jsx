@@ -1,15 +1,26 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ArrowKnob from '../components/ArrowKnob.jsx';
-import { songs } from '../data/mockData.js';
+import LoadStatus from '../components/LoadStatus.jsx';
+import SongText from '../components/SongText.jsx';
+import { useSong } from '../api/songs.js';
 
 const FONT_SIZES = [16, 19, 23];
 const FONT_LABELS = ['S', 'M', 'L'];
 
 export default function SongDetail() {
   const { id } = useParams();
-  const song = songs.find((s) => String(s.id) === id);
+  const { song, loading, error, retry } = useSong(id);
   const [fontStep, setFontStep] = useState(1);
+  const [chords, setChords] = useState(false);
+
+  if (loading || error) {
+    return (
+      <div className="page-enter container" style={{ padding: '40px 16px' }}>
+        <LoadStatus error={error} onRetry={retry} />
+      </div>
+    );
+  }
 
   if (!song) {
     return (
@@ -27,17 +38,29 @@ export default function SongDetail() {
           <ArrowKnob size={30} bg="#fff" fg="#0d0d0d" symbol="←" />
           <span style={{ fontSize: 11.5 }}>Сборник</span>
         </Link>
-        <div style={{ display: 'flex', gap: 3, padding: 4, borderRadius: 999, background: 'var(--c-panel)' }}>
-          {FONT_LABELS.map((label, i) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {song.hasChords && (
             <button
-              key={label}
-              onClick={() => setFontStep(i)}
+              onClick={() => setChords((on) => !on)}
+              aria-pressed={chords}
               className="pill-btn"
-              style={{ padding: '8px 14px', fontSize: 11, background: fontStep === i ? '#0d0d0d' : 'transparent', color: fontStep === i ? '#fff' : '#0d0d0d' }}
+              style={{ padding: '0 18px', height: 44, fontSize: 11, background: chords ? '#0d0d0d' : 'var(--c-panel)', color: chords ? '#fff' : '#0d0d0d' }}
             >
-              {label}
+              Аккорды
             </button>
-          ))}
+          )}
+          <div style={{ display: 'flex', gap: 3, padding: 4, borderRadius: 999, background: 'var(--c-panel)' }}>
+            {FONT_LABELS.map((label, i) => (
+              <button
+                key={label}
+                onClick={() => setFontStep(i)}
+                className="pill-btn"
+                style={{ padding: '8px 14px', fontSize: 11, background: fontStep === i ? '#0d0d0d' : 'transparent', color: fontStep === i ? '#fff' : '#0d0d0d' }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -48,27 +71,7 @@ export default function SongDetail() {
       <div style={{ font: '600 13px var(--f-body)', color: 'var(--c-gray-text)', marginTop: 6 }}>{song.sub}</div>
 
       <div style={{ marginTop: 30 }}>
-        {song.lyrics.map((line, i) => {
-          const isLabel = line.length < 20;
-          return (
-            <p
-              key={i}
-              style={{
-                margin: '0 0 20px',
-                whiteSpace: 'pre-line',
-                fontFamily: isLabel ? 'var(--f-head)' : 'var(--f-body)',
-                fontWeight: isLabel ? 700 : 500,
-                fontSize: isLabel ? 11 : FONT_SIZES[fontStep],
-                lineHeight: isLabel ? 1 : 1.75,
-                letterSpacing: isLabel ? '.12em' : 'normal',
-                textTransform: isLabel ? 'uppercase' : 'none',
-                color: isLabel ? 'var(--c-gray-text-mute)' : '#1a1a1a',
-              }}
-            >
-              {line}
-            </p>
-          );
-        })}
+        <SongText sections={song.sections} chords={chords} fontSize={FONT_SIZES[fontStep]} />
       </div>
     </div>
   );
