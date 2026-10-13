@@ -4,9 +4,13 @@ import { useLayoutEffect, useRef } from 'react';
 import ArrowKnob from '../components/ArrowKnob.jsx';
 import ChurchBrand from '../components/ChurchBrand.jsx';
 import ContactsCard from '../components/ContactsCard.jsx';
-import { duty, homeEvents } from '../data/mockData.js';
+import { useChurch } from '../api/church.js';
+import { useEvents } from '../api/events.js';
 
 export default function Home() {
+  const { events: homeEvents, error: eventsError } = useEvents({ limit: 3 });
+  const nextEvent = homeEvents[0];
+  const duty = useChurch()?.duty;
   const donationRef = useRef(null);
   const scheduleColumnRef = useRef(null);
 
@@ -62,14 +66,16 @@ export default function Home() {
           </span>
         </Link>
 
-        <Link to="/schedule/e28" className="home-mobile-next">
-          <div style={{ minWidth: 0 }}>
-            <div className="home-mobile-next-label">Ближайшее · 28 июня</div>
-            <div className="home-mobile-next-title">Богослужение</div>
-            <div className="home-mobile-next-meta">Воскресенье · 11:00 · Главный зал</div>
-          </div>
-          <span className="home-mobile-arrow">↗</span>
-        </Link>
+        {nextEvent && (
+          <Link to={`/schedule/${nextEvent.id}`} className="home-mobile-next">
+            <div style={{ minWidth: 0 }}>
+              <div className="home-mobile-next-label">{t('Ближайшее')} · {nextEvent.dateLabel}</div>
+              <div className="home-mobile-next-title">{nextEvent.title}</div>
+              <div className="home-mobile-next-meta">{nextEvent.when}</div>
+            </div>
+            <span className="home-mobile-arrow">↗</span>
+          </Link>
+        )}
 
         <ContactsCard />
       </div>
@@ -138,11 +144,14 @@ export default function Home() {
                 </span>
                 <span style={{ flex: 1, minWidth: 0 }}>
                   <span style={{ display: 'block', fontFamily: 'var(--f-head)', fontWeight: 600, fontSize: 17, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.title}</span>
-                  <span style={{ display: 'block', font: '500 11.5px var(--f-body)', color: 'var(--c-gray-text)', marginTop: 2 }}>{e.sub}</span>
+                  <span style={{ display: 'block', font: '500 11.5px var(--f-body)', color: 'var(--c-gray-text)', marginTop: 2 }}>{e.when}</span>
                 </span>
                 <span style={{ color: 'var(--c-gray-text-mute)' }}>↗</span>
               </Link>
             ))}
+            {eventsError && (
+              <div role="alert" style={{ font: '500 12.5px/1.5 var(--f-body)', color: 'var(--c-gray-text)' }}>Не удалось загрузить данные.</div>
+            )}
           </div>
         </div>
 
@@ -203,13 +212,14 @@ export default function Home() {
           <p style={{ font: '500 14px/1.5 var(--f-body)', color: 'rgba(255,255,255,.72)', maxWidth: 300, margin: '11px 0 0' }}>
             Наша история, во что мы верим и команда, которая ждёт именно тебя.
           </p>
+          {duty?.shifts.length > 0 && (
           <div style={{ marginTop: 18, padding: 16, borderRadius: 18, background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)' }}>
             <div style={{ fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 8.5, letterSpacing: '.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,.5)' }}>
-              Дежурство служителей · 10:00–18:00
+              {[t('Дежурство служителей'), duty.hours].filter(Boolean).join(' · ')}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginTop: 12 }}>
-              {duty.map((d) => (
-                <div key={d.dow} className="card-row">
+              {duty.shifts.map((d, i) => (
+                <div key={i} className="card-row">
                   <span className="icon-circle" style={{ flex: '0 0 30px', height: 30, background: 'rgba(255,255,255,.12)', fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 10, textTransform: 'uppercase' }}>
                     {d.dow}
                   </span>
@@ -218,6 +228,7 @@ export default function Home() {
               ))}
             </div>
           </div>
+          )}
         </Link>
         </div>
       </div>

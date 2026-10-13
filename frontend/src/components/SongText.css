@@ -1,0 +1,47 @@
+.song-text .song-label {
+  margin: 0 0 var(--song-gap);
+  font: 700 11px/1 var(--f-head);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--c-gray-text-mute);
+}
+
+.song-text .song-lines {
+  margin: 0 0 var(--song-gap);
+  font-family: var(--f-body);
+  font-weight: 500;
+  line-height: 1.75;
+  color: #1a1a1a;
+}
+
+/* Строка с аккордами переносится по словам; внутри слова каждый аккорд стоит
+   над своим кусочком текста. */
+.song-text .song-line-chords {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  line-height: 1.35;
+  margin-top: .35em;
+}
+
+.song-text .song-word {
+  display: inline-flex;
+  align-items: flex-end;
+}
+
+.song-text .song-piece {
+  display: inline-flex;
+  flex-direction: column;
+  white-space: pre;
+}
+
+.song-text .song-chord {
+  padding-right: .45em;
+  font: 700 .74em/1.3 var(--f-head);
+  color: var(--c-second);
+}
+
+.song-text .song-chord-over {
+  width: 0;
+  padding-right: 0;
+}

@@ -1,11 +1,21 @@
+import { t } from '../i18n.js';
 import { Link, useParams } from 'react-router-dom';
 import ArrowKnob from '../components/ArrowKnob.jsx';
-import { events, sermons } from '../data/mockData.js';
+import LoadStatus from '../components/LoadStatus.jsx';
+import { useEvent } from '../api/events.js';
 
 export default function SermonDetail() {
   const { id } = useParams();
-  const ev = events.find((e) => e.id === id);
-  const sermon = ev?.preachers?.[0] ? sermons[ev.preachers[0].id] : null;
+  const { event: ev, loading, error, retry } = useEvent(id);
+  const sermon = ev?.sermon;
+
+  if (loading || error) {
+    return (
+      <div className="page-enter container" style={{ padding: '40px 16px' }}>
+        <LoadStatus error={error} onRetry={retry} />
+      </div>
+    );
+  }
 
   if (!ev || !sermon) {
     return (
@@ -64,10 +74,12 @@ export default function SermonDetail() {
               {sermon.verseRef}
             </div>
           </div>
-          <a href="#listen" className="pill-btn" style={{ padding: '8px 8px 8px 22px', background: '#0d0d0d', color: '#fff' }}>
-            <span style={{ flex: 1, fontSize: 13 }}>{sermon.durationLabel}</span>
-            <ArrowKnob size={40} bg="var(--c-main)" fg="#0d0d0d" symbol="▶" />
-          </a>
+          {(sermon.audioUrl || sermon.durationLabel) && (
+            <a href={sermon.audioUrl ?? '#listen'} className="pill-btn" style={{ padding: '8px 8px 8px 22px', background: '#0d0d0d', color: '#fff' }}>
+              <span style={{ flex: 1, fontSize: 13 }}>{sermon.durationLabel ?? t('Слушать')}</span>
+              <ArrowKnob size={40} bg="var(--c-main)" fg="#0d0d0d" symbol="▶" />
+            </a>
+          )}
         </div>
       </div>
     </div>

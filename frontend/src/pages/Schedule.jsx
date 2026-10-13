@@ -1,19 +1,24 @@
 import { t } from '../i18n.js';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { events } from '../data/mockData.js';
+import { useEvents } from '../api/events.js';
+import LoadStatus from '../components/LoadStatus.jsx';
 
 const MONTHS = [t('Январь'),t('Февраль'),t('Март'),t('Апрель'),t('Май'),t('Июнь'),t('Июль'),t('Август'),t('Сентябрь'),t('Октябрь'),t('Ноябрь'),t('Декабрь')];
 
+// Месяц с годом: в расписании могут оказаться, например, декабрь и январь.
+const monthKey = (e) => `${e.year}-${e.month}`;
+
 export default function Schedule() {
+  const { events, loading, error, retry } = useEvents();
   const [monthFilter, setMonthFilter] = useState('all');
 
   const filtered = useMemo(() => {
     if (monthFilter === 'all') return events;
-    return events.filter((e) => e.month === monthFilter);
-  }, [monthFilter]);
+    return events.filter((e) => monthKey(e) === monthFilter);
+  }, [events, monthFilter]);
 
-  const months = useMemo(() => [...new Set(events.map((e) => e.month))], []);
+  const months = useMemo(() => [...new Map(events.map((e) => [monthKey(e), e.month]))], [events]);
 
   return (
     <div className="page-enter container" style={{ padding: '26px 16px 48px' }}>
@@ -34,18 +39,18 @@ export default function Schedule() {
           >
             Все
           </button>
-          {months.map((m) => (
+          {months.map(([key, month]) => (
             <button
-              key={m}
-              onClick={() => setMonthFilter(m)}
+              key={key}
+              onClick={() => setMonthFilter(key)}
               className="pill-btn"
               style={{
                 padding: '11px 18px', fontSize: 11.5,
-                background: monthFilter === m ? '#0d0d0d' : 'var(--c-panel)',
-                color: monthFilter === m ? '#fff' : '#0d0d0d',
+                background: monthFilter === key ? '#0d0d0d' : 'var(--c-panel)',
+                color: monthFilter === key ? '#fff' : '#0d0d0d',
               }}
             >
-              {MONTHS[m]}
+              {MONTHS[month - 1]}
             </button>
           ))}
         </div>
@@ -82,7 +87,9 @@ export default function Schedule() {
           </Link>
         ))}
 
-        {filtered.length === 0 && (
+        {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
+
+        {!loading && !error && filtered.length === 0 && (
           <div style={{ padding: '56px 20px', borderRadius: 24, background: 'var(--c-panel)', textAlign: 'center' }}>
             <div className="h-display" style={{ fontSize: 22 }}>Ничего не нашлось</div>
             <div style={{ font: '500 14px/1.5 var(--f-body)', color: 'var(--c-gray-text)', marginTop: 8 }}>

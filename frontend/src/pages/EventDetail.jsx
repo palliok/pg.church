@@ -1,10 +1,19 @@
 import { Link, useParams } from 'react-router-dom';
 import ArrowKnob from '../components/ArrowKnob.jsx';
-import { events, sermons, songs } from '../data/mockData.js';
+import LoadStatus from '../components/LoadStatus.jsx';
+import { useEvent } from '../api/events.js';
 
 export default function EventDetail() {
   const { id } = useParams();
-  const ev = events.find((e) => e.id === id);
+  const { event: ev, loading, error, retry } = useEvent(id);
+
+  if (loading || error) {
+    return (
+      <div className="page-enter container" style={{ padding: '40px 16px' }}>
+        <LoadStatus error={error} onRetry={retry} />
+      </div>
+    );
+  }
 
   if (!ev) {
     return (
@@ -15,8 +24,8 @@ export default function EventDetail() {
     );
   }
 
-  const preacher = ev.preachers?.[0] ? sermons[ev.preachers[0].id] : null;
-  const eventHymns = songs.filter((s) => ev.hymnIds?.includes(s.id));
+  const preacher = ev.sermon;
+  const eventHymns = ev.hymns ?? [];
 
   return (
     <div className="page-enter container" style={{ padding: '20px 16px 48px' }}>

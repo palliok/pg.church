@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { t } from '../i18n.js';
 import ArrowKnob from '../components/ArrowKnob.jsx';
-import { donationAmounts, donationBankDetails, donationTargets } from '../data/mockData.js';
+import LoadStatus from '../components/LoadStatus.jsx';
+import { useDonation } from '../api/donation.js';
+
+// Реквизиты-тексты; остальные — числа, их не переносим и выравниваем по цифрам.
+const TEXT_FIELDS = new Set(['recipient', 'bank']);
 
 function CopyIndicator({ state }) {
   const message = state === 'success' ? 'Скопировано' : state === 'error' ? 'Не удалось скопировать. Скопируйте текст вручную.' : state === 'pending' ? 'Копирование' : '';
@@ -14,7 +18,11 @@ function CopyIndicator({ state }) {
 }
 
 export default function Donate() {
-  const [amount, setAmount] = useState(donationAmounts[1]);
+  const { donation, loading, error, retry } = useDonation();
+  const amounts = donation?.amounts ?? [];
+  const [chosenAmount, setAmount] = useState(null);
+  // Пока посетитель не выбрал сумму сам, выбрана вторая из предложенных.
+  const amount = chosenAmount ?? amounts[1] ?? amounts[0];
   const [copyStatus, setCopyStatus] = useState({ key: '', state: '' });
   const copying = copyStatus.state === 'pending';
 
@@ -42,7 +50,7 @@ export default function Donate() {
           </p>
 
           <div style={{ display: 'flex', gap: 10, marginTop: 28, flexWrap: 'wrap' }}>
-            {donationAmounts.map((a) => (
+            {amounts.map((a) => (
               <button
                 key={a}
                 onClick={() => setAmount(a)}
@@ -55,7 +63,7 @@ export default function Donate() {
           </div>
 
           <a href="#pay" className="pill-btn" style={{ marginTop: 16, padding: '8px 8px 8px 26px', background: '#0d0d0d', color: '#fff' }}>
-            <span style={{ fontSize: 15 }}>{t('Пожертвовать')} {amount.toLocaleString('ru-RU')} ₽</span>
+            <span style={{ fontSize: 15 }}>{t('Пожертвовать')}{amount ? ` ${amount.toLocaleString('ru-RU')} ₽` : ''}</span>
             <ArrowKnob size={44} bg="var(--c-main)" fg="#0d0d0d" />
           </a>
         </div>
@@ -63,7 +71,7 @@ export default function Donate() {
         <div style={{ borderRadius: 24, background: '#0d0d0d', color: '#fff', padding: 'clamp(24px, 4vw, 34px)' }}>
           <div className="eyebrow" style={{ color: 'rgba(255,255,255,.5)' }}>Куда идут пожертвования</div>
           <div style={{ display: 'flex', flexDirection: 'column', marginTop: 18 }}>
-            {donationTargets.map((t) => (
+            {(donation?.targets ?? []).map((t) => (
               <div key={t.title} className="card-row" style={{ padding: '18px 0', borderTop: '1px solid rgba(255,255,255,.14)' }}>
                 <span style={{ flex: '0 0 44px', height: 44, borderRadius: 12, background: t.color }} />
                 <span style={{ flex: 1 }}>
@@ -79,41 +87,57 @@ export default function Donate() {
         </div>
       </div>
 
-      <section className="donate-bank card" aria-labelledby="donate-bank-title">
-        <div className="donate-bank-main">
-          <div className="eyebrow">Банковский перевод</div>
-          <h2 id="donate-bank-title" className="h-display">Реквизиты для пожертвований</h2>
-          <dl className="donate-bank-details">
-            {donationBankDetails.fields.map(({ key, label, value }) => (
-              <div key={key} className={`donate-bank-field-${key}`}>
-                <dt>{t(label)}</dt>
-                <dd>
-                  <button type="button" className={`donate-bank-value${key === 'bank' ? '' : ' donate-bank-number'}`} aria-label={`Копировать ${label}: ${value}`} title="Нажмите, чтобы скопировать" disabled={copying} onClick={() => copyDetails(key, value)}>
-                    <span>{value}</span>
-                    <CopyIndicator state={copyStatus.key === key ? copyStatus.state : ''} />
+      {(loading || error) && (
+        <div style={{ marginTop: 16 }}>
+          <LoadStatus error={error} onRetry={retry} />
+        </div>
+      )}
+
+      {/* Реквизитов может быть несколько: у каждых свой блок и свой QR-код. */}
+      {(donation?.accounts ?? []).map((account) => {
+        const titleId = `donate-bank-title-${account.id}`;
+        const copyKey = (key) => `${account.id}:${key}`;
+
+        return (
+          <section key={account.id} className="donate-bank card" aria-labelledby={titleId}>
+            <div className="donate-bank-main">
+              <div className="eyebrow">Банковский перевод</div>
+              <h2 id={titleId} className="h-display">{account.title ?? 'Реквизиты для пожертвований'}</h2>
+              <dl className="donate-bank-details">
+                {account.fields.map(({ key, label, value }) => (
+                  <div key={key} className={`donate-bank-field-${key}`}>
+                    <dt>{label}</dt>
+                    <dd>
+                      <button type="button" className={`donate-bank-value${TEXT_FIELDS.has(key) ? '' : ' donate-bank-number'}`} aria-label={`Копировать ${label}: ${value}`} title="Нажмите, чтобы скопировать" disabled={copying} onClick={() => copyDetails(copyKey(key), value)}>
+                        <span>{value}</span>
+                        <CopyIndicator state={copyStatus.key === copyKey(key) ? copyStatus.state : ''} />
+                      </button>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            {account.paymentPurpose && (
+              <div className="donate-bank-purpose">
+                <div>Назначение платежа</div>
+                <p>
+                  <button type="button" className="donate-bank-value" aria-label={`Копировать назначение платежа: ${account.paymentPurpose}`} title="Нажмите, чтобы скопировать" disabled={copying} onClick={() => copyDetails(copyKey('purpose'), account.paymentPurpose)}>
+                    <span>«{account.paymentPurpose}»</span>
+                    <CopyIndicator state={copyStatus.key === copyKey('purpose') ? copyStatus.state : ''} />
                   </button>
-                </dd>
+                </p>
               </div>
-            ))}
-          </dl>
-        </div>
+            )}
 
-        <div className="donate-bank-purpose">
-          <div>Назначение платежа</div>
-          <p>
-            <button type="button" className="donate-bank-value" aria-label={`Копировать назначение платежа: ${donationBankDetails.paymentPurpose}`} title="Нажмите, чтобы скопировать" disabled={copying} onClick={() => copyDetails('purpose', donationBankDetails.paymentPurpose)}>
-              <span>«{donationBankDetails.paymentPurpose}»</span>
-              <CopyIndicator state={copyStatus.key === 'purpose' ? copyStatus.state : ''} />
-            </button>
-          </p>
-        </div>
-
-        <figure className="donate-bank-qr">
-          <img src={donationBankDetails.qrCode} alt="QR-код для пожертвования" width="1068" height="1068" />
-          <figcaption>Отсканируйте QR-код в приложении банка</figcaption>
-          <a href={donationBankDetails.qrCode} download="donation-qr.svg" className="pill-btn donate-bank-qr-download">Скачать QR-код</a>
-        </figure>
-      </section>
+            <figure className="donate-bank-qr">
+              <img src={account.qrCode} alt="QR-код для пожертвования" width="1068" height="1068" />
+              <figcaption>Отсканируйте QR-код в приложении банка</figcaption>
+              <a href={`${account.qrCode}?download=1`} download="donation-qr.svg" className="pill-btn donate-bank-qr-download">Скачать QR-код</a>
+            </figure>
+          </section>
+        );
+      })}
     </div>
   );
 }

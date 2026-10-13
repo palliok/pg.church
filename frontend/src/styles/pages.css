@@ -124,7 +124,7 @@
 .donate-bank-qr figcaption { max-width: 240px; margin-top: 12px; font: 500 14px/1.5 var(--f-body); color: var(--c-gray-text); }
 .donate-bank-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; margin: 24px 0 0; }
 .donate-bank-details > div { min-width: 0; }
-.donate-bank-field-bank { grid-column: 1 / -1; }
+.donate-bank-field-bank, .donate-bank-field-recipient { grid-column: 1 / -1; }
 .donate-bank-details dt, .donate-bank-purpose > div { font: 500 13px/1.5 var(--f-body); color: var(--c-gray-text); }
 .donate-bank-details dd { margin: 5px 0 0; }
 .donate-bank-value { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 0; border: 0; border-radius: 3px; background: transparent; color: var(--c-ink); font: 600 16px/1.5 var(--f-body); text-align: left; cursor: copy; }

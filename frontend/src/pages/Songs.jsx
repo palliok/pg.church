@@ -1,29 +1,49 @@
 import { t } from '../i18n.js';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { songs } from '../data/mockData.js';
+import { useSong, useSongCategories, useSongs, useSongSearch } from '../api/songs.js';
+import LoadStatus from '../components/LoadStatus.jsx';
+import SongText from '../components/SongText.jsx';
 
-const CATS = [t('Все'), t('Поклонение'), t('Прославление'), t('Гимны')];
+const ALL = 'all';
+
+// Значение, которое не менялось delay миллисекунд: чтобы не слать запрос на каждую букву.
+function useDebounced(value, delay) {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debounced;
+}
 
 export default function Songs() {
   const [q, setQ] = useState('');
-  const [cat, setCat] = useState(t('Все'));
-  const [favs, setFavs] = useState(() => new Set([songs[0]?.id]));
+  const [cat, setCat] = useState(ALL);
+  const [favs, setFavs] = useState(() => new Set());
   const navigate = useNavigate();
 
-  const filtered = useMemo(() => {
-    return songs.filter((s) => {
-      const matchesCat = cat === t('Все') || s.category === cat;
-      const matchesQ =
-        !q.trim() ||
-        s.title.toLowerCase().includes(q.trim().toLowerCase()) ||
-        String(s.num).includes(q.trim());
-      return matchesCat && matchesQ;
-    });
-  }, [q, cat]);
+  const { songs, loading, error, retry } = useSongs();
+  const categories = useSongCategories();
+  const term = q.trim();
+  const searchedTerm = useDebounced(term, 250);
+  const found = useSongSearch(searchedTerm);
 
-  const exact = songs.find((s) => String(s.num) === q.trim());
+  const filtered = useMemo(() => {
+    if (!term) return cat === ALL ? songs : songs.filter((s) => s.categoryId === cat);
+
+    // По названию и номеру ищем сразу в загруженном списке, по строке текста — на сервере.
+    const ids = new Set(found && searchedTerm === term ? found.map((s) => s.id) : []);
+    const matches = (s) => ids.has(s.id) || s.title.toLowerCase().includes(term.toLowerCase()) || String(s.num).startsWith(term);
+
+    return songs.filter((s) => matches(s) && (cat === ALL || s.categoryId === cat));
+  }, [songs, found, searchedTerm, term, cat]);
+
+  const exact = songs.find((s) => String(s.num) === term);
   const preview = exact || filtered[0] || songs[0];
+  const { song: previewSong } = useSong(preview?.id ?? null);
 
   function toggleFav(id) {
     setFavs((prev) => {
@@ -41,7 +61,7 @@ export default function Songs() {
           <h1 className="h-display" style={{ fontSize: 'clamp(34px, 6vw, 54px)', marginTop: 8 }}>Сборник песен</h1>
         </div>
         <button
-          onClick={() => navigate(`/songs/${songs[Math.floor(Math.random() * songs.length)].id}`)}
+          onClick={() => songs.length > 0 && navigate(`/songs/${songs[Math.floor(Math.random() * songs.length)].id}`)}
           className="pill-btn"
           style={{ padding: '0 8px 0 20px', height: 46, background: 'var(--c-panel)', color: '#0d0d0d' }}
         >
@@ -66,14 +86,14 @@ export default function Songs() {
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginTop: 14 }}>
-            {CATS.map((c) => (
+            {[{ id: ALL, name: t('Все') }, ...categories].map((c) => (
               <button
-                key={c}
-                onClick={() => setCat(c)}
+                key={c.id}
+                onClick={() => setCat(c.id)}
                 className="pill-btn"
-                style={{ padding: '9px 15px', fontSize: 11, background: cat === c ? '#0d0d0d' : '#fff', color: cat === c ? '#fff' : '#0d0d0d' }}
+                style={{ padding: '9px 15px', fontSize: 11, background: cat === c.id ? '#0d0d0d' : '#fff', color: cat === c.id ? '#fff' : '#0d0d0d' }}
               >
-                {c}
+                {c.name}
               </button>
             ))}
           </div>
@@ -102,7 +122,8 @@ export default function Songs() {
                 </button>
               </div>
             ))}
-            {filtered.length === 0 && (
+            {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
+            {!loading && !error && filtered.length === 0 && (
               <div style={{ padding: '34px 18px', borderRadius: 18, background: '#fff', textAlign: 'center', marginTop: 10 }}>
                 <div className="h-display" style={{ fontSize: 16 }}>Ничего не нашлось</div>
                 <div style={{ font: '500 12.5px/1.5 var(--f-body)', color: 'var(--c-gray-text-soft)', marginTop: 6 }}>
@@ -127,11 +148,7 @@ export default function Songs() {
                 <div className="h-display" style={{ fontSize: 40, marginTop: 10 }}>{preview.title}</div>
               </div>
               <div style={{ padding: 28 }}>
-                {preview.lyrics.map((line, i) => (
-                  <p key={i} style={{ margin: '0 0 14px', font: line.length < 20 ? '700 11px var(--f-head)' : '500 16px/1.7 var(--f-body)', color: line.length < 20 ? 'var(--c-gray-text-mute)' : '#1a1a1a', textTransform: line.length < 20 ? 'uppercase' : 'none', letterSpacing: line.length < 20 ? '.12em' : 'normal', whiteSpace: 'pre-line' }}>
-                    {line}
-                  </p>
-                ))}
+                {previewSong && <SongText sections={previewSong.sections} gap={14} />}
                 <Link to={`/songs/${preview.id}`} className="pill-btn" style={{ marginTop: 10, padding: '11px 20px', background: '#0d0d0d', color: '#fff', fontSize: 11.5 }}>
                   Открыть песню ↗
                 </Link>
