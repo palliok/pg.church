@@ -10,3 +10,9 @@
 npm install
 npm run dev       # http://localhost:5173
 npm run build      # сборка в dist/
+```
+
+## Бэкенд
+
+Laravel 13 + Backpack 7 + PostgreSQL в Docker: панель управления и API для фронтенда.
+Запуск и описание API — в [backend/README.md](backend/README.md).
