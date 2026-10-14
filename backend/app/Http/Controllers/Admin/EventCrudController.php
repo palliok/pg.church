@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\HasListFilters;
 use App\Http\Controllers\Admin\Concerns\ValidatesFromFields;
 use App\Models\CalendarSource;
 use App\Models\Event;
@@ -16,7 +17,7 @@ use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 class EventCrudController extends CrudController
 {
     use CreateOperation, DeleteOperation, ListOperation, UpdateOperation;
-    use ValidatesFromFields;
+    use HasListFilters, ValidatesFromFields;
 
     public function setup(): void
     {
@@ -38,6 +39,16 @@ class EventCrudController extends CrudController
         CRUD::column('is_published')->label('Опубликовано')->type('boolean');
         CRUD::column('calendar_source_id')->label('Из календаря')->type('select')
             ->entity('calendarSource')->model(CalendarSource::class)->attribute('name');
+
+        $this->addListFilter('period', 'Когда', ['upcoming' => 'Предстоящие', 'past' => 'Прошедшие'],
+            fn (string $period) => CRUD::addClause('where', 'starts_at', $period === 'upcoming' ? '>=' : '<', today()));
+        $this->addListFilter('published', 'Публикация', ['1' => 'Опубликованные', '0' => 'Скрытые'],
+            fn (string $published) => CRUD::addClause('where', 'is_published', $published === '1'));
+        $this->addListFilter('source', 'Откуда', ['site' => 'Созданы на сайте'] + CalendarSource::query()->orderBy('name')->pluck('name', 'id')->all(),
+            fn (string $source) => $source === 'site'
+                ? CRUD::addClause('whereNull', 'calendar_source_id')
+                : CRUD::addClause('where', 'calendar_source_id', (int) $source));
+        $this->showListFilters();
     }
 
     protected function setupCreateOperation(): void
@@ -61,7 +72,7 @@ class EventCrudController extends CrudController
             ->attributes(['rows' => 6])
             ->hint('Абзацы разделяйте пустой строкой')
             ->validationRules('nullable|string');
-        CRUD::field('songs')->label('Гимны служения')->type('select_multiple')
+        CRUD::field('songs')->label('Гимны служения')->type('select_multiple_search')
             ->entity('songs')->model(Song::class)->attribute('display_name')
             ->options(fn ($query) => $query->orderBy('number')->get())
             ->validationRules('nullable|array');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\StoryScene;
+use App\Http\Controllers\Admin\Concerns\HasListFilters;
 use App\Http\Controllers\Admin\Concerns\ValidatesFromFields;
 use App\Models\Story;
 use App\Models\StoryPanel;
@@ -17,7 +18,7 @@ use Illuminate\Validation\Rule;
 class StoryPanelCrudController extends CrudController
 {
     use CreateOperation, DeleteOperation, ListOperation, UpdateOperation;
-    use ValidatesFromFields;
+    use HasListFilters, ValidatesFromFields;
 
     public function setup(): void
     {
@@ -37,15 +38,24 @@ class StoryPanelCrudController extends CrudController
         CRUD::column('tag')->label('Метка');
         CRUD::column('scene')->label('Иллюстрация')->type('select_from_array')
             ->options(StoryScene::options());
+
+        $this->addListFilter('story', 'История', Story::query()->orderBy('sort')->orderBy('id')->pluck('title', 'id')->all(),
+            fn (string $story) => CRUD::addClause('where', 'story_id', (int) $story));
+        $this->showListFilters();
     }
 
     protected function setupCreateOperation(): void
     {
-        CRUD::field('story_id')->label('История')->type('select')
+        // Ссылка «Добавить кадр» со страницы истории передаёт её в адресе: ?story_id=…
+        $storyId = request()->integer('story_id') ?: null;
+
+        CRUD::field('story_id')->label('История')->type('select_search')
             ->entity('story')->model(Story::class)->attribute('title')
             ->options(fn ($query) => $query->orderBy('sort')->orderBy('id')->get())
+            ->default($storyId)
             ->validationRules($this->rules('required', Rule::exists('stories', 'id')));
-        CRUD::field('sort')->label('Порядок')->type('number')->default(0)
+        CRUD::field('sort')->label('Порядок')->type('number')
+            ->default($storyId ? (int) StoryPanel::query()->where('story_id', $storyId)->max('sort') + 1 : 0)
             ->hint('Кадры показываются по возрастанию этого числа')
             ->validationRules('required|integer|min:0|max:65535');
         CRUD::field('scene')->label('Иллюстрация')->type('select_from_array')

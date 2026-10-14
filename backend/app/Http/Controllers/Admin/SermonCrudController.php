@@ -41,7 +41,7 @@ class SermonCrudController extends CrudController
 
     protected function setupCreateOperation(): void
     {
-        CRUD::field('event_id')->label('Событие')->type('select')
+        CRUD::field('event_id')->label('Событие')->type('select_search')
             ->entity('event')->model(Event::class)->attribute('display_name')
             ->options(fn ($query) => $query->orderByDesc('starts_at')->get())
             ->validationRules($this->rules(
@@ -49,7 +49,7 @@ class SermonCrudController extends CrudController
                 Rule::exists('events', 'id'),
                 Rule::unique('sermons', 'event_id')->ignore(CRUD::getCurrentEntryId() ?: null),
             ));
-        CRUD::field('minister_id')->label('Проповедник')->type('select')
+        CRUD::field('minister_id')->label('Проповедник')->type('select_search')
             ->entity('minister')->model(Minister::class)->attribute('name')
             ->validationRules($this->rules('nullable', Rule::exists('ministers', 'id')));
         CRUD::field('topic')->label('Тема')->validationRules('required|string|max:255');

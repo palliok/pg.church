@@ -333,6 +333,105 @@ class AdminPanelTest extends TestCase
             ->assertSee('Событие загружено из календаря «Служения»');
     }
 
+    public function test_list_filters_narrow_the_table(): void
+    {
+        $this->actingAsAdmin();
+        $this->travelTo('2026-10-14 12:00:00');
+
+        $source = CalendarSource::query()->create(['name' => 'Google', 'url' => 'https://example.com/a.ics']);
+        Event::query()->create(['title' => 'Прошлое', 'starts_at' => '2026-10-01 11:00']);
+        Event::query()->create(['title' => 'Будущее', 'starts_at' => '2026-10-18 11:00']);
+        Event::query()->create(['title' => 'Скрытое', 'starts_at' => '2026-10-20 11:00', 'is_published' => false]);
+        Event::query()->create(['title' => 'Из Google', 'starts_at' => '2026-10-21 11:00', 'calendar_source_id' => $source->id, 'external_uid' => 'x']);
+
+        Post::query()->create(['type' => PostType::News, 'title' => 'Новость', 'published_at' => '2026-10-01 12:00']);
+        Post::query()->create(['type' => PostType::Blog, 'title' => 'Блог', 'published_at' => '2026-10-02 12:00']);
+        Post::query()->create(['type' => PostType::Blog, 'title' => 'Отложенный', 'published_at' => '2026-11-01 12:00']);
+        Post::query()->create(['type' => PostType::Blog, 'title' => 'Черновик']);
+
+        $hymns = SongCategory::query()->create(['name' => 'Гимны']);
+        Song::query()->create(['number' => 1, 'title' => 'С аккордами', 'song_category_id' => $hymns->id, 'chordpro' => '[Am]Свят']);
+        Song::query()->create(['number' => 2, 'title' => 'Без аккордов', 'song_category_id' => $hymns->id, 'chordpro' => 'Свят']);
+        Song::query()->create(['number' => 3, 'title' => 'Без текста']);
+
+        $this->get('/admin/event')->assertOk()
+            ->assertSee('data-list-filters', false)
+            ->assertSee('Предстоящие')
+            ->assertSee('Созданы на сайте')
+            ->assertSee('Google');
+
+        $titles = fn (string $url) => collect($this->postJson($url, ['draw' => 1, 'start' => 0, 'length' => 50])->assertOk()->json('data'))
+            ->map(fn (array $row) => trim(strip_tags($row[1])))
+            ->sort()->values()->all();
+
+        $this->assertSame(['Будущее', 'Из Google', 'Скрытое'], $titles('/admin/event/search?period=upcoming'));
+        $this->assertSame(['Прошлое'], $titles('/admin/event/search?period=past'));
+        $this->assertSame(['Скрытое'], $titles('/admin/event/search?published=0'));
+        $this->assertSame(['Из Google'], $titles("/admin/event/search?source={$source->id}"));
+        $this->assertSame(['Будущее', 'Прошлое', 'Скрытое'], $titles('/admin/event/search?source=site'));
+        // Неизвестное значение фильтра игнорируется.
+        $this->assertCount(4, $titles('/admin/event/search?period=whenever'));
+
+        $postTitles = fn (string $query) => collect($this->postJson('/admin/post/search?'.$query, ['draw' => 1, 'start' => 0, 'length' => 50])->json('data'))
+            ->map(fn (array $row) => trim(strip_tags($row[2])))->sort()->values()->all();
+
+        $this->assertSame(['Блог', 'Отложенный', 'Черновик'], $postTitles('type=blog'));
+        $this->assertSame(['Блог', 'Новость'], $postTitles('status=published'));
+        $this->assertSame(['Отложенный'], $postTitles('type=blog&status=scheduled'));
+        $this->assertSame(['Черновик'], $postTitles('status=draft'));
+
+        $songTitles = fn (string $query) => collect($this->postJson('/admin/song/search?'.$query, ['draw' => 1, 'start' => 0, 'length' => 50])->json('data'))
+            ->map(fn (array $row) => trim(strip_tags($row[1])))->sort()->values()->all();
+
+        $this->assertSame(['С аккордами'], $songTitles('chords=1'));
+        $this->assertSame(['Без аккордов', 'Без текста'], $songTitles('chords=0'));
+        $this->assertSame(['Без текста'], $songTitles('category=none'));
+        $this->assertSame(['Без аккордов', 'С аккордами'], $songTitles("category={$hymns->id}"));
+    }
+
+    public function test_long_lists_use_searchable_selects(): void
+    {
+        $this->actingAsAdmin();
+
+        $this->get('/admin/event/create')->assertOk()
+            ->assertSee('data-init-function="bpFieldInitSearchableSelect"', false)
+            ->assertSee('tom-select.complete.min.js', false)
+            ->assertSee('tom-select.bootstrap5.min.css', false);
+
+        $this->get('/admin/post/create')->assertOk()->assertSee('bpFieldInitSearchableSelect', false);
+        $this->get('/admin/sermon/create')->assertOk()->assertSee('bpFieldInitSearchableSelect', false);
+    }
+
+    public function test_story_form_lists_its_panels(): void
+    {
+        $this->actingAsAdmin();
+        $story = Story::query()->create(['slug' => 'easter', 'kicker' => 'Пасха', 'title' => 'Что такое Пасха?', 'cover_scene' => 'tomb']);
+        $story->panels()->create(['sort' => 1, 'scene' => 'city', 'title' => 'Царь на ослёнке']);
+        $story->panels()->create(['sort' => 2, 'scene' => 'tomb', 'title' => 'Гробница пуста']);
+
+        $this->get("/admin/story/{$story->id}/edit")->assertOk()
+            ->assertSeeInOrder(['Кадры истории', 'Царь на ослёнке', 'Гробница пуста', 'Добавить кадр'])
+            ->assertSee("/admin/story-panel/create?story_id={$story->id}", false);
+
+        // «Добавить кадр» открывает форму с выбранной историей и следующим порядковым номером.
+        $this->get("/admin/story-panel/create?story_id={$story->id}")->assertOk()
+            ->assertSee('<option value="'.$story->id.'" selected', false)
+            ->assertSee('value="3"', false);
+    }
+
+    public function test_post_form_shows_cover_preview(): void
+    {
+        Storage::fake('public');
+        $this->actingAsAdmin();
+        $post = Post::query()->create(['type' => PostType::News, 'title' => 'С обложкой', 'image' => 'posts/cover.jpg']);
+
+        $this->get("/admin/post/{$post->id}/edit")->assertOk()
+            ->assertSee('<img src="'.Storage::disk('public')->url('posts/cover.jpg').'"', false);
+
+        $row = $this->postJson('/admin/post/search', ['draw' => 1, 'start' => 0, 'length' => 10])->json('data.0');
+        $this->assertStringContainsString(Storage::disk('public')->url('posts/cover.jpg'), $row[0]);
+    }
+
     public function test_settings_can_only_be_edited(): void
     {
         $this->seed(SettingSeeder::class);

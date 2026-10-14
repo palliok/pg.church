@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\HasListFilters;
 use App\Http\Controllers\Admin\Concerns\ValidatesFromFields;
 use App\Models\Song;
 use App\Models\SongCategory;
@@ -16,7 +17,7 @@ use Illuminate\Validation\Rule;
 class SongCrudController extends CrudController
 {
     use CreateOperation, DeleteOperation, ListOperation, UpdateOperation;
-    use ValidatesFromFields;
+    use HasListFilters, ValidatesFromFields;
 
     public function setup(): void
     {
@@ -39,6 +40,16 @@ class SongCrudController extends CrudController
         CRUD::column('song_category_id')->label('Раздел')->type('select')
             ->entity('category')->model(SongCategory::class)->attribute('name');
         CRUD::column('key')->label('Тональность');
+
+        $this->addListFilter('category', 'Раздел', ['none' => 'Без раздела'] + SongCategory::query()->orderBy('sort')->orderBy('name')->pluck('name', 'id')->all(),
+            fn (string $category) => $category === 'none'
+                ? CRUD::addClause('whereNull', 'song_category_id')
+                : CRUD::addClause('where', 'song_category_id', (int) $category));
+        $this->addListFilter('chords', 'Аккорды', ['1' => 'С аккордами', '0' => 'Без аккордов'],
+            fn (string $chords) => $chords === '1'
+                ? CRUD::addClause('where', 'chordpro', 'like', '%[%]%')
+                : CRUD::addClause('where', fn ($query) => $query->whereNull('chordpro')->orWhere('chordpro', 'not like', '%[%]%')));
+        $this->showListFilters();
     }
 
     protected function setupCreateOperation(): void
