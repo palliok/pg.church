@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Event;
+use App\Services\Calendar\EventExporter;
 use App\Support\RuDate;
 use App\Support\Text;
 use Illuminate\Http\Request;
@@ -21,7 +22,8 @@ class EventResource extends JsonResource
     public function toArray(Request $request): array
     {
         $weekday = RuDate::weekday($this->starts_at);
-        $time = $this->starts_at->format('H:i');
+        $time = $this->all_day ? null : $this->starts_at->format('H:i');
+        $calendar = app(EventExporter::class);
 
         return [
             'id' => $this->id,
@@ -31,6 +33,8 @@ class EventResource extends JsonResource
             'live' => $this->has_stream,
             'streamUrl' => $this->stream_url,
             'startsAt' => $this->starts_at->toIso8601String(),
+            'endsAt' => $this->ends_at?->toIso8601String(),
+            'allDay' => $this->all_day,
             'year' => $this->starts_at->year,
             'month' => $this->starts_at->month,
             'day' => $this->starts_at->day,
@@ -45,6 +49,12 @@ class EventResource extends JsonResource
             'sermon' => new SermonResource($this->whenLoaded('sermon')),
             'hymns' => SongResource::collection($this->whenLoaded('songs')),
             'hymnIds' => $this->whenLoaded('songs', fn () => $this->songs->pluck('id')),
+            // Добавить событие в календарь: файл .ics (Apple, Outlook, Яндекс) и формы Google и Outlook.
+            'calendar' => [
+                'ics' => route('api.events.ics', $this->id),
+                'google' => $calendar->googleUrl($this->resource),
+                'outlook' => $calendar->outlookUrl($this->resource),
+            ],
         ];
     }
 }

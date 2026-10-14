@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Admin\Concerns\ValidatesFromFields;
+use App\Models\CalendarSource;
 use App\Models\Event;
 use App\Models\Song;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
@@ -35,6 +36,8 @@ class EventCrudController extends CrudController
         CRUD::column('is_main')->label('Главное')->type('boolean');
         CRUD::column('has_stream')->label('Трансляция')->type('boolean');
         CRUD::column('is_published')->label('Опубликовано')->type('boolean');
+        CRUD::column('calendar_source_id')->label('Из календаря')->type('select')
+            ->entity('calendarSource')->model(CalendarSource::class)->attribute('name');
     }
 
     protected function setupCreateOperation(): void
@@ -42,6 +45,11 @@ class EventCrudController extends CrudController
         CRUD::field('title')->label('Название')->validationRules('required|string|max:255');
         CRUD::field('starts_at')->label('Дата и время начала')->type('datetime')
             ->validationRules('required|date');
+        CRUD::field('ends_at')->label('Дата и время окончания')->type('datetime')
+            ->hint('Можно не указывать: в календарях посетителей событие займёт '.config('church.event_duration').' минут')
+            ->validationRules('nullable|date|after_or_equal:starts_at');
+        CRUD::field('all_day')->label('Весь день')->type('switch')
+            ->hint('Время начала и окончания не учитывается, только даты');
         CRUD::field('tag')->label('Метка')->hint('Например: «Воскресенье», «Будни», «Молодёжь»')
             ->validationRules('nullable|string|max:255');
         CRUD::field('place')->label('Место')->hint('Например: «Главный зал»')
@@ -68,6 +76,16 @@ class EventCrudController extends CrudController
 
     protected function setupUpdateOperation(): void
     {
+        $source = CRUD::getCurrentEntry()?->calendarSource;
+
+        if ($source) {
+            CRUD::field('calendar_notice')->type('custom_html')->value(
+                '<div class="alert alert-info mb-0">Событие загружено из календаря «'.e($source->name).'». '
+                .'Название, описание, место и время обновляются при каждой синхронизации — меняйте их в самом календаре. '
+                .'Метку, гимны, трансляцию и публикацию можно менять здесь.</div>'
+            );
+        }
+
         $this->setupCreateOperation();
     }
 }

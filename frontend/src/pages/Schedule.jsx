@@ -1,7 +1,9 @@
 import { t } from '../i18n.js';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useChurch } from '../api/church.js';
 import { useEvents } from '../api/events.js';
+import CalendarOptions from '../components/CalendarOptions.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
 
 const MONTHS = [t('Январь'),t('Февраль'),t('Март'),t('Апрель'),t('Май'),t('Июнь'),t('Июль'),t('Август'),t('Сентябрь'),t('Октябрь'),t('Ноябрь'),t('Декабрь')];
@@ -12,6 +14,18 @@ const monthKey = (e) => `${e.year}-${e.month}`;
 export default function Schedule() {
   const { events, loading, error, retry } = useEvents();
   const [monthFilter, setMonthFilter] = useState('all');
+  const feed = useChurch()?.calendarFeed;
+  const [subscribeOpen, setSubscribeOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  async function copyFeedLink() {
+    try {
+      await navigator.clipboard.writeText(feed.ics);
+      setCopied(true);
+    } catch {
+      window.prompt(t('Ссылка на расписание'), feed.ics);
+    }
+  }
 
   const filtered = useMemo(() => {
     if (monthFilter === 'all') return events;
@@ -53,8 +67,34 @@ export default function Schedule() {
               {MONTHS[month - 1]}
             </button>
           ))}
+          {feed && (
+            <button
+              onClick={() => setSubscribeOpen((open) => !open)}
+              aria-expanded={subscribeOpen}
+              className="pill-btn"
+              style={{ padding: '11px 18px', fontSize: 11.5, background: subscribeOpen ? '#0d0d0d' : 'var(--c-main)', color: subscribeOpen ? '#fff' : '#0d0d0d' }}
+            >
+              <span aria-hidden="true">+</span>
+              <span>Подписаться</span>
+            </button>
+          )}
         </div>
       </div>
+
+      {feed && subscribeOpen && (
+        <div style={{ marginTop: 16, marginLeft: 'auto', maxWidth: 420, padding: 16, borderRadius: 22, background: 'var(--c-panel)' }}>
+          <div style={{ font: '500 13px/1.5 var(--f-body)', color: 'var(--c-gray-text)' }}>
+            Расписание появится в вашем календаре и будет обновляться само.
+          </div>
+          <CalendarOptions
+            options={[
+              { label: t('Google Календарь'), href: feed.google, external: true },
+              { label: t('Apple, Outlook и другие'), href: feed.webcal },
+              { label: copied ? t('Ссылка скопирована') : t('Скопировать ссылку'), hint: t('Для Яндекс Календаря и других: «Подписаться по ссылке»'), onClick: copyFeedLink },
+            ]}
+          />
+        </div>
+      )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 26 }}>
         {filtered.map((e) => (

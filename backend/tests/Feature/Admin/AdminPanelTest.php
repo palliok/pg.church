@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Enums\PostType;
+use App\Models\CalendarSource;
 use App\Models\DonationAccount;
 use App\Models\DonationTarget;
 use App\Models\DutyShift;
@@ -24,6 +25,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -48,6 +50,7 @@ class AdminPanelTest extends TestCase
     {
         return [
             'event' => ['event', Event::class, true],
+            'calendar-source' => ['calendar-source', CalendarSource::class, true],
             'sermon' => ['sermon', Sermon::class, true],
             'minister' => ['minister', Minister::class, true],
             'duty-shift' => ['duty-shift', DutyShift::class, true],
@@ -98,6 +101,7 @@ class AdminPanelTest extends TestCase
     public function test_crud_pages_render(string $route, string $model, bool $canCreate): void
     {
         $this->seed([SettingSeeder::class, DonationAccountSeeder::class, DemoContentSeeder::class]);
+        CalendarSource::query()->create(['name' => 'Календарь служений', 'url' => 'https://calendar.google.com/calendar/ical/secret/basic.ics']);
         $this->actingAsAdmin();
 
         $this->get("/admin/{$route}")->assertOk();
@@ -276,6 +280,57 @@ class AdminPanelTest extends TestCase
         $this->assertNull($account->kpp);
         $this->assertSame('40703810555000000365', $account->account);
         $this->assertTrue($account->is_published);
+    }
+
+    public function test_admin_adds_calendar_and_it_is_synced_right_away(): void
+    {
+        $this->actingAsAdmin();
+        $ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Test//EN\r\nBEGIN:VEVENT\r\nUID:a@example.com\r\n"
+            ."SUMMARY:Молитвенная встреча\r\nDTSTART:20991021T160000Z\r\nDTEND:20991021T170000Z\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n";
+        // Http::fake() оставляет первую подошедшую заглушку, поэтому ответ меняется через переменную.
+        $response = Http::response($ics, 200);
+        Http::fake(function () use (&$response) {
+            return $response;
+        });
+        $this->travelTo(now()->setDate(2099, 10, 14));
+
+        $this->post('/admin/calendar-source', ['name' => 'Служения', 'url' => 'ftp://example.com/calendar.ics'])
+            ->assertSessionHasErrors(['url' => 'Поле «Ссылка на календарь (iCal)» должно начинаться с одного из следующих значений: https://, http://, webcal://, webcals://.']);
+
+        $this->post('/admin/calendar-source', [
+            'name' => 'Служения', 'url' => 'webcal://p01-calendars.icloud.com/published/2/secret', 'is_active' => '1', 'publish_events' => '1',
+        ])->assertSessionHasNoErrors()->assertRedirect();
+
+        $source = CalendarSource::query()->sole();
+        $this->assertSame('webcal://p01-calendars.icloud.com/published/2/secret', $source->url);
+        // Ссылка секретная: в базе она зашифрована.
+        $this->assertStringNotContainsString('icloud', DB::table('calendar_sources')->value('url'));
+        $this->assertNotNull($source->last_synced_at);
+        $this->assertSame('Молитвенная встреча', Event::query()->sole()->title);
+        $this->assertStringContainsString('синхронизирован: добавлено 1', implode(' ', session('alert_messages.success') ?? []));
+
+        // Строки таблицы приходят отдельным запросом — в них и кнопка «Синхронизировать».
+        $rows = $this->postJson('/admin/calendar-source/search', ['draw' => 1, 'start' => 0, 'length' => 10])->assertOk()->json('data');
+        $this->assertStringContainsString("/admin/calendar-source/{$source->id}/sync", implode(' ', $rows[0]));
+        $this->assertStringContainsString('p01-calendars.icloud.com', implode(' ', $rows[0]));
+        $this->assertStringNotContainsString('secret', implode(' ', $rows[0]));
+
+        // Кнопка «Синхронизировать»: ошибка показывается администратору и сохраняется.
+        $response = Http::response('nope', 500);
+        $this->from('/admin/calendar-source')->post("/admin/calendar-source/{$source->id}/sync")
+            ->assertRedirect('/admin/calendar-source');
+        $this->assertStringContainsString('ошибкой 500', implode(' ', session('alert_messages.error') ?? []));
+        $this->assertStringContainsString('ошибкой 500', $source->refresh()->last_error);
+
+        // Кнопка из устаревшего списка: календарь уже удалён.
+        $this->from('/admin/calendar-source')->post('/admin/calendar-source/999999/sync')
+            ->assertRedirect('/admin/calendar-source');
+        $this->assertStringContainsString('Календарь не найден', implode(' ', session('alert_messages.error') ?? []));
+
+        // На форме события из календаря — предупреждение, что часть полей обновляется оттуда.
+        $this->get('/admin/event/'.Event::query()->sole()->id.'/edit')
+            ->assertOk()
+            ->assertSee('Событие загружено из календаря «Служения»');
     }
 
     public function test_settings_can_only_be_edited(): void

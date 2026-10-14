@@ -12,6 +12,7 @@
 
 return [
 
+    'after_or_equal' => 'Поле :attribute должно быть не раньше, чем :date.',
     'alpha_dash' => 'Поле :attribute может содержать только латинские буквы, цифры, дефис и подчёркивание.',
     'array' => 'Поле :attribute должно быть списком.',
     'between' => [
@@ -40,6 +41,7 @@ return [
     ],
     'regex' => 'Поле :attribute заполнено в неверном формате.',
     'required' => 'Поле :attribute обязательно для заполнения.',
+    'starts_with' => 'Поле :attribute должно начинаться с одного из следующих значений: :values.',
     'string' => 'Поле :attribute должно быть строкой.',
     'unique' => 'Такое значение поля :attribute уже используется.',
     'url' => 'Поле :attribute должно быть ссылкой, например https://example.com.',
