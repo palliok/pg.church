@@ -48,6 +48,12 @@ class ChurchController extends Controller
                 'hours' => $settings->get('duty_hours'),
                 'shifts' => $shifts,
             ],
+            // Подписка на расписание: календарь сам подтягивает новые события.
+            'calendarFeed' => [
+                'ics' => $feed = route('api.events.feed'),
+                'webcal' => preg_replace('#^https?://#', 'webcal://', $feed),
+                'google' => 'https://calendar.google.com/calendar/render?cid='.rawurlencode(preg_replace('#^https?://#', 'webcal://', $feed)),
+            ],
             'live' => [
                 'isLive' => (bool) $settings->get('stream_live'),
                 'url' => $settings->get('stream_url'),

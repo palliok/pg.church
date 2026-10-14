@@ -1,11 +1,15 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { t } from '../i18n.js';
 import ArrowKnob from '../components/ArrowKnob.jsx';
+import CalendarOptions from '../components/CalendarOptions.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
 import { useEvent } from '../api/events.js';
 
 export default function EventDetail() {
   const { id } = useParams();
   const { event: ev, loading, error, retry } = useEvent(id);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   if (loading || error) {
     return (
@@ -45,9 +49,11 @@ export default function EventDetail() {
             }}
           >
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              <span style={{ background: 'rgba(255,255,255,.14)', border: '1px solid rgba(255,255,255,.24)', padding: '7px 13px', borderRadius: 8, fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase' }}>
-                {ev.tag}
-              </span>
+              {ev.tag && (
+                <span style={{ background: 'rgba(255,255,255,.14)', border: '1px solid rgba(255,255,255,.24)', padding: '7px 13px', borderRadius: 8, fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase' }}>
+                  {ev.tag}
+                </span>
+              )}
               {ev.main && (
                 <span style={{ background: 'var(--c-main)', color: '#0d0d0d', padding: '7px 13px', borderRadius: 8, fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase' }}>
                   Главное
@@ -104,7 +110,7 @@ export default function EventDetail() {
                 <span style={{ fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 8, letterSpacing: '.1em', opacity: 0.7, marginTop: 2 }}>{ev.mon}</span>
               </span>
               <span>
-                <span style={{ display: 'block', fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 19 }}>{ev.timeLabel}</span>
+                <span style={{ display: 'block', fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 19 }}>{ev.timeLabel ?? t('Весь день')}</span>
                 <span style={{ display: 'block', font: '600 12.5px var(--f-body)', color: 'var(--c-gray-text)', marginTop: 4 }}>{ev.dowLabel}</span>
               </span>
             </div>
@@ -114,17 +120,26 @@ export default function EventDetail() {
               </span>
               <span style={{ flex: 1, minWidth: 0 }}>
                 <div className="eyebrow">Где</div>
-                <div style={{ font: '600 14.5px var(--f-body)', marginTop: 5 }}>{ev.place} · {ev.addr}</div>
+                <div style={{ font: '600 14.5px var(--f-body)', marginTop: 5 }}>{[ev.place, ev.addr].filter(Boolean).join(' · ')}</div>
               </span>
               <ArrowKnob size={38} />
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-              <a href="#calendar" className="pill-btn" style={{ flex: 1, padding: '7px 7px 7px 20px', background: '#0d0d0d', color: '#fff' }}>
-                <span style={{ flex: 1, fontSize: 12 }}>В календарь</span>
-                <ArrowKnob size={36} bg="var(--c-main)" fg="#0d0d0d" symbol="＋" />
-              </a>
+              <button type="button" onClick={() => setCalendarOpen((open) => !open)} aria-expanded={calendarOpen} className="pill-btn" style={{ flex: 1, padding: '7px 7px 7px 20px', background: '#0d0d0d', color: '#fff' }}>
+                <span style={{ flex: 1, fontSize: 12, textAlign: 'left' }}>В календарь</span>
+                <ArrowKnob size={36} bg="var(--c-main)" fg="#0d0d0d" symbol={calendarOpen ? '−' : '＋'} />
+              </button>
               <ArrowKnob as="a" href="#share" size={50} bg="#fff" fg="#0d0d0d" />
             </div>
+            {calendarOpen && (
+              <CalendarOptions
+                options={[
+                  { label: t('Google Календарь'), href: ev.calendar.google, external: true },
+                  { label: 'Outlook', href: ev.calendar.outlook, external: true },
+                  { label: t('Apple, Яндекс и другие'), hint: t('файл .ics'), href: ev.calendar.ics },
+                ]}
+              />
+            )}
           </div>
 
           {eventHymns.length > 0 && (

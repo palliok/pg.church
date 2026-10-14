@@ -4,6 +4,7 @@
 <x-backpack::menu-dropdown title="Расписание" icon="la la-calendar">
     <x-backpack::menu-dropdown-item title="События" icon="la la-calendar-day" :link="backpack_url('event')" />
     <x-backpack::menu-dropdown-item title="Проповеди" icon="la la-bible" :link="backpack_url('sermon')" />
+    <x-backpack::menu-dropdown-item title="Календари для импорта" icon="la la-calendar-plus" :link="backpack_url('calendar-source')" />
 </x-backpack::menu-dropdown>
 
 <x-backpack::menu-dropdown title="Сборник песен" icon="la la-music">

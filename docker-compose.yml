@@ -1,12 +1,24 @@
 services:
 
   app:
-    build:
+    image: pgchurch-app
+    build: &php-build
       context: .
       dockerfile: docker/php/Dockerfile
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
+    volumes:
+      - ./backend:/var/www
+    depends_on:
+      database:
+        condition: service_healthy
+
+  # Планировщик Laravel: синхронизация внешних календарей каждые 15 минут (routes/console.php).
+  scheduler:
+    image: pgchurch-app
+    build: *php-build
+    command: php artisan schedule:work
     volumes:
       - ./backend:/var/www
     depends_on:

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Api\ChurchController;
 use App\Http\Controllers\Api\DonationController;
 use App\Http\Controllers\Api\EventController;
@@ -17,6 +18,8 @@ Route::prefix('v1')->where(array_fill_keys(['event', 'song', 'post', 'account'],
     Route::get('donation/accounts/{account}/qr.svg', [DonationController::class, 'qr'])->name('api.donation.qr');
 
     Route::get('events', [EventController::class, 'index']);
+    Route::get('events.ics', [CalendarController::class, 'feed'])->name('api.events.feed');
+    Route::get('events/{event}.ics', [CalendarController::class, 'event'])->name('api.events.ics');
     Route::get('events/{event}', [EventController::class, 'show']);
     Route::get('events/{event}/sermon', [EventController::class, 'sermon']);
 
