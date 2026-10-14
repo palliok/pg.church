@@ -66,5 +66,20 @@ class StoryCrudController extends CrudController
     protected function setupUpdateOperation(): void
     {
         $this->setupCreateOperation();
+
+        // Кадры истории — отдельные записи; здесь их список и ссылки на редактирование.
+        $story = CRUD::getCurrentEntry();
+
+        if ($story) {
+            $panels = $story->panels->map(fn ($panel) => '<li><a href="'.e(backpack_url("story-panel/{$panel->id}/edit")).'">'
+                .e($panel->title).'</a> <span class="text-secondary">· '.e(StoryScene::tryFrom($panel->scene)?->label() ?? $panel->scene).'</span></li>')->implode('');
+
+            CRUD::field('panels_overview')->type('custom_html')->value(
+                '<label class="form-label">Кадры истории</label>'
+                .($panels ? '<ol class="mb-2">'.$panels.'</ol>' : '<p class="text-secondary mb-2">Кадров пока нет.</p>')
+                .'<a class="btn btn-sm btn-outline-primary" href="'.e(backpack_url('story-panel/create').'?story_id='.$story->id).'">Добавить кадр</a> '
+                .'<a class="btn btn-sm btn-link" href="'.e(backpack_url('story-panel').'?story='.$story->id).'">Все кадры этой истории</a>'
+            );
+        }
     }
 }

@@ -49,9 +49,8 @@ class SettingSeeder extends Seeder
             ['social_youtube', 'Соцсети', 'YouTube', SettingType::Url, null, 'Пустая ссылка скрывает значок на сайте'],
             ['social_instagram', 'Соцсети', 'Instagram', SettingType::Url, null, 'Пустая ссылка скрывает значок на сайте'],
 
-            ['stream_live', 'Трансляция', 'Сейчас идёт трансляция', SettingType::Boolean, '0', 'Включает плашку «В эфире» в шапке сайта'],
-            ['stream_url', 'Трансляция', 'Ссылка на трансляцию', SettingType::Url, null, null],
-            ['stream_text', 'Трансляция', 'Текст плашки', SettingType::Text, 'Идёт воскресное богослужение — присоединяйся онлайн', null],
+            ['stream_links', 'Трансляция', 'Ссылки на трансляцию', SettingType::UrlList, null, 'По одной ссылке на строке — YouTube, VK Видео, Rutube, Telegram и другие площадки. Пока есть хоть одна ссылка, на сайте видна плашка «В эфире» с кнопкой на каждую площадку. Очистите поле, когда трансляция закончится. Ссылки может задавать и Telegram-бот.'],
+            ['stream_text', 'Трансляция', 'Текст плашки «В эфире»', SettingType::Text, 'Идёт воскресное богослужение — присоединяйся онлайн', null],
 
             ['duty_hours', 'Дежурство', 'Часы дежурства служителей', SettingType::Text, '10:00–18:00', null],
 
