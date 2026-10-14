@@ -8,6 +8,8 @@ enum SettingType: string
     case Textarea = 'textarea';
     case Url = 'url';
     case Boolean = 'boolean';
+    /** Несколько ссылок, по одной на строке. */
+    case UrlList = 'url_list';
 
     /**
      * Тип поля Backpack, которым редактируется значение.
@@ -16,6 +18,7 @@ enum SettingType: string
     {
         return match ($this) {
             self::Boolean => 'switch',
+            self::UrlList => 'textarea',
             default => $this->value,
         };
     }

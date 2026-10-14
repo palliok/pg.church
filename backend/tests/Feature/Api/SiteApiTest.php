@@ -19,15 +19,13 @@ class SiteApiTest extends TestCase
         $this->seed(SettingSeeder::class);
     }
 
-    public function test_church_returns_contacts_duty_and_live_state(): void
+    public function test_church_returns_contacts_and_duty(): void
     {
         Minister::query()->create(['name' => 'Антон Третьяк'])->dutyShifts()->create(['weekday' => 3]);
         Minister::query()->create(['name' => 'Алексей Синичкин'])->dutyShifts()->create(['weekday' => 2]);
 
         $this->set('church_phone', '+7 (911) 123-43-43');
         $this->set('social_youtube', 'https://youtube.com/@pgora');
-        $this->set('stream_live', '1');
-        $this->set('stream_url', 'https://youtube.com/live/abc');
 
         $this->getJson('/api/v1/church')
             ->assertOk()
@@ -42,15 +40,14 @@ class SiteApiTest extends TestCase
                 ['weekday' => 2, 'dow' => 'Вт', 'name' => 'Алексей Синичкин'],
                 ['weekday' => 3, 'dow' => 'Ср', 'name' => 'Антон Третьяк'],
             ])
-            ->assertJsonPath('data.live.isLive', true)
-            ->assertJsonPath('data.live.url', 'https://youtube.com/live/abc');
+            // Трансляция — отдельный адрес /api/v1/live (см. LiveStreamTest).
+            ->assertJsonMissingPath('data.live');
     }
 
-    public function test_church_live_flag_is_off_by_default(): void
+    public function test_church_without_socials_and_duty(): void
     {
         $this->getJson('/api/v1/church')
             ->assertOk()
-            ->assertJsonPath('data.live.isLive', false)
             ->assertJsonPath('data.social', [])
             ->assertJsonPath('data.duty.shifts', []);
     }

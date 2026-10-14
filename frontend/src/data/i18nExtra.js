@@ -68,6 +68,8 @@ export const EN_EXTRA = {
   'На главную': 'Home',
   'Читай дальше': 'Keep reading',
   'Ближайшее': 'Next',
+  'VK Видео': 'VK Video',
+  'Одноклассники': 'Odnoklassniki',
   'Весь день': 'All day',
   'Google Календарь': 'Google Calendar',
   'Apple, Яндекс и другие': 'Apple, Yandex and others',

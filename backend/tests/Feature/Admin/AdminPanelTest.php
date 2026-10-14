@@ -438,19 +438,24 @@ class AdminPanelTest extends TestCase
         $this->actingAsAdmin();
 
         $phone = Setting::query()->where('key', 'church_phone')->firstOrFail();
-        $live = Setting::query()->where('key', 'stream_live')->firstOrFail();
-        $url = Setting::query()->where('key', 'stream_url')->firstOrFail();
+        $text = Setting::query()->where('key', 'stream_text')->firstOrFail();
+        $links = Setting::query()->where('key', 'stream_links')->firstOrFail();
 
         $this->put("/admin/setting/{$phone->id}", ['id' => $phone->id, 'value' => '+7 812 000-00-00', 'key' => 'hacked', 'label' => 'hacked'])
             ->assertSessionHasNoErrors()->assertRedirect();
-        $this->put("/admin/setting/{$live->id}", ['id' => $live->id, 'value' => '1'])->assertSessionHasNoErrors();
-        $this->put("/admin/setting/{$url->id}", ['id' => $url->id, 'value' => 'не ссылка'])->assertSessionHasErrors('value');
+        $this->put("/admin/setting/{$text->id}", ['id' => $text->id, 'value' => 'Мы в эфире'])->assertSessionHasNoErrors();
+        // Ссылки на трансляцию — по одной на строке; строка не со ссылкой не пропускается.
+        $this->put("/admin/setting/{$links->id}", ['id' => $links->id, 'value' => "https://youtu.be/abc\nне ссылка"])
+            ->assertSessionHasErrors(['value' => 'Строка 2 поля «Ссылки на трансляцию» — не ссылка: «не ссылка». Каждая ссылка — с новой строки и начинается с https://.']);
+        $this->assertNull($links->fresh()->value);
+        $this->put("/admin/setting/{$links->id}", ['id' => $links->id, 'value' => "https://youtu.be/abc\r\nhttps://vkvideo.ru/video-1_2"])
+            ->assertSessionHasNoErrors();
+        $this->getJson('/api/v1/live')->assertJsonPath('data.links.*.platform', ['youtube', 'vk']);
 
         $this->assertSame('+7 812 000-00-00', $phone->fresh()->value);
         $this->assertSame('church_phone', $phone->fresh()->key);
         $this->assertSame('Телефон', $phone->fresh()->label);
-        $this->assertTrue(Setting::values()->get('stream_live'));
-        $this->assertNull($url->fresh()->value);
+        $this->assertSame('Мы в эфире', Setting::values()->get('stream_text'));
 
         $count = Setting::query()->count();
 

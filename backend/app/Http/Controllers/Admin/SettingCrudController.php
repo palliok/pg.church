@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\SettingType;
 use App\Http\Controllers\Admin\Concerns\ValidatesFromFields;
 use App\Models\Setting;
+use App\Rules\UrlPerLine;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
@@ -47,12 +48,18 @@ class SettingCrudController extends CrudController
             $field->hint($setting->hint);
         }
 
-        $field->validationRules(match ($setting->type) {
-            SettingType::Boolean => 'boolean',
-            SettingType::Url => 'nullable|url|max:2000',
-            SettingType::Textarea => 'nullable|string|max:5000',
-            SettingType::Text => 'nullable|string|max:1000',
-        });
+        if ($setting->type === SettingType::UrlList) {
+            // Правило-объект в validationRules() поля не передать: Backpack принимает там только строку.
+            CRUD::setValidation(['value' => ['nullable', 'string', 'max:5000', new UrlPerLine]]);
+            $field->attributes(['rows' => 5, 'spellcheck' => 'false']);
+        } else {
+            $field->validationRules(match ($setting->type) {
+                SettingType::Boolean => 'boolean',
+                SettingType::Url => 'nullable|url|max:2000',
+                SettingType::Textarea => 'nullable|string|max:5000',
+                SettingType::Text => 'nullable|string|max:1000',
+            });
+        }
 
         $this->useFieldLabelsInValidationErrors();
     }
