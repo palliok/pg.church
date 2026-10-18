@@ -22,7 +22,7 @@ step "Код из GitHub"
 git pull --ff-only
 
 step "Бэкенд"
-docker compose build -q
+docker compose build -q app
 docker compose run --rm -T app composer install --no-dev --optimize-autoloader --no-interaction --quiet
 docker compose up -d
 docker compose exec -T app php artisan migrate --force

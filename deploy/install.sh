@@ -111,7 +111,7 @@ EOF
 fi
 
 step "Бэкенд: сборка и запуск контейнеров (первый раз — несколько минут)"
-as_app "docker compose build -q"
+as_app "docker compose build -q app"
 as_app "docker compose run --rm -T app composer install --no-dev --optimize-autoloader --no-interaction --quiet"
 grep -q '^APP_KEY=base64:' "$BACKEND_ENV" || as_app "docker compose run --rm -T app php artisan key:generate --force"
 as_app "docker compose up -d"
