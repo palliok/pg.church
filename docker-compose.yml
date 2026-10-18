@@ -59,3 +59,10 @@ services:
 
 volumes:
   dbdata:
+
+# MTU сети контейнеров должен совпадать с MTU сервера (на облачных серверах часто 1450),
+# иначе большие загрузки (composer, календари) зависают. Задаётся в .env: DOCKER_MTU=1450.
+networks:
+  default:
+    driver_opts:
+      com.docker.network.driver.mtu: ${DOCKER_MTU:-1500}

@@ -86,6 +86,11 @@ EOF
 fi
 DB_PASSWORD=$(grep '^DB_PASSWORD=' "$APP_DIR/.env" | cut -d= -f2-)
 
+# MTU основной сетевой карты: сеть контейнеров должна быть не больше, иначе загрузки зависают.
+NET_DEV=$(ip route get 1.1.1.1 | awk '{for (i = 1; i < NF; i++) if ($i == "dev") print $(i + 1)}')
+DOCKER_MTU=$(cat "/sys/class/net/$NET_DEV/mtu" 2>/dev/null || echo 1500)
+set_env "$APP_DIR/.env" DOCKER_MTU "$DOCKER_MTU"
+
 BACKEND_ENV="$APP_DIR/backend/.env"
 if [ ! -f "$BACKEND_ENV" ]; then
     ADMIN_PASSWORD=$(openssl rand -base64 12 | tr -d '/+=')
@@ -111,7 +116,11 @@ EOF
 fi
 
 step "Бэкенд: сборка и запуск контейнеров (первый раз — несколько минут)"
-as_app "docker compose build -q app"
+# Образ собирается через сеть хоста: на облачных серверах MTU часто меньше 1500,
+# и через мост Docker загрузки apt зависают.
+as_app "docker build --network host -q -t pgchurch-app --build-arg UID=\$(id -u) --build-arg GID=\$(id -g) -f docker/php/Dockerfile ."
+# Пересоздаём сеть контейнеров, чтобы применился MTU (данные базы хранятся в томе и не теряются).
+as_app "docker compose down --remove-orphans"
 as_app "docker compose run --rm -T app composer install --no-dev --optimize-autoloader --no-interaction --quiet"
 grep -q '^APP_KEY=base64:' "$BACKEND_ENV" || as_app "docker compose run --rm -T app php artisan key:generate --force"
 as_app "docker compose up -d"
@@ -125,7 +134,7 @@ done
 as_app "docker compose exec -T app php artisan optimize"
 
 step "Фронтенд: сборка"
-as_app "docker run --rm -u \$(id -u):\$(id -g) -e HOME=/tmp -v \"\$PWD/frontend\":/app -w /app \
+as_app "docker run --rm --network host -u \$(id -u):\$(id -g) -e HOME=/tmp -v \"\$PWD/frontend\":/app -w /app \
     -e VITE_API_URL=https://$API_DOMAIN/api/v1 node:22-alpine sh -c 'npm ci --no-audit --no-fund && npm run build'"
 chmod o+x /srv "$APP_DIR" "$APP_DIR/frontend"
 
