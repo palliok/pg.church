@@ -12,6 +12,8 @@
     <x-backpack::menu-dropdown-item title="Разделы" icon="la la-folder" :link="backpack_url('song-category')" />
 </x-backpack::menu-dropdown>
 
+<x-backpack::menu-item title="Объявления" icon="la la-bullhorn" :link="backpack_url('announcement')" />
+
 <x-backpack::menu-dropdown title="Медиа" icon="la la-newspaper">
     <x-backpack::menu-dropdown-item title="Новости и блог" icon="la la-pen" :link="backpack_url('post')" />
     <x-backpack::menu-dropdown-item title="Теги" icon="la la-tags" :link="backpack_url('tag')" />

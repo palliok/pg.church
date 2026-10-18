@@ -28,6 +28,7 @@ Route::group([
     Route::crud('tag', 'TagCrudController');
     Route::crud('story', 'StoryCrudController');
     Route::crud('story-panel', 'StoryPanelCrudController');
+    Route::crud('announcement', 'AnnouncementCrudController');
     Route::crud('donation-target', 'DonationTargetCrudController');
     Route::crud('donation-account', 'DonationAccountCrudController');
     Route::crud('setting', 'SettingCrudController');

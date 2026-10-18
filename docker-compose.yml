@@ -2,6 +2,7 @@ services:
 
   app:
     image: pgchurch-app
+    restart: unless-stopped
     build: &php-build
       context: .
       dockerfile: docker/php/Dockerfile
@@ -19,6 +20,7 @@ services:
     image: pgchurch-app
     build: *php-build
     command: php artisan schedule:work
+    restart: unless-stopped
     volumes:
       - ./backend:/var/www
     depends_on:
@@ -27,6 +29,7 @@ services:
 
   nginx:
     image: nginx:stable-alpine
+    restart: unless-stopped
     ports:
       - "${APP_PORT:-8300}:80"
     volumes:
@@ -41,7 +44,8 @@ services:
     environment:
       POSTGRES_DB: pgchurch
       POSTGRES_USER: pgchurch
-      POSTGRES_PASSWORD: secret
+      # На сервере пароль задаётся в .env рядом с docker-compose.yml (тот же, что DB_PASSWORD в backend/.env).
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
     ports:
       - "${DB_FORWARD_PORT:-5437}:5432"
     volumes:

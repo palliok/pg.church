@@ -7,58 +7,51 @@
 }
 
 .home-grid {
+  --home-gap: 14px;
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: 1.05fr 1fr .95fr;
-  gap: 14px;
-  min-height: 730px;
+  gap: var(--home-gap);
 }
 
-.home-left { display: contents; }
-.home-right { display: contents; gap: inherit; }
-.home-hero { grid-column: 1 / 6; grid-row: 1 / 3; }
-.home-donate-column { display: flex; flex-direction: column; grid-column: 9 / 13; grid-row: 1 / 3; gap: inherit; min-width: 0; }
-.home-donate { flex: 1; }
-.home-church-people { display: none; }
-.home-address { grid-column: 1 / 6; grid-row: 3 / 4; align-self: start; }
-.home-schedule-column { display: flex; flex-direction: column; grid-column: 6 / 9; grid-row: 1 / 4; gap: inherit; min-width: 0; }
+/* Обёртки колонок нужны только для разметки: блоки сами встают в ячейки сетки. */
+.home-left, .home-top-left, .home-schedule-column, .home-right { display: contents; }
 .home-church { display: block; width: 100%; height: auto; }
 .home-church img { display: block; width: 100%; height: auto; }
-.home-schedule { flex: 1; min-width: 0; }
-.home-about { grid-column: 9 / 13; grid-row: 3 / 4; }
+.home-church-people { display: none; }
+.home-schedule { min-width: 0; }
 
+/* Десктоп: три колонки и два ряда. Верхний ряд тянется по высоте экрана,
+   нижний — карта, расписание и «Кто мы» — начинается и заканчивается на одной линии. */
 @media (min-width: 1081px) {
   .home-grid {
     grid-template-columns: minmax(0, 5fr) repeat(2, minmax(0, 3.5fr));
+    grid-template-rows: minmax(0, 1fr) auto;
     min-height: max(664px, calc(100dvh - 104px));
-    grid-template-rows: auto minmax(0, 1fr) auto;
   }
-  .home-left { display: flex; flex-direction: column; grid-column: 1 / 2; grid-row: 1 / 4; gap: inherit; min-height: 0; }
-  .home-schedule-column { grid-column: 2 / 3; }
-  .home-donate-column, .home-about { grid-column: 3 / 4; }
-  .home-left > .home-address { flex-shrink: 0; align-self: stretch; }
+
+  .home-top-left { display: flex; flex-direction: column; gap: var(--home-gap); grid-column: 1; grid-row: 1; min-height: 0; }
   .home-hero { flex: 1; min-height: min-content; padding: 60px 32px 16px !important; }
-  .home-schedule { min-height: min-content; padding: 16px !important; }
-  .home-church { position: relative; z-index: 1; height: calc(var(--donation-height, 190px) - 14px); flex-shrink: 0; transform: translateY(-60px); }
-  .home-church img { position: absolute; bottom: 0; transform: translateY(38%); pointer-events: none; }
-  .home-church-people { display: block; width: 100%; height: auto; flex-shrink: 0; }
-  .home-donate { padding: 16px 18px !important; gap: 14px; }
-  .home-about { min-height: min-content; padding: 20px !important; }
+
+  .home-church { grid-column: 2; grid-row: 1; display: flex; align-items: flex-end; justify-content: center; min-height: 0; }
+  .home-church img { width: 100%; height: 100%; object-fit: contain; object-position: bottom; }
+
+  .home-donate-column { display: flex; flex-direction: column; grid-column: 3; grid-row: 1; gap: var(--home-gap); min-width: 0; min-height: 0; }
+  .home-donate { flex: 1; padding: 16px 18px !important; gap: 14px; }
+  .home-church-people { display: block; width: 100%; height: auto; min-height: 0; object-fit: contain; flex-shrink: 1; }
+
+  .home-address { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; }
+  .home-address .contacts-card-map { flex: 1 1 150px; }
+  .home-schedule { grid-column: 2; grid-row: 2; padding: 16px !important; }
+  .home-about { grid-column: 3; grid-row: 2; padding: 20px !important; }
 }
 
 @media (min-width: 1081px) and (max-height: 850px) {
-  .home-grid { gap: 8px; }
-  .home-church { height: calc(var(--donation-height, 184px) - 8px); }
+  .home-grid { --home-gap: 8px; }
   .home-hero .h-display > span { font-size: clamp(64px, calc(60dvh - 396px), 112px) !important; }
   .home-hero > p, .home-hero > .pill-btn { margin-top: 6px !important; }
 }
 
 @media (min-width: 1081px) and (max-width: 1440px) {
-  .home-right { display: flex; flex-direction: column; grid-column: 3 / 4; grid-row: 1 / 4; gap: inherit; min-width: 0; }
-  .home-church { height: auto; transform: none; }
-  .home-church img { position: static; transform: none; }
-  .home-donate-column { flex: 1; }
-  .home-about { padding: 12px !important; }
+  .home-about { padding: 16px !important; }
   .home-about > .h-display { font-size: 44px !important; }
   .home-about > div:last-child { margin-top: 12px !important; }
 }
@@ -67,20 +60,24 @@
   .home-grid {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: none;
+    /* «Поддержать служение» встаёт рядом с адресом, а не оставляет под ним дыру. */
+    grid-auto-flow: row dense;
     min-height: 0;
   }
   .home-hero { grid-column: 1 / 3; grid-row: auto; min-height: 420px; }
-  .home-donate-column { grid-column: 1 / 2; grid-row: auto; }
+  .home-donate-column { display: flex; flex-direction: column; grid-column: 1 / 2; grid-row: auto; }
+  .home-donate { flex: 1; }
   .home-address { grid-column: 2 / 3; grid-row: auto; }
-  .home-schedule-column { grid-column: 1 / 3; grid-row: auto; }
-  .home-church { max-width: 420px; align-self: center; }
+  .home-church { grid-column: 1 / 3; max-width: 420px; justify-self: center; }
+  .home-schedule { grid-column: 1 / 3; }
   .home-about { grid-column: 1 / 3; grid-row: auto; min-height: 340px; }
+  .home-announcements { grid-column: 1 / 3; grid-row: auto; }
 }
 
 @media (max-width: 640px) {
   .home-grid { grid-template-columns: 1fr; }
   .home-hero, .home-donate-column, .home-address,
-  .home-schedule-column, .home-about { grid-column: 1 / 2; }
+  .home-church, .home-schedule, .home-about, .home-announcements { grid-column: 1 / 2; }
   .home-hero { min-height: 380px; }
   .home-about { min-height: 300px; }
 }
@@ -318,6 +315,21 @@
     align-items: flex-end;
     justify-content: space-between;
     gap: 12px;
+  }
+
+  .home-mobile-donate {
+    background: var(--c-main);
+    color: var(--c-ink);
+  }
+
+  .home-mobile-donate .home-mobile-next-label {
+    background: var(--c-ink);
+    color: #fff;
+  }
+
+  .home-mobile-donate .home-mobile-arrow {
+    background: var(--c-ink);
+    color: #fff;
   }
 
   .home-mobile-next-label {

@@ -1,6 +1,6 @@
 import { t, getLang, langPath } from '../i18n.js';
 import { Link } from 'react-router-dom';
-import { useLayoutEffect, useRef } from 'react';
+import Announcements from '../components/Announcements.jsx';
 import ArrowKnob from '../components/ArrowKnob.jsx';
 import ChurchBrand from '../components/ChurchBrand.jsx';
 import ContactsCard from '../components/ContactsCard.jsx';
@@ -11,19 +11,6 @@ export default function Home() {
   const { events: homeEvents, error: eventsError } = useEvents({ limit: 3 });
   const nextEvent = homeEvents[0];
   const duty = useChurch()?.duty;
-  const donationRef = useRef(null);
-  const scheduleColumnRef = useRef(null);
-
-  useLayoutEffect(() => {
-    const donation = donationRef.current;
-    const updateHeight = () => {
-      scheduleColumnRef.current.style.setProperty('--donation-height', `${donation.getBoundingClientRect().height}px`);
-    };
-    updateHeight();
-    const observer = new ResizeObserver(updateHeight);
-    observer.observe(donation);
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <div className="home-wrap page-enter container" style={{ paddingLeft: 0, paddingRight: 0, maxWidth: 'var(--content-max)' }}>
@@ -66,6 +53,8 @@ export default function Home() {
           </span>
         </Link>
 
+        <Announcements />
+
         {nextEvent && (
           <Link to={`/schedule/${nextEvent.id}`} className="home-mobile-next">
             <div style={{ minWidth: 0 }}>
@@ -77,12 +66,21 @@ export default function Home() {
           </Link>
         )}
 
+        <Link to="/donate" className="home-mobile-next home-mobile-donate">
+          <div style={{ minWidth: 0 }}>
+            <div className="home-mobile-next-label">{t('Пожертвование')}</div>
+            <div className="home-mobile-next-title">{t('Поддержать')}<br />{t('служение')}</div>
+          </div>
+          <span className="home-mobile-arrow">↗</span>
+        </Link>
+
         <ContactsCard />
       </div>
 
       <div className="home-grid" style={{ padding: '0 18px' }}>
 
         <div className="home-left">
+        <div className="home-top-left">
         {/* Евангелие */}
         <div
           className="home-hero"
@@ -118,11 +116,15 @@ export default function Home() {
           </a>
         </div>
 
+        {/* Объявления */}
+        <Announcements className="home-announcements" popup />
+        </div>
+
         {/* Адрес */}
         <ContactsCard className="home-address" />
         </div>
 
-        <div className="home-schedule-column" ref={scheduleColumnRef}>
+        <div className="home-schedule-column">
         <div className="home-church">
           <img src="/church-with-people-details-v6.png" alt="" />
         </div>
@@ -163,7 +165,6 @@ export default function Home() {
         <Link
           to="/donate"
           className="home-donate"
-          ref={donationRef}
           style={{
             position: 'relative',
             overflow: 'hidden',

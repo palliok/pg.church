@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\PostType;
+use App\Models\Announcement;
 use App\Models\DonationTarget;
 use App\Models\Event;
 use App\Models\Minister;
@@ -35,6 +36,7 @@ class DemoContentSeeder extends Seeder
         $this->seedPosts();
         $this->seedStories();
         $this->seedDonationTargets();
+        $this->seedAnnouncements();
     }
 
     private function seedMinisters(): Minister
@@ -259,5 +261,19 @@ class DemoContentSeeder extends Seeder
                 'sort' => $sort,
             ]);
         }
+    }
+
+    private function seedAnnouncements(): void
+    {
+        Announcement::query()->create([
+            'title' => 'Членское собрание после богослужения',
+            'body' => "В воскресенье после богослужения — членское собрание церкви в главном зале.\nПросим членов церкви остаться.",
+            'sort' => 1,
+        ]);
+        Announcement::query()->create([
+            'title' => 'Запись в летний лагерь открыта',
+            'body' => 'Записаться можно у служителей после богослужения или по телефону церкви.',
+            'sort' => 2,
+        ]);
     }
 }

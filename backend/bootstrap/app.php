@@ -13,7 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // На сервере запросы приходят через nginx, который принимает HTTPS. Доверяем его
+        // заголовкам X-Forwarded-*, чтобы ссылки (картинки, админка, календарь) были https://.
+        // Контейнер приложения снаружи недоступен, поэтому подменить заголовки некому.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

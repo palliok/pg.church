@@ -14,21 +14,39 @@
   z-index: 2;
 }
 
-.contacts-card-body { padding: 18px; }
+.contacts-card-body { --contacts-icon: 36px; --metro-icon: 24px; padding: 18px; container-type: inline-size; }
 
 .contacts-card-info { font: 500 14px var(--f-body); color: var(--c-gray-text); display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
 
 .contacts-card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
 .contacts-card-socials { display: flex; justify-content: flex-end; gap: 7px; flex: 0 1 128px; min-width: 0; }
 .contacts-card-social.icon-circle { width: 38px; max-width: 38px; height: auto; aspect-ratio: 1; flex: 1; min-width: 0; background: #fff; font-family: var(--f-head); font-weight: 700; font-size: 10px; }
-.contacts-card-phone { width: fit-content; white-space: nowrap; font-family: var(--f-head); font-weight: 700; font-size: 19px; color: var(--c-ink); }
+.contacts-card-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 0 18px 0 0;
+  border-radius: 99px;
+  background: var(--c-main);
+  color: var(--c-ink);
+  white-space: nowrap;
+  font-family: var(--f-head);
+  font-weight: 700;
+  font-size: 16px;
+  transition: transform .15s ease, background .15s ease;
+}
+.contacts-card-phone:hover { background: rgb(0, 168, 210); }
+.contacts-card-phone:active { transform: scale(.97); }
+.contacts-card-phone-icon { width: var(--contacts-icon); height: var(--contacts-icon); flex: 0 0 auto; border-radius: 99px; background: var(--c-ink); color: #fff; display: flex; align-items: center; justify-content: center; }
 .contacts-card-metro-icon {
-  width: 18px;
-  height: 18px;
+  width: var(--metro-icon);
+  height: var(--metro-icon);
+  flex: 0 0 auto;
   border-radius: 99px;
   background: #0078d7;
   color: #fff;
-  font: 700 10px var(--f-body);
+  font: 700 11px var(--f-body);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -37,13 +55,16 @@
 .contacts-card-address {
   font-family: var(--f-head);
   font-weight: 800;
-  font-size: 26px;
+  /* Адрес в одну строку: в узкой карточке шрифт уменьшается вместе с её шириной. */
+  font-size: clamp(17px, 8cqi, 26px);
   line-height: .94;
+  white-space: nowrap;
   letter-spacing: -.03em;
   text-transform: uppercase;
 }
 
-.contacts-card-metro { display: flex; align-items: center; gap: 10px; }
+/* Адрес, значок метро и кнопка телефона начинаются с одной линии. */
+.contacts-card-metro { display: flex; align-items: center; gap: 10px; font-size: 15px; }
 
 .contacts-card-button { background: var(--c-ink); color: #fff; display: inline-flex; align-items: center; gap: 10px; padding: 7px 7px 7px 18px; border-radius: 99px; font-family: var(--f-head); font-weight: 700; font-size: 12px; }
 .contacts-card-button-arrow { width: 34px; height: 34px; border-radius: 99px; background: #fff; color: var(--c-ink); display: flex; align-items: center; justify-content: center; }

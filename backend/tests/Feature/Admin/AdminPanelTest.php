@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Enums\PostType;
+use App\Models\Announcement;
 use App\Models\CalendarSource;
 use App\Models\DonationAccount;
 use App\Models\DonationTarget;
@@ -60,6 +61,7 @@ class AdminPanelTest extends TestCase
             'tag' => ['tag', Tag::class, true],
             'story' => ['story', Story::class, true],
             'story-panel' => ['story-panel', StoryPanel::class, true],
+            'announcement' => ['announcement', Announcement::class, true],
             'donation-target' => ['donation-target', DonationTarget::class, true],
             'donation-account' => ['donation-account', DonationAccount::class, true],
             'setting' => ['setting', Setting::class, false],

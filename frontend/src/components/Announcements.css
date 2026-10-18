@@ -1,0 +1,150 @@
+.announcements {
+  flex-shrink: 0;
+  min-width: 0;
+  border-radius: 24px;
+  background: var(--c-panel);
+  color: var(--c-ink);
+  overflow: hidden;
+}
+
+.announcements-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 14px 14px 18px;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: background .15s ease;
+}
+.announcements-toggle:hover { background: var(--c-panel-hover); }
+
+.announcements-head { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; }
+
+.announcements-label {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--c-ink);
+  color: #fff;
+  padding: 6px 7px 6px 12px;
+  border-radius: 9px;
+  font-family: var(--f-head);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.announcements-count {
+  position: relative;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: var(--c-main);
+  color: var(--c-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0;
+}
+
+.announcements-unread {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--c-signal);
+  box-shadow: 0 0 0 1.5px var(--c-ink);
+}
+
+.announcements-preview {
+  font-family: var(--f-head);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.announcements-knob {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 99px;
+  background: var(--c-ink);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.announcements-chevron { transition: transform .25s ease; }
+.announcements.is-open .announcements-chevron { transform: rotate(180deg); }
+
+.announcements-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 18px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.announcements-item { padding: 12px 0; border-top: 1px solid var(--c-line); }
+.announcements-item-title { font-family: var(--f-head); font-weight: 700; font-size: 16px; line-height: 1.2; }
+.announcements-item-body { margin: 6px 0 0; font: 500 13.5px/1.5 var(--f-body); color: var(--c-ink-70); white-space: pre-line; }
+
+.announcements-panel:not([hidden]) { animation: announcements-in .25s ease; }
+
+/* ===== Всплывающее окно (десктоп) ===== */
+.announcements-dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(640px, calc(100dvh - 64px));
+  padding: 0;
+  border: 0;
+  border-radius: 28px;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  box-shadow: 0 30px 80px rgba(13, 13, 13, .25);
+  overflow: hidden;
+}
+.announcements-dialog[open] { display: flex; animation: announcements-in .25s ease; }
+.announcements-dialog::backdrop { background: rgba(13, 13, 13, .55); backdrop-filter: blur(4px); }
+
+.announcements-dialog-inner { display: flex; flex-direction: column; width: 100%; min-height: 0; }
+
+.announcements-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 22px 16px 26px;
+}
+.announcements-dialog-title { margin: 0; font-size: 34px; }
+.announcements-close { cursor: pointer; transition: transform .15s ease; }
+.announcements-close:active { transform: scale(.94); }
+
+.announcements-dialog .announcements-list { padding: 0 26px 22px; overflow-y: auto; gap: 8px; }
+.announcements-dialog .announcements-item { padding: 16px 18px; border: 0; border-radius: 18px; background: var(--c-panel); }
+.announcements-dialog .announcements-item-title { font-size: 18px; }
+.announcements-dialog .announcements-item-body { font-size: 14.5px; }
+
+@keyframes announcements-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcements-chevron { transition: none; }
+  .announcements-panel:not([hidden]),
+  .announcements-dialog[open] { animation: none; }
+}

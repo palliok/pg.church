@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Api\ChurchController;
 use App\Http\Controllers\Api\DonationController;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->where(array_fill_keys(['event', 'song', 'post', 'account'], '[0-9]{1,18}'))->group(function () {
     Route::get('church', ChurchController::class);
     Route::get('live', [StreamController::class, 'show']);
+    Route::get('announcements', AnnouncementController::class);
 
     // Telegram-бот задаёт и убирает ссылки на трансляцию (ключ в STREAM_API_TOKEN).
     Route::middleware(['throttle:30,1', EnsureStreamToken::class])->group(function () {
