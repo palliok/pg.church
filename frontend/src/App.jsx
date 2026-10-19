@@ -7,6 +7,7 @@ import SermonDetail from './pages/SermonDetail.jsx';
 import Songs from './pages/Songs.jsx';
 import SongDetail from './pages/SongDetail.jsx';
 import Media from './pages/Media.jsx';
+import Announcements from './pages/Announcements.jsx';
 import About from './pages/About.jsx';
 import Donate from './pages/Donate.jsx';
 import Story from './pages/Story.jsx';
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/songs" element={<Songs />} />
         <Route path="/songs/:id" element={<SongDetail />} />
         <Route path="/media" element={<Media />} />
+        <Route path="/announcements" element={<Announcements />} />
         <Route path="/about" element={<About />} />
         <Route path="/donate" element={<Donate />} />
       </Route>

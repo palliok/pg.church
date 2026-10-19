@@ -8,7 +8,7 @@ import { useChurch } from '../api/church.js';
 import { useEvents } from '../api/events.js';
 
 export default function Home() {
-  const { events: homeEvents, error: eventsError } = useEvents({ limit: 3 });
+  const { events: homeEvents, error: eventsError } = useEvents({ limit: 12 });
   const nextEvent = homeEvents[0];
   const duty = useChurch()?.duty;
 
@@ -53,8 +53,6 @@ export default function Home() {
           </span>
         </Link>
 
-        <Announcements />
-
         {nextEvent && (
           <Link to={`/schedule/${nextEvent.id}`} className="home-mobile-next">
             <div style={{ minWidth: 0 }}>
@@ -66,13 +64,7 @@ export default function Home() {
           </Link>
         )}
 
-        <Link to="/donate" className="home-mobile-next home-mobile-donate">
-          <div style={{ minWidth: 0 }}>
-            <div className="home-mobile-next-label">{t('Пожертвование')}</div>
-            <div className="home-mobile-next-title">{t('Поддержать')}<br />{t('служение')}</div>
-          </div>
-          <span className="home-mobile-arrow">↗</span>
-        </Link>
+        <Announcements />
 
         <ContactsCard />
       </div>
@@ -115,9 +107,6 @@ export default function Home() {
             <ArrowKnob size={44} bg="#0d0d0d" fg="#fff" />
           </a>
         </div>
-
-        {/* Объявления */}
-        <Announcements className="home-announcements" popup />
         </div>
 
         {/* Адрес */}
@@ -125,9 +114,8 @@ export default function Home() {
         </div>
 
         <div className="home-schedule-column">
-        <div className="home-church">
-          <img src="/church-with-people-details-v6.png" alt="" />
-        </div>
+        {/* Объявления */}
+        <Announcements className="home-announcements" />
 
         {/* Расписание */}
         <div className="home-schedule" style={{ borderRadius: 24, background: 'var(--c-panel)', padding: '20px 20px 16px', display: 'flex', flexDirection: 'column' }}>
@@ -137,7 +125,7 @@ export default function Home() {
               <ArrowKnob size={38} as="span" />
             </Link>
           </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginTop: 10 }}>
+          <div className="home-schedule-list" style={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: 10 }}>
             {homeEvents.map((e) => (
               <Link key={e.id} to={`/schedule/${e.id}`} className="card-row" style={{ padding: '8px 0' }}>
                 <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 46, height: 46, borderRadius: 14, background: '#0d0d0d', color: '#fff', flex: '0 0 auto' }}>
@@ -188,7 +176,6 @@ export default function Home() {
             </span>
           </div>
         </Link>
-        <img className="home-church-people" src="/church-people-details-v3.png" alt="" />
         </div>
 
         {/* Кто мы */}

@@ -26,6 +26,15 @@ const TABS = [
     ),
   },
   {
+    to: '/announcements', label: t('Объявления'),
+    icon: (
+      <>
+        <rect x="3" y="4.5" width="18" height="15" rx="2.5" />
+        <path d="M7 9h10M7 13h10M7 16.5h6" />
+      </>
+    ),
+  },
+  {
     to: '/about', label: t('О нас'),
     icon: (
       <>
@@ -67,7 +76,7 @@ export default function TabBar() {
           gap: 2,
           width: 'fit-content',
           margin: '0 auto',
-          padding: '5px 14px',
+          padding: 5,
           borderRadius: 999,
           background: 'var(--c-ink)',
           boxShadow: '0 18px 38px -14px rgba(0,0,0,.7)',
@@ -84,7 +93,8 @@ export default function TabBar() {
             aria-label={tab.label}
             style={({ isActive }) => ({
               height: 46,
-              width: isActive ? 'auto' : 42,
+              // Неактивные вкладки сжимаются на узком экране, чтобы длинная подпись активной влезла.
+              minWidth: isActive ? undefined : 34,
               padding: isActive ? '0 14px 0 11px' : 0,
               border: 'none',
               borderRadius: 999,
@@ -92,7 +102,7 @@ export default function TabBar() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 7,
-              flex: '0 0 auto',
+              flex: isActive ? '0 0 auto' : '0 1 42px',
               transition: 'background .25s, color .25s',
               background: isActive ? 'var(--c-main)' : 'transparent',
               color: isActive ? 'var(--c-ink)' : 'rgba(255,255,255,.55)',

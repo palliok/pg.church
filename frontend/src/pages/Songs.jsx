@@ -57,8 +57,7 @@ export default function Songs() {
     <div className="page-enter container" style={{ padding: '26px 16px 48px' }}>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
         <div>
-          <div className="eyebrow">{t('Поклонная гора')} · {songs.length} {t('песен')}</div>
-          <h1 className="h-display" style={{ fontSize: 'clamp(34px, 6vw, 54px)', marginTop: 8 }}>Сборник песен</h1>
+          <h1 className="h-display" style={{ fontSize: 'clamp(34px, 6vw, 54px)' }}>Сборник песен</h1>
         </div>
         <button
           onClick={() => songs.length > 0 && navigate(`/songs/${songs[Math.floor(Math.random() * songs.length)].id}`)}

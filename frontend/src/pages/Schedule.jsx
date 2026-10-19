@@ -38,8 +38,7 @@ export default function Schedule() {
     <div className="page-enter container" style={{ padding: '26px 16px 48px' }}>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
         <div>
-          <div className="eyebrow">Жизнь церкви</div>
-          <h1 className="h-display" style={{ fontSize: 'clamp(34px, 6vw, 54px)', marginTop: 8 }}>Расписание</h1>
+          <h1 className="h-display" style={{ fontSize: 'clamp(34px, 6vw, 54px)' }}>Расписание</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <button

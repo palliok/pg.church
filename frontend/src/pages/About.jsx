@@ -6,11 +6,9 @@ export default function About() {
       className="page-enter container"
       style={{ padding: '26px 16px 48px' }}
     >
-      <div className="eyebrow">Церковь «Поклонная гора»</div>
-
       <h1
         className="h-display"
-        style={{ fontSize: 'clamp(34px, 6vw, 54px)', marginTop: 8 }}
+        style={{ fontSize: 'clamp(34px, 6vw, 54px)' }}
       >
         О церкви
       </h1>
