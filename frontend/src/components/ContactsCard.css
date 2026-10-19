@@ -4,7 +4,7 @@
   container-type: inline-size;
   border-radius: 24px;
   overflow: hidden;
-  background: var(--c-bg);
+  background: var(--c-panel);
   min-width: 0;
 }
 
@@ -71,12 +71,12 @@
 .contacts-card-social.icon-circle {
   width: 44px;
   height: 44px;
-  background: var(--c-panel);
+  background: #fff;
   color: var(--c-ink);
   font: 700 12px var(--f-head);
   transition: background .15s ease;
 }
-.contacts-card-social.icon-circle:hover { background: var(--c-panel-hover); }
+.contacts-card-social.icon-circle:hover { background: rgba(255, 255, 255, .7); }
 
 /* Десктоп: адрес и метро слева, телефон и соцсети справа в одну строку.
    С 500px — компактно, чтобы влезть в колонку главной; с 760px — размеры макета. */
