@@ -38,19 +38,13 @@ export default function Home() {
         </div>
 
         <Link to="/story/jesus" className="home-mobile-hero">
-          <div className="home-mobile-hero-label">Евангелие</div>
-          <div className="home-mobile-hero-meta">Фото · общение</div>
           <div className="home-mobile-hero-title">
-            {getLang() === 'ky' ? null : <>{t('Кто')}<br />{t('такой')}<br /></>}
+            {getLang() === 'ky' ? null : <>{t('Кто такой')}<br /></>}
             <span>{t('Иисус?')}</span>
           </div>
           <p className="home-mobile-hero-text">
-            Хорошая новость простыми словами — о том, почему это важно для тебя.
+            Всё началось задолго до сотворения мира. И с тех пор вся история связана с Ним.
           </p>
-          <span className="hero-cta">
-            Читать как комикс
-            <i><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10" /></svg></i>
-          </span>
         </Link>
 
         {nextEvent && (
@@ -74,39 +68,33 @@ export default function Home() {
         <div className="home-left">
         <div className="home-top-left">
         {/* Евангелие */}
-        <div
+        {/* Текст сверху, чтобы внизу картинки были видны Иисус и дети. */}
+        <Link
+          to="/story/jesus"
           className="home-hero"
           style={{
             position: 'relative',
             overflow: 'hidden',
             borderRadius: 24,
-            backgroundColor: '#0d0d0d',
-            backgroundImage:
-              'linear-gradient(70deg, rgba(5,5,5,.92) 12%, rgba(5,5,5,.4) 62%, rgba(5,5,5,.15) 100%), repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 11px, transparent 11px 22px)',
             color: '#fff',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'flex-end',
-            padding: 40,
+            justifyContent: 'flex-start',
+            padding: 32,
+            textDecoration: 'none',
           }}
         >
-          <div style={{ position: 'absolute', top: 26, left: 26, background: '#fff', color: '#0d0d0d', padding: '9px 14px', borderRadius: 11, fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase' }}>
-            Евангелие
-          </div>
-          <div className="h-display" style={{ fontSize: 38 }}>
+          <div className="h-display" style={{ fontSize: 28 }}>
             Кто такой
-            <span style={{ display: 'block', fontWeight: 900, fontSize: 'clamp(48px, 8vw, 112px)', lineHeight: 0.8, letterSpacing: '-.05em', marginTop: 8, color: 'var(--c-main)' }}>
+            <span style={{ display: 'block', fontWeight: 900, fontSize: 'clamp(44px, 5vw, 72px)', lineHeight: 0.85, letterSpacing: '-.05em', marginTop: 6, color: 'var(--c-main)' }}>
               Иисус?
             </span>
           </div>
-          <p style={{ font: '500 16px/1.5 var(--f-body)', color: 'rgba(255,255,255,.72)', maxWidth: 400, margin: '22px 0 0' }}>
-            Хорошая новость простыми словами — о том, кто такой Иисус и почему это важно для тебя.
+          {/* Узкая колонка — чтобы текст не заходил на Иисуса справа. */}
+          <p style={{ font: '500 15px/1.5 var(--f-body)', color: 'rgba(255,255,255,.8)', maxWidth: 240, margin: '14px 0 0' }}>
+            Всё началось задолго до сотворения мира. И с тех пор вся история связана с Ним.
           </p>
-          <a href="#gospel" className="pill-btn" style={{ alignSelf: 'flex-start', marginTop: 24, padding: '7px 7px 7px 26px', background: '#fff', color: '#0d0d0d' }}>
-            <span style={{ fontSize: 13 }}>Подробнее</span>
-            <ArrowKnob size={44} bg="#0d0d0d" fg="#fff" />
-          </a>
-        </div>
+        </Link>
         </div>
 
         {/* Адрес */}

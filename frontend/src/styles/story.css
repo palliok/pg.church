@@ -42,8 +42,6 @@
 
 /* Home: hero opens the story */
 a.home-mobile-hero { text-decoration: none; }
-.hero-cta { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 6px 6px 6px 14px; border-radius: 99px; background: var(--c-main); color: #0d0d0d; font: 700 11px var(--f-head); text-transform: uppercase; letter-spacing: .04em; }
-.hero-cta i { width: 26px; height: 26px; border-radius: 99px; background: #0d0d0d; color: var(--c-main); display: flex; align-items: center; justify-content: center; }
 
 /* Live banner play icon */
 .play-dot { display: none; width: 16px; height: 16px; margin-right: 7px; vertical-align: -3px; border-radius: 99px; background: var(--c-ink); color: var(--c-main); align-items: center; justify-content: center; }
