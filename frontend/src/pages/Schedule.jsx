@@ -1,22 +1,475 @@
-import { t } from '../i18n.js';
-import { useMemo, useState } from 'react';
+import { getLang, t } from '../i18n.js';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useChurch } from '../api/church.js';
-import { useEvents } from '../api/events.js';
+import { churchToday, dayLabel, monthYearLabel } from '../api/dates.js';
+import { EVENT_CATEGORIES, useEvents } from '../api/events.js';
 import CalendarOptions from '../components/CalendarOptions.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
+import './Schedule.css';
 
-const MONTHS = [t('Январь'),t('Февраль'),t('Март'),t('Апрель'),t('Май'),t('Июнь'),t('Июль'),t('Август'),t('Сентябрь'),t('Октябрь'),t('Ноябрь'),t('Декабрь')];
+const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
-// Месяц с годом: в расписании могут оказаться, например, декабрь и январь.
-const monthKey = (e) => `${e.year}-${e.month}`;
+// Цвет точки и тон карточки по направлению; главное событие недели — всегда синее.
+const CATEGORY_STYLE = {
+  'Богослужение': { color: '#02407d', tone: 'purple' },
+  'Молодёжь': { color: '#f9c9a5', tone: 'peach' },
+  'Дети': { color: '#f9c9a5', tone: 'peach' },
+  'Молитва': { color: '#0d0d0d', tone: 'dark' },
+  'Общение': { color: '#00b7e3', tone: 'yellow' },
+};
+const LEGEND = [['#02407d', 'Богослужение'], ['#f9c9a5', 'Молодёжь и дети'], ['#0d0d0d', 'Молитва'], ['#00b7e3', 'Общение']];
 
+const categoryColor = (e) => CATEGORY_STYLE[e.category]?.color ?? '#a3a3a3';
+const eventTone = (e) => (e.main ? 'purple' : CATEGORY_STYLE[e.category]?.tone ?? 'dark');
+const categoryLabel = (category) => t(category === 'Общение' ? 'Малые группы' : category);
+const pad = (n) => String(n).padStart(2, '0');
+const daysInMonth = ({ year, month }) => new Date(Date.UTC(year, month, 0)).getUTCDate();
+
+// «1 событие», «3 события», «7 событий»; в английском — event/events, в киргизском форма одна.
+function eventsWord(n) {
+  if (getLang() === 'en') return n === 1 ? 'event' : 'events';
+
+  const a = n % 10;
+  const b = n % 100;
+  if (a === 1 && b !== 11) return t('событие');
+  if (a >= 2 && a <= 4 && (b < 10 || b >= 20)) return t('события');
+  return t('событий');
+}
+
+// Расписание по месяцам (макет «Расписание» в resources/): лента событий по дням или календарь месяца,
+// фильтр по направлению и трансляции. На телефоне фильтр открывается шторкой снизу.
 export default function Schedule() {
-  const { events, loading, error, retry } = useEvents();
-  const [monthFilter, setMonthFilter] = useState('all');
+  const today = useMemo(() => churchToday(), []);
+  const [ym, setYm] = useState({ year: today.year, month: today.month });
+  const [view, setView] = useState('list');
+  const [pickedDay, setPickedDay] = useState(null);
+  const [cats, setCats] = useState([]);
+  const [online, setOnline] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const dim = daysInMonth(ym);
+  const monthPrefix = `${ym.year}-${pad(ym.month)}`;
+  const { events, loading, error, retry } = useEvents({ from: `${monthPrefix}-01`, to: `${monthPrefix}-${pad(dim)}`, limit: 200 });
+
+  const filtered = useMemo(
+    () => events.filter((e) => (cats.length === 0 || cats.includes(e.category)) && (!online || e.live)),
+    [events, cats, online],
+  );
+
+  const byDay = useMemo(() => {
+    const map = new Map();
+    for (const e of filtered) map.set(e.day, [...(map.get(e.day) ?? []), e]);
+    return map;
+  }, [filtered]);
+
+  const isCurrentMonth = ym.year === today.year && ym.month === today.month;
+  const todayNum = isCurrentMonth ? today.day : null;
+  // Выбранный день календаря: сегодня, а в другом месяце — первый день с событиями.
+  const selDay = pickedDay ?? todayNum ?? (byDay.keys().next().value ?? 1);
+
+  const filterCount = cats.length + (online ? 1 : 0);
+  const summary = `${filtered.length} ${eventsWord(filtered.length)} · ${t(MONTHS[ym.month - 1]).toLowerCase()} ${ym.year}`;
+
+  function goMonth(next) {
+    setYm(next);
+    setPickedDay(null);
+  }
+
+  function toggleCat(category) {
+    setCats((list) => (list.includes(category) ? list.filter((c) => c !== category) : [...list, category]));
+  }
+
+  function resetFilters() {
+    setCats([]);
+    setOnline(false);
+  }
+
+  const viewTabs = [['list', 'Лента', 'Списком'], ['month', 'Месяц', 'Календарь']];
+
+  return (
+    <div className="page-enter container sched-page">
+      <div className="sched-head">
+        <div className="sched-title-row">
+          <div>
+            <div className="sched-d sched-eyebrow">Жизнь церкви</div>
+            <h1 className="h-display sched-title">Расписание</h1>
+          </div>
+          <button type="button" className="sched-m sched-filter-round" onClick={() => setSheetOpen(true)} aria-label="Фильтр">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4" /></svg>
+            {filterCount > 0 && <span className="sched-badge">{filterCount}</span>}
+          </button>
+        </div>
+
+        <div className="sched-controls">
+          <button type="button" className={`sched-d sched-today${isCurrentMonth ? ' is-on' : ''}`} onClick={() => { goMonth({ year: today.year, month: today.month }); setPickedDay(today.day); }}>
+            Сегодня
+          </button>
+          <MonthNav ym={ym} onChange={goMonth} />
+          <div className="sched-seg">
+            {viewTabs.map(([key, desktopLabel, mobileLabel]) => (
+              <button key={key} type="button" className={view === key ? 'is-on' : ''} onClick={() => setView(key)} aria-pressed={view === key}>
+                <span className="sched-d">{desktopLabel}</span>
+                <span className="sched-m">{mobileLabel}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="sched-toolbar">
+        <button type="button" className={`sched-d sched-filter-btn${panelOpen || filterCount ? ' is-on' : ''}`} onClick={() => setPanelOpen((open) => !open)} aria-expanded={panelOpen}>
+          <span>Фильтры</span>
+          {filterCount > 0 && <span className="sched-badge sched-badge--inline">{filterCount}</span>}
+          <span className="sched-caret" aria-hidden="true">▾</span>
+        </button>
+        {cats.map((category) => (
+          <button key={category} type="button" className="sched-d sched-active-chip" onClick={() => toggleCat(category)}>
+            {categoryLabel(category)} ✕
+          </button>
+        ))}
+        {online && (
+          <button type="button" className="sched-d sched-active-chip is-live" onClick={() => setOnline(false)}>
+            <span>С трансляцией</span> ✕
+          </button>
+        )}
+        {filterCount > 0 && (
+          <>
+            <button type="button" className="sched-d sched-reset" onClick={resetFilters}>Сбросить</button>
+            <button type="button" className="sched-m sched-reset" onClick={resetFilters}>Сбросить фильтры</button>
+          </>
+        )}
+        <span style={{ flex: 1 }} />
+        <span className="sched-d sched-summary"><span className="sched-summary-dot" />{summary}</span>
+        <Subscribe />
+      </div>
+
+      {panelOpen && (
+        <div className="sched-d sched-panel">
+          <div className="sched-label">Направление</div>
+          <div className="sched-chips">
+            {EVENT_CATEGORIES.map((category) => (
+              <button key={category} type="button" className={`sched-chip${cats.includes(category) ? ' is-on' : ''}`} onClick={() => toggleCat(category)} aria-pressed={cats.includes(category)}>
+                {categoryLabel(category)}
+              </button>
+            ))}
+          </div>
+          <div className="sched-label" style={{ marginTop: 20 }}>Формат</div>
+          <div className="sched-chips">
+            <button type="button" className={`sched-chip sched-chip--live${online ? ' is-on' : ''}`} onClick={() => setOnline((on) => !on)} aria-pressed={online}>
+              Есть трансляция
+            </button>
+          </div>
+        </div>
+      )}
+
+      {(loading || error) ? (
+        <div style={{ marginTop: 24 }}><LoadStatus error={error} onRetry={retry} /></div>
+      ) : view === 'list' ? (
+        <ListView byDay={byDay} ym={ym} todayNum={todayNum} hasFilters={filterCount > 0} onReset={resetFilters} />
+      ) : (
+        <MonthView ym={ym} byDay={byDay} selDay={selDay} todayNum={todayNum} onPick={setPickedDay} />
+      )}
+
+      {sheetOpen && (
+        <FilterSheet
+          cats={cats}
+          online={online}
+          count={filtered.length}
+          onToggleCat={toggleCat}
+          onOnline={setOnline}
+          onReset={resetFilters}
+          onClose={() => setSheetOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ‹ Месяц ▾ Год ▾ › — выпадающие списки закрываются кликом мимо и клавишей Esc.
+function MonthNav({ ym, onChange }) {
+  const [picker, setPicker] = useState(null);
+  const ref = useRef(null);
+  const thisYear = churchToday().year;
+  const years = [thisYear - 1, thisYear, thisYear + 1, thisYear + 2];
+
+  useEffect(() => {
+    if (!picker) return undefined;
+
+    const onPointer = (event) => { if (!ref.current?.contains(event.target)) setPicker(null); };
+    const onKey = (event) => { if (event.key === 'Escape') setPicker(null); };
+    document.addEventListener('pointerdown', onPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [picker]);
+
+  function shift(delta) {
+    const index = ym.year * 12 + ym.month - 1 + delta;
+    setPicker(null);
+    onChange({ year: Math.floor(index / 12), month: (index % 12) + 1 });
+  }
+
+  function pick(next) {
+    setPicker(null);
+    onChange(next);
+  }
+
+  return (
+    <div className="sched-monthnav" ref={ref}>
+      <button type="button" className="sched-arrow" onClick={() => shift(-1)} aria-label="Предыдущий месяц">‹</button>
+      <div className="sched-pick sched-pick--month">
+        <button type="button" onClick={() => setPicker(picker === 'month' ? null : 'month')} aria-expanded={picker === 'month'}>
+          {t(MONTHS[ym.month - 1])} <span className="sched-pick-caret" aria-hidden="true">▾</span>
+        </button>
+        {picker === 'month' && (
+          <div className="sched-pop sched-pop--months">
+            {MONTHS.map((name, index) => (
+              <button key={name} type="button" className={index + 1 === ym.month ? 'is-on' : ''} onClick={() => pick({ year: ym.year, month: index + 1 })}>
+                {t(name)}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="sched-pick sched-pick--year">
+        <button type="button" onClick={() => setPicker(picker === 'year' ? null : 'year')} aria-expanded={picker === 'year'}>
+          {ym.year} <span className="sched-pick-caret" aria-hidden="true">▾</span>
+        </button>
+        {picker === 'year' && (
+          <div className="sched-pop sched-pop--years">
+            {years.map((year) => (
+              <button key={year} type="button" className={year === ym.year ? 'is-on' : ''} onClick={() => pick({ year, month: ym.month })}>
+                {year}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <button type="button" className="sched-arrow" onClick={() => shift(1)} aria-label="Следующий месяц">›</button>
+    </div>
+  );
+}
+
+// Лента: на десктопе — дни с карточками событий, на телефоне — строки, главное событие — синей карточкой.
+function ListView({ byDay, ym, todayNum, hasFilters, onReset }) {
+  if (byDay.size === 0) {
+    return (
+      <div className="sched-empty">
+        <div className="sched-empty-title">Ничего не нашлось</div>
+        {hasFilters ? (
+          <>
+            <div className="sched-empty-text">В этом месяце по выбранным фильтрам собраний нет. Снимите часть условий или переключите месяц.</div>
+            <button type="button" className="sched-empty-btn" onClick={onReset}>Сбросить фильтры</button>
+          </>
+        ) : (
+          <div className="sched-empty-text">В этом месяце собраний нет.</div>
+        )}
+      </div>
+    );
+  }
+
+  const days = [...byDay.entries()];
+
+  return (
+    <>
+      <div className="sched-d sched-month-label">{t(MONTHS[ym.month - 1])} {ym.year}</div>
+
+      <div className="sched-d sched-lenta">
+        {days.map(([day, items]) => (
+          <div key={day} className={`sched-lenta-day${day === todayNum ? ' is-today' : ''}`}>
+            <div className="sched-lenta-date">
+              <span className="sched-lenta-num">{day}</span>
+              <span style={{ minWidth: 0, paddingTop: 5 }}>
+                <span className="sched-lenta-dow">{items[0].dowLabel}</span>
+                <span className="sched-lenta-month">{monthYearLabel(ym)}</span>
+                {items.length > 1 && <span className="sched-lenta-count">{items.length} {eventsWord(items.length)}</span>}
+                {day === todayNum && <span className="sched-today-badge">Сегодня</span>}
+              </span>
+            </div>
+            <div className="sched-lenta-items">
+              {items.map((e) => (
+                <Link key={e.id} to={`/schedule/${e.id}`} className={`sched-lenta-card${e.main ? ` is-filled tone-${eventTone(e)}` : ''}`}>
+                  <span className="sched-lenta-time">{e.timeRange}</span>
+                  <span className="sched-dot" style={{ '--dot': categoryColor(e) }} />
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <span className="sched-lenta-title">{e.title}</span>
+                    <span className="sched-lenta-sub">{[e.place, e.category && categoryLabel(e.category)].filter(Boolean).join(' · ')}</span>
+                  </span>
+                  {e.live && <span className="sched-live"><span className="sched-live-dot" />Трансляция</span>}
+                  <span className="sched-knob" aria-hidden="true">↗</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="sched-m sched-rows">
+        {days.flatMap(([, items]) => items).map((e) => (e.main ? (
+          <Link key={e.id} to={`/schedule/${e.id}`} className="sched-main-card">
+            <div style={{ minWidth: 0 }}>
+              <div className="sched-main-chip">{t('Главное')} · {dayLabel(e)}</div>
+              <div className="sched-main-title">{e.title}</div>
+              <div className="sched-main-sub">{[e.dowLabel, e.timeLabel, e.place].filter(Boolean).join(' · ')}</div>
+            </div>
+            <span className="sched-main-knob" aria-hidden="true">↗</span>
+          </Link>
+        ) : (
+          <Link key={e.id} to={`/schedule/${e.id}`} className={`sched-row tone-${eventTone(e)}`}>
+            <span className="sched-row-chip">
+              <span className="sched-row-day">{e.day}</span>
+              <span className="sched-row-mon">{e.mon}</span>
+            </span>
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <span className="sched-row-title">{e.title}</span>
+              <span className="sched-row-sub">{[e.dowShort, e.timeLabel, e.place].filter(Boolean).join(' · ')}</span>
+            </span>
+            <span className="sched-row-knob" aria-hidden="true">↗</span>
+          </Link>
+        )))}
+      </div>
+    </>
+  );
+}
+
+// Календарь месяца и события выбранного дня.
+function MonthView({ ym, byDay, selDay, todayNum, onPick }) {
+  const dim = daysInMonth(ym);
+  const startDow = (new Date(Date.UTC(ym.year, ym.month - 1, 1)).getUTCDay() + 6) % 7;
+  const cells = Array.from({ length: Math.ceil((startDow + dim) / 7) * 7 }, (_, i) => i - startDow + 1);
+  const dayEvents = byDay.get(selDay) ?? [];
+  const selDow = (startDow + selDay - 1) % 7;
+  const selLabel = `${dayLabel({ ...ym, day: selDay })} · ${t(['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'][selDow]).toLowerCase()}`;
+
+  return (
+    <div className="sched-monthview">
+      <div className="sched-calendar">
+        <div className="sched-weekdays">
+          {WEEKDAYS.map((name) => <div key={name}>{t(name)}</div>)}
+        </div>
+        <div className="sched-grid">
+          {cells.map((day, i) => {
+            const inMonth = day >= 1 && day <= dim;
+            if (!inMonth) return <span key={i} className="sched-cell is-out" />;
+
+            const items = byDay.get(day) ?? [];
+            const classes = ['sched-cell', items.length && 'has-events', day === selDay && 'is-sel', day === todayNum && 'is-today'].filter(Boolean).join(' ');
+
+            return (
+              <button key={i} type="button" className={classes} onClick={() => onPick(day)} aria-pressed={day === selDay}>
+                <span className="sched-cell-num">{day}</span>
+                <span className="sched-cell-foot">
+                  <span className="sched-cell-time">{items.length ? items[0].timeLabel + (items.length > 1 ? `  +${items.length - 1}` : '') : ''}</span>
+                  <span className="sched-cell-dots">
+                    {items.slice(0, 4).map((e) => <span key={e.id} className="sched-dot" style={{ '--dot': categoryColor(e) }} />)}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="sched-legend">
+          {LEGEND.map(([color, label]) => (
+            <span key={label}><span className="sched-dot" style={{ '--dot': color }} />{label}</span>
+          ))}
+        </div>
+      </div>
+
+      <div className="sched-day">
+        <div className="sched-day-head">
+          <span className="sched-day-label">{selLabel}</span>
+          <span className="sched-day-count">{dayEvents.length} {eventsWord(dayEvents.length)}</span>
+        </div>
+        <div className="sched-day-list">
+          {dayEvents.map((e) => (
+            <Link key={e.id} to={`/schedule/${e.id}`} className={`sched-day-card tone-${eventTone(e)}`}>
+              <span style={{ minWidth: 0, flex: 1 }} className="sched-day-body">
+                <span className="sched-day-time">{e.timeRange}</span>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span className="sched-day-title">{e.title}</span>
+                  <span className="sched-day-place">{[e.place, e.category && categoryLabel(e.category)].filter(Boolean).join(' · ')}</span>
+                </span>
+              </span>
+              <span className="sched-day-knob" aria-hidden="true">↗</span>
+            </Link>
+          ))}
+        </div>
+        {dayEvents.length === 0 && (
+          <div className="sched-day-empty">
+            <div className="sched-empty-title">Нет встреч</div>
+            <div className="sched-empty-text">
+              <span className="sched-d">Выберите день с цветной точкой — там есть собрание.</span>
+              <span className="sched-m">В этот день собраний не запланировано.</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Фильтр на телефоне — шторка снизу, как в макете приложения.
+function FilterSheet({ cats, online, count, onToggleCat, onOnline, onReset, onClose }) {
+  useEffect(() => {
+    const overflow = document.body.style.overflow;
+    const onKey = (event) => { if (event.key === 'Escape') onClose(); };
+
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = overflow;
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <div className="sched-sheet">
+      <div className="sched-sheet-backdrop" onClick={onClose} />
+      <div className="sched-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sched-sheet-title">
+        <div className="sched-sheet-handle" aria-hidden="true" />
+        <div className="sched-sheet-head">
+          <span id="sched-sheet-title" className="sched-sheet-title">Фильтр</span>
+          <button type="button" className="sched-sheet-reset" onClick={onReset}>Сбросить</button>
+        </div>
+
+        <div className="sched-label sched-label--sheet">Направление</div>
+        <div className="sched-chips">
+          {EVENT_CATEGORIES.map((category) => (
+            <button key={category} type="button" className={`sched-chip${cats.includes(category) ? ' is-on' : ''}`} onClick={() => onToggleCat(category)} aria-pressed={cats.includes(category)}>
+              {categoryLabel(category)}
+            </button>
+          ))}
+        </div>
+
+        <div className="sched-label sched-label--sheet">Место</div>
+        <div className="sched-cells">
+          <button type="button" className={online ? '' : 'is-on'} onClick={() => onOnline(false)} aria-pressed={!online}>Любое место</button>
+          <button type="button" className={online ? 'is-on' : ''} onClick={() => onOnline(true)} aria-pressed={online}>Есть трансляция</button>
+        </div>
+
+        <button type="button" className="sched-sheet-apply" onClick={onClose}>
+          <span>{t('Показать')} {count} {eventsWord(count)}</span>
+          <span className="sched-sheet-go" aria-hidden="true">→</span>
+        </button>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+// «+ Подписаться»: расписание календарём, который обновляется сам.
+function Subscribe() {
   const feed = useChurch()?.calendarFeed;
-  const [subscribeOpen, setSubscribeOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  if (!feed) return null;
 
   async function copyFeedLink() {
     try {
@@ -27,61 +480,14 @@ export default function Schedule() {
     }
   }
 
-  const filtered = useMemo(() => {
-    if (monthFilter === 'all') return events;
-    return events.filter((e) => monthKey(e) === monthFilter);
-  }, [events, monthFilter]);
-
-  const months = useMemo(() => [...new Map(events.map((e) => [monthKey(e), e.month]))], [events]);
-
   return (
-    <div className="page-enter container" style={{ padding: '26px 16px 48px' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
-        <div>
-          <h1 className="h-display" style={{ fontSize: 'clamp(34px, 6vw, 54px)' }}>Расписание</h1>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          <button
-            onClick={() => setMonthFilter('all')}
-            className="pill-btn"
-            style={{
-              padding: '11px 18px', fontSize: 11.5,
-              background: monthFilter === 'all' ? '#0d0d0d' : 'var(--c-panel)',
-              color: monthFilter === 'all' ? '#fff' : '#0d0d0d',
-            }}
-          >
-            Все
-          </button>
-          {months.map(([key, month]) => (
-            <button
-              key={key}
-              onClick={() => setMonthFilter(key)}
-              className="pill-btn"
-              style={{
-                padding: '11px 18px', fontSize: 11.5,
-                background: monthFilter === key ? '#0d0d0d' : 'var(--c-panel)',
-                color: monthFilter === key ? '#fff' : '#0d0d0d',
-              }}
-            >
-              {MONTHS[month - 1]}
-            </button>
-          ))}
-          {feed && (
-            <button
-              onClick={() => setSubscribeOpen((open) => !open)}
-              aria-expanded={subscribeOpen}
-              className="pill-btn"
-              style={{ padding: '11px 18px', fontSize: 11.5, background: subscribeOpen ? '#0d0d0d' : 'var(--c-main)', color: subscribeOpen ? '#fff' : '#0d0d0d' }}
-            >
-              <span aria-hidden="true">+</span>
-              <span>Подписаться</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {feed && subscribeOpen && (
-        <div style={{ marginTop: 16, marginLeft: 'auto', maxWidth: 420, padding: 16, borderRadius: 22, background: 'var(--c-panel)' }}>
+    <div className="sched-subscribe">
+      <button type="button" className={`sched-subscribe-btn${open ? ' is-on' : ''}`} onClick={() => setOpen((v) => !v)} aria-expanded={open}>
+        <span aria-hidden="true">+</span>
+        <span>Подписаться</span>
+      </button>
+      {open && (
+        <div className="sched-subscribe-pop">
           <div style={{ font: '500 13px/1.5 var(--f-body)', color: 'var(--c-gray-text)' }}>
             Расписание появится в вашем календаре и будет обновляться само.
           </div>
@@ -94,49 +500,6 @@ export default function Schedule() {
           />
         </div>
       )}
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 26 }}>
-        {filtered.map((e) => (
-          <Link
-            key={e.id}
-            to={`/schedule/${e.id}`}
-            className="card-row"
-            style={{
-              padding: '20px 22px',
-              borderRadius: 22,
-              background: 'var(--c-panel)',
-              color: '#0d0d0d',
-              transition: 'transform .18s ease',
-            }}
-          >
-            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 56, height: 56, borderRadius: 16, background: '#0d0d0d', color: '#fff', flex: '0 0 auto' }}>
-              <span style={{ fontFamily: 'var(--f-head)', fontWeight: 800, fontSize: 19, lineHeight: 1 }}>{e.day}</span>
-              <span style={{ fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 8, letterSpacing: '.1em', opacity: 0.7, marginTop: 2 }}>{e.mon}</span>
-            </span>
-            <span style={{ flex: 1, minWidth: 0 }}>
-              <span style={{ display: 'block', fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 'clamp(18px, 3vw, 24px)', letterSpacing: '-.02em' }}>{e.title}</span>
-              <span style={{ display: 'block', font: '600 12.5px var(--f-body)', opacity: 0.72, marginTop: 6 }}>{e.when}</span>
-            </span>
-            {e.live && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '7px 13px', borderRadius: 999, background: 'rgba(13,13,13,.08)', fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 9.5, letterSpacing: '.1em', textTransform: 'uppercase' }}>
-                <span className="live-dot" />Трансляция
-              </span>
-            )}
-            <span style={{ color: 'var(--c-gray-text-mute)' }}>↗</span>
-          </Link>
-        ))}
-
-        {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
-
-        {!loading && !error && filtered.length === 0 && (
-          <div style={{ padding: '56px 20px', borderRadius: 24, background: 'var(--c-panel)', textAlign: 'center' }}>
-            <div className="h-display" style={{ fontSize: 22 }}>Ничего не нашлось</div>
-            <div style={{ font: '500 14px/1.5 var(--f-body)', color: 'var(--c-gray-text)', marginTop: 8 }}>
-              В этом месяце собраний нет по выбранным фильтрам.
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

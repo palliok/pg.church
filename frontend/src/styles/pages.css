@@ -16,6 +16,20 @@
 .home-left, .home-top-left, .home-schedule-column, .home-right { display: contents; }
 .home-schedule { min-width: 0; }
 
+/* Строка расписания на главной: главное событие — тёмной плашкой, остальные — с линией сверху. */
+.home-sched-row { display: flex; align-items: center; gap: 13px; padding: 9px 0; border-top: 1px solid rgba(13,13,13,.14); color: var(--c-ink); }
+.home-sched-row.is-main { padding: 11px 12px; border-top: none; border-radius: 16px; background: var(--c-ink); color: #fff; }
+.home-sched-row.is-main + .home-sched-row { border-top: none; }
+.home-sched-chip { flex: 0 0 44px; height: 44px; border-radius: 13px; background: #fff; color: var(--c-ink); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.home-sched-row.is-peach .home-sched-chip { background: var(--c-third); }
+.home-sched-row.is-main .home-sched-chip { background: var(--c-main); }
+.home-sched-day { font: 800 16px/1 var(--f-head); }
+.home-sched-mon { font: 700 7.5px var(--f-head); letter-spacing: .1em; opacity: .65; margin-top: 2px; }
+.home-sched-title { display: block; font: 600 17px/1.1 var(--f-head); letter-spacing: -.015em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.home-sched-sub { display: block; margin-top: 3px; font: 600 11px var(--f-body); color: var(--c-gray-text); }
+.home-sched-row.is-main .home-sched-sub { color: rgba(255,255,255,.6); }
+.home-sched-knob { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 99px; background: #fff; color: var(--c-ink); display: flex; align-items: center; justify-content: center; font-size: 13px; }
+
 /* Десктоп: три колонки, у каждой своя стопка блоков разной высоты.
    Слева Евангелие тянется, адрес компактный; в центре объявления по содержимому,
    расписание — на всю оставшуюся высоту; справа тянется «Поддержать». */

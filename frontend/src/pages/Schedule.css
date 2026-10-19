@@ -1,0 +1,254 @@
+/* Расписание. Макеты: «Расписание» в App.dc.html (телефон) и Site.dc.html (десктоп). Сначала телефон, от 861px — десктоп. */
+
+.sched-page { padding: 26px 18px 48px; }
+
+/* Части только для десктопа (.sched-d) или только для телефона (.sched-m); свой display они берут из своих классов. */
+@media (max-width: 860px) { .sched-d { display: none !important; } }
+@media (min-width: 861px) { .sched-m { display: none !important; } }
+
+/* ===== Шапка ===== */
+.sched-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sched-eyebrow { font: 700 10px var(--f-head); letter-spacing: .16em; text-transform: uppercase; color: #a3a3a3; }
+.sched-title { font-size: 38px; font-weight: 800; line-height: 1; letter-spacing: -.035em; }
+
+.sched-filter-round { position: relative; flex: 0 0 auto; width: 46px; height: 46px; border: none; border-radius: 99px; background: var(--c-ink); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.sched-badge { position: absolute; top: 1px; right: 1px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: var(--c-main); color: var(--c-ink); font: 800 10px var(--f-head); display: flex; align-items: center; justify-content: center; }
+.sched-badge--inline { position: static; min-width: 22px; height: 22px; padding: 0 6px; font-size: 11px; }
+
+.sched-controls { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+
+.sched-today { height: 46px; padding: 0 20px; border: none; border-radius: 99px; cursor: pointer; background: var(--c-panel); color: var(--c-ink); font: 700 11.5px var(--f-head); letter-spacing: .05em; text-transform: uppercase; transition: background .2s, color .2s; }
+.sched-today.is-on { background: var(--c-ink); color: #fff; }
+
+/* ‹ Месяц ▾ Год ▾ › */
+.sched-monthnav { position: relative; display: flex; align-items: center; gap: 8px; }
+.sched-arrow { flex: 0 0 auto; width: 46px; height: 46px; border: none; border-radius: 99px; background: var(--c-panel); color: var(--c-ink); font-size: 17px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .18s; }
+/* На телефоне выпадающие списки — во всю ширину навигации, на десктопе — под своей кнопкой. */
+.sched-pick--month { flex: 1 1 auto; min-width: 0; }
+.sched-pick--year { flex: 0 0 90px; }
+.sched-pick > button { width: 100%; height: 46px; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; border-radius: 99px; background: var(--c-panel); color: var(--c-ink); font: 700 14px var(--f-head); letter-spacing: .02em; text-transform: uppercase; cursor: pointer; }
+.sched-pick-caret { font-size: 9px; color: #8a8a8a; }
+
+.sched-pop { position: absolute; top: calc(100% + 7px); z-index: 50; background: #fff; border-radius: 18px; box-shadow: 0 24px 54px -18px rgba(0,0,0,.45), 0 0 0 1px rgba(13,13,13,.06); }
+.sched-pop button { border: none; cursor: pointer; border-radius: 11px; background: transparent; color: var(--c-ink); font: 600 12.5px var(--f-head); text-transform: uppercase; }
+.sched-pop button.is-on { background: var(--c-main); font-weight: 700; }
+.sched-pop--months { left: 0; right: 0; padding: 9px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.sched-pop--months button { padding: 11px 2px; text-align: center; overflow-wrap: anywhere; }
+.sched-pop--years { right: 0; min-width: 118px; padding: 8px; display: flex; flex-direction: column; gap: 2px; }
+.sched-pop--years button { width: 100%; padding: 11px 14px; text-align: left; }
+
+/* Лента / Месяц */
+.sched-seg { display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 99px; background: var(--c-panel); }
+.sched-seg button { flex: 1 1 0; padding: 12px 0; border: none; border-radius: 99px; cursor: pointer; background: transparent; color: var(--c-gray-text); font: 700 12px var(--f-head); letter-spacing: .03em; text-transform: uppercase; transition: background .2s, color .2s; }
+.sched-seg button.is-on { background: var(--c-ink); color: #fff; }
+
+/* ===== Фильтры ===== */
+.sched-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.sched-filter-btn { display: inline-flex; align-items: center; gap: 12px; height: 46px; padding: 0 18px; border: none; border-radius: 99px; cursor: pointer; background: var(--c-panel); color: var(--c-ink); font: 700 11.5px var(--f-head); letter-spacing: .04em; text-transform: uppercase; transition: background .2s, color .2s; }
+.sched-filter-btn.is-on { background: var(--c-ink); color: #fff; }
+.sched-caret { font-size: 9px; opacity: .6; transition: transform .2s; }
+.sched-filter-btn[aria-expanded="true"] .sched-caret { transform: rotate(180deg); }
+.sched-active-chip { display: inline-flex; align-items: center; gap: 8px; padding: 11px 15px; border: none; border-radius: 99px; cursor: pointer; background: var(--c-panel); color: var(--c-ink); font: 700 11.5px var(--f-head); text-transform: uppercase; }
+.sched-active-chip.is-live { background: var(--c-signal); color: #fff; }
+.sched-reset { padding: 9px 14px; border: none; border-radius: 99px; cursor: pointer; background: var(--c-panel); color: var(--c-gray-text); font: 700 11px var(--f-head); letter-spacing: .03em; text-transform: uppercase; }
+.sched-summary { display: inline-flex; align-items: center; gap: 9px; font: 700 11.5px var(--f-head); letter-spacing: .06em; text-transform: uppercase; }
+.sched-summary-dot { width: 6px; height: 6px; border-radius: 99px; background: var(--c-main); }
+
+.sched-panel { margin-top: 12px; padding: 22px 24px; border-radius: 22px; background: var(--c-panel); }
+.sched-label { font: 700 10px var(--f-head); letter-spacing: .16em; text-transform: uppercase; color: var(--c-gray-text); }
+.sched-label--sheet { margin-top: 20px; font-size: 9.5px; color: #a3a3a3; }
+.sched-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 11px; }
+.sched-chip { padding: 11px 15px; border: 1.5px solid rgba(13,13,13,.16); border-radius: 99px; cursor: pointer; background: transparent; color: var(--c-ink); font: 700 12px var(--f-head); text-transform: uppercase; }
+.sched-chip.is-on { border-color: var(--c-ink); background: var(--c-ink); color: #fff; }
+.sched-chip--live.is-on { border-color: var(--c-signal); background: var(--c-signal); }
+
+.sched-subscribe { position: relative; }
+.sched-subscribe-btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border: none; border-radius: 99px; cursor: pointer; background: var(--c-main); color: var(--c-ink); font: 700 11px var(--f-head); letter-spacing: .03em; text-transform: uppercase; }
+.sched-subscribe-btn.is-on { background: var(--c-ink); color: #fff; }
+.sched-subscribe-pop { position: absolute; top: calc(100% + 8px); right: 0; z-index: 40; width: min(380px, calc(100vw - 36px)); padding: 16px; border-radius: 22px; background: #fff; box-shadow: 0 24px 54px -18px rgba(0,0,0,.45), 0 0 0 1px rgba(13,13,13,.06); }
+
+/* ===== Лента: телефон ===== */
+.sched-rows { display: flex; flex-direction: column; margin-top: 18px; }
+.sched-row { display: flex; align-items: center; gap: 13px; padding: 12px 0; border-top: 1px solid rgba(13,13,13,.12); color: var(--c-ink); }
+.sched-row-chip { flex: 0 0 44px; height: 44px; border-radius: 13px; background: var(--tone-bg); color: var(--tone-fg); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.sched-row-day { font: 800 15px/1 var(--f-head); }
+.sched-row-mon { font: 700 7.5px var(--f-head); letter-spacing: .1em; opacity: .7; margin-top: 2px; }
+.sched-row-title { display: block; font: 600 18px/1.1 var(--f-head); letter-spacing: -.015em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sched-row-sub { display: block; margin-top: 4px; font: 600 11px var(--f-body); color: var(--c-gray-text); }
+.sched-row-knob { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 99px; background: var(--c-panel); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+
+.sched-main-card { margin: 4px 0 12px; border-radius: 20px; background: var(--c-second); color: #fff; padding: 18px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.sched-row + .sched-main-card { margin-top: 12px; }
+.sched-main-card + .sched-row { border-top: none; }
+.sched-main-chip { display: inline-flex; background: #fff; color: var(--c-ink); padding: 6px 11px; border-radius: 8px; font: 700 9px var(--f-head); letter-spacing: .08em; text-transform: uppercase; }
+.sched-main-title { margin-top: 12px; font: 600 23px/1.1 var(--f-head); letter-spacing: -.015em; }
+.sched-main-sub { margin-top: 8px; font: 600 12px var(--f-body); opacity: .85; }
+.sched-main-knob { flex: 0 0 auto; width: 46px; height: 46px; border-radius: 99px; background: #fff; color: var(--c-ink); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+/* Тона карточек событий, как в макете. */
+.tone-purple { --tone-bg: #02407d; --tone-fg: #fff; --chip-bg: #fff; --chip-fg: #0d0d0d; --knob-bg: #fff; --knob-fg: #0d0d0d; }
+.tone-yellow { --tone-bg: #00b7e3; --tone-fg: #0d0d0d; --chip-bg: rgba(13,13,13,.12); --chip-fg: #0d0d0d; --knob-bg: #0d0d0d; --knob-fg: #fff; }
+.tone-peach { --tone-bg: #f9c9a5; --tone-fg: #0d0d0d; --chip-bg: rgba(13,13,13,.12); --chip-fg: #0d0d0d; --knob-bg: #0d0d0d; --knob-fg: #fff; }
+.tone-dark { --tone-bg: #0d0d0d; --tone-fg: #fff; --chip-bg: rgba(255,255,255,.16); --chip-fg: #fff; --knob-bg: #00b7e3; --knob-fg: #0d0d0d; }
+
+.sched-dot { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 99px; background: var(--dot); }
+
+/* ===== Пусто ===== */
+.sched-empty { display: flex; flex-direction: column; align-items: center; margin-top: 18px; padding: 34px 20px; border-radius: 20px; background: var(--c-panel); text-align: center; }
+.sched-empty-title { font: 800 17px var(--f-head); letter-spacing: -.01em; text-transform: uppercase; }
+.sched-empty-text { max-width: 340px; margin-top: 6px; font: 500 12.5px/1.5 var(--f-body); color: #8a8a8a; }
+.sched-empty-btn { margin-top: 16px; padding: 12px 20px; border: none; border-radius: 99px; background: var(--c-ink); color: #fff; font: 700 11.5px var(--f-head); letter-spacing: .03em; text-transform: uppercase; cursor: pointer; }
+
+/* ===== Календарь: телефон ===== */
+.sched-monthview { margin-top: 18px; }
+.sched-weekdays, .sched-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
+.sched-weekdays { margin-bottom: 8px; }
+.sched-weekdays div { text-align: center; font: 700 9.5px var(--f-head); letter-spacing: .16em; text-transform: uppercase; color: #a3a3a3; }
+.sched-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; height: 46px; padding: 0; border: none; border-radius: 14px; background: transparent; color: var(--c-ink); cursor: pointer; transition: background .2s, color .2s; }
+.sched-cell.has-events { background: var(--c-panel); }
+.sched-cell.is-sel { background: var(--c-ink); color: #fff; }
+.sched-cell-num { font: 600 15px/1 var(--f-head); }
+.sched-cell.is-sel .sched-cell-num { font-weight: 800; }
+.sched-cell-time { display: none; }
+.sched-cell-dots { display: flex; gap: 3px; height: 6px; }
+.sched-cell-dots .sched-dot { width: 6px; height: 6px; background: var(--c-ink); }
+.sched-cell-dots .sched-dot:nth-child(n + 4) { display: none; }
+.sched-cell.is-sel .sched-cell-dots .sched-dot { background: var(--c-main); }
+.sched-legend { display: none; }
+
+.sched-day { margin-top: 20px; }
+.sched-day-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sched-day-label { font: 700 9.5px var(--f-head); letter-spacing: .16em; text-transform: uppercase; color: #a3a3a3; }
+.sched-day-count { font: 600 11.5px var(--f-body); color: #8a8a8a; }
+.sched-day-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.sched-day-card { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 16px; border-radius: 20px; background: var(--tone-bg); color: var(--tone-fg); }
+.sched-day-body { display: block; }
+.sched-day-time { display: inline-flex; padding: 6px 11px; border-radius: 8px; background: var(--chip-bg); color: var(--chip-fg); font: 700 9px var(--f-head); letter-spacing: .08em; text-transform: uppercase; }
+.sched-day-title { display: block; margin-top: 10px; font: 600 21px/1.1 var(--f-head); letter-spacing: -.015em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sched-day-place { display: block; margin-top: 6px; font: 600 11.5px var(--f-body); opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sched-day-knob { flex: 0 0 auto; width: 42px; height: 42px; border-radius: 99px; background: var(--knob-bg); color: var(--knob-fg); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.sched-day-empty { margin-top: 18px; padding: 30px 18px; border-radius: 20px; background: var(--c-panel); text-align: center; }
+.sched-day-empty .sched-empty-text { max-width: none; }
+
+/* ===== Шторка фильтра (телефон) ===== */
+.sched-sheet { position: fixed; inset: 0; z-index: 100; }
+.sched-sheet-backdrop { position: absolute; inset: 0; background: rgba(13,13,13,.55); animation: schedFade .22s ease-out; }
+.sched-sheet-panel { position: absolute; left: 0; right: 0; bottom: 0; max-height: 100dvh; overflow-y: auto; background: #fff; border-radius: 28px 28px 0 0; padding: 14px 18px calc(26px + env(safe-area-inset-bottom)); box-shadow: 0 -20px 60px -20px rgba(0,0,0,.5); animation: sheetIn .3s cubic-bezier(.2,.8,.2,1); }
+.sched-sheet-handle { width: 44px; height: 4px; border-radius: 99px; background: #e0e0e2; margin: 0 auto; }
+.sched-sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
+.sched-sheet-title { font: 900 26px var(--f-head); letter-spacing: -.03em; text-transform: uppercase; }
+.sched-sheet-reset { border: none; background: none; padding: 0; font: 700 11px var(--f-head); letter-spacing: .08em; text-transform: uppercase; color: #8a8a8a; cursor: pointer; }
+.sched-cells { display: flex; gap: 8px; margin-top: 11px; }
+.sched-cells button { flex: 1; padding: 12px 0; border: none; border-radius: 14px; cursor: pointer; background: var(--c-panel); color: var(--c-ink); font: 700 11.5px var(--f-head); text-transform: uppercase; }
+.sched-cells button.is-on { background: var(--c-main); }
+.sched-sheet-apply { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 24px; padding: 8px 8px 8px 20px; border: none; border-radius: 99px; background: var(--c-ink); color: #fff; cursor: pointer; font: 700 13.5px var(--f-head); text-transform: uppercase; text-align: left; }
+.sched-sheet-apply > span:first-child { flex: 1; }
+.sched-sheet-go { width: 44px; height: 44px; border-radius: 99px; background: var(--c-main); color: var(--c-ink); display: flex; align-items: center; justify-content: center; font-size: 17px; }
+
+@keyframes schedFade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ===== Десктоп ===== */
+@media (min-width: 861px) {
+  .sched-page { padding: 26px 32px 48px; }
+
+  .sched-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .sched-title { margin-top: 8px; font-size: 54px; font-weight: 900; line-height: .9; letter-spacing: -.04em; }
+  .sched-controls { flex-direction: row; align-items: center; gap: 10px; margin-top: 0; }
+
+  .sched-monthnav { gap: 3px; padding: 4px; border-radius: 99px; background: var(--c-panel); }
+  .sched-arrow { width: 38px; height: 38px; background: transparent; }
+  .sched-arrow:hover { background: rgba(255,255,255,.9); }
+  .sched-pick { position: relative; }
+  .sched-pick--month { flex: 0 0 auto; }
+  .sched-pick--year { flex: 0 0 auto; }
+  .sched-pick > button { height: 38px; background: #fff; font-size: 13.5px; }
+  .sched-pick--month > button { min-width: 146px; padding: 0 14px; }
+  .sched-pick--year > button { min-width: 78px; text-transform: none; }
+  .sched-pop { top: calc(100% + 11px); }
+  .sched-pop--months { left: 50%; right: auto; transform: translateX(-50%); width: 320px; }
+  .sched-pop--years { left: 50%; right: auto; transform: translateX(-50%); min-width: 124px; }
+
+  .sched-seg button { padding: 11px 20px; font-size: 11.5px; }
+
+  .sched-toolbar { margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(13,13,13,.12); }
+  .sched-reset { padding: 10px 16px; }
+  .sched-chip { padding: 11px 16px; background: #fff; }
+  .sched-chips { gap: 9px; margin-top: 12px; }
+
+  .sched-empty { margin-top: 16px; padding: 56px 20px; border-radius: 24px; }
+  .sched-empty-title { font-size: 22px; }
+  .sched-empty-text { margin-top: 8px; font-size: 14px; color: var(--c-gray-text); }
+  .sched-empty-btn { margin-top: 18px; padding: 14px 24px; font-size: 12px; }
+
+  /* Лента */
+  .sched-month-label { margin-top: 26px; font: 700 10px var(--f-head); letter-spacing: .16em; text-transform: uppercase; color: var(--c-gray-text); }
+  .sched-lenta { margin-top: 8px; }
+  .sched-lenta-day { display: flex; gap: 24px; padding: 20px 0; border-top: 1px solid rgba(13,13,13,.12); }
+  .sched-lenta-day.is-today { border-top-color: rgba(2,64,125,.45); }
+  .sched-lenta-date { flex: 0 0 186px; display: flex; align-items: flex-start; gap: 14px; padding-top: 2px; }
+  .sched-lenta-num { flex: 0 0 62px; height: 62px; border-radius: 18px; background: var(--c-panel); display: flex; align-items: center; justify-content: center; font: 900 26px var(--f-head); letter-spacing: -.03em; }
+  .is-today .sched-lenta-num { background: var(--c-second); color: #fff; }
+  .sched-lenta-dow { display: block; font: 800 11.5px var(--f-head); letter-spacing: .05em; text-transform: uppercase; }
+  .sched-lenta-month { display: block; margin-top: 4px; font: 500 12.5px var(--f-body); color: var(--c-gray-text); }
+  .sched-lenta-count { display: block; margin-top: 8px; font: 700 9.5px var(--f-head); letter-spacing: .12em; text-transform: uppercase; color: #a3a3a3; }
+  .sched-today-badge { display: inline-flex; margin-top: 8px; padding: 5px 10px; border-radius: 8px; background: var(--c-second); color: #fff; font: 700 8.5px var(--f-head); letter-spacing: .12em; text-transform: uppercase; }
+  .sched-lenta-items { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+  .sched-lenta-card { display: flex; align-items: center; gap: 20px; padding: 20px 22px; border-radius: 20px; background: var(--c-panel); color: var(--c-ink); transition: transform .2s, box-shadow .2s; }
+  .sched-lenta-card:hover { transform: translateY(-2px); box-shadow: 0 18px 34px -22px rgba(13,13,13,.55); }
+  .sched-lenta-card.is-filled { background: var(--tone-bg); color: var(--tone-fg); }
+  .sched-lenta-card .sched-dot { width: 10px; height: 10px; }
+  .sched-lenta-card.is-filled .sched-dot { background: rgba(255,255,255,.85); }
+  .sched-lenta-time { flex: 0 0 132px; font: 800 15px var(--f-head); letter-spacing: .02em; opacity: .7; }
+  .sched-lenta-card.is-filled .sched-lenta-time { opacity: 1; }
+  .sched-lenta-title { display: block; font: 700 24px/1.05 var(--f-head); letter-spacing: -.025em; }
+  .sched-lenta-sub { display: block; margin-top: 7px; font: 600 12.5px var(--f-body); opacity: .72; }
+  .sched-live { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; padding: 7px 13px; border-radius: 99px; background: rgba(13,13,13,.08); font: 700 9.5px var(--f-head); letter-spacing: .1em; text-transform: uppercase; }
+  .sched-lenta-card.is-filled .sched-live { background: rgba(255,255,255,.14); }
+  .sched-live-dot { width: 7px; height: 7px; border-radius: 99px; background: var(--c-signal); }
+  .sched-knob { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 99px; background: #fff; color: var(--c-ink); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+
+  /* Месяц */
+  .sched-monthview { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 452px); gap: 24px; margin-top: 24px; align-items: start; }
+  .sched-calendar { border-radius: 24px; background: var(--c-panel); padding: 22px 24px 20px; }
+  .sched-weekdays, .sched-grid { gap: 6px; }
+  .sched-weekdays { margin-bottom: 10px; }
+  .sched-weekdays div { text-align: left; padding-left: 12px; font-size: 10px; letter-spacing: .14em; color: var(--c-gray-text); }
+  .sched-cell { align-items: flex-start; justify-content: space-between; height: 92px; padding: 11px 12px; border-radius: 16px; overflow: hidden; text-align: left; background: rgba(255,255,255,.42); color: #9a9a9e; }
+  .sched-cell.is-out { background: transparent; }
+  .sched-cell.has-events { background: #fff; color: var(--c-ink); }
+  .sched-cell.is-today:not(.is-sel) { box-shadow: inset 0 0 0 2px var(--c-second); }
+  .sched-cell.is-sel { background: var(--c-ink); color: #fff; }
+  .sched-cell-num { font-weight: 700; font-size: 19px; letter-spacing: -.03em; }
+  .sched-cell.is-sel .sched-cell-num { font-weight: 900; }
+  .sched-cell-foot { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; width: 100%; }
+  .sched-cell-time { display: block; font: 600 11px var(--f-body); letter-spacing: .01em; white-space: pre; opacity: .55; }
+  .sched-cell.is-sel .sched-cell-time { opacity: .8; }
+  .sched-cell-dots { gap: 4px; height: 8px; }
+  .sched-cell-dots .sched-dot, .sched-cell.is-sel .sched-cell-dots .sched-dot { width: 8px; height: 8px; background: var(--dot); }
+  .sched-cell-dots .sched-dot:nth-child(4) { display: block; }
+  .sched-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(13,13,13,.12); }
+  .sched-legend > span { display: inline-flex; align-items: center; gap: 7px; font: 600 11.5px var(--f-body); color: var(--c-gray-text); }
+
+  .sched-day { margin-top: 0; padding: 22px; border-radius: 24px; background: #fff; box-shadow: 0 0 0 1px rgba(13,13,13,.09); }
+  .sched-day-label { font: 800 21px/1.1 var(--f-head); letter-spacing: -.025em; text-transform: none; color: var(--c-ink); }
+  .sched-day-count { flex: 0 0 auto; padding: 6px 11px; border-radius: 99px; background: var(--c-panel); font: 700 10px var(--f-head); letter-spacing: .08em; text-transform: uppercase; color: var(--c-gray-text); }
+  .sched-day-list { margin-top: 16px; }
+  .sched-day-card { align-items: center; gap: 16px; padding: 16px 18px; border-radius: 18px; }
+  .sched-day-body { display: flex; align-items: center; gap: 16px; }
+  .sched-day-time { flex: 0 0 auto; padding: 7px 11px; border-radius: 9px; font: 800 11.5px var(--f-head); letter-spacing: .02em; }
+  .sched-day-title { margin-top: 0; font: 700 20px/1.1 var(--f-head); letter-spacing: -.025em; white-space: normal; }
+  .sched-day-place { font-size: 12px; opacity: .72; }
+  .sched-day-knob { width: 38px; height: 38px; font-size: 15px; }
+  .sched-day-empty { margin-top: 14px; padding: 44px 20px; }
+  .sched-day-empty .sched-empty-title { font-size: 18px; }
+  .sched-day-empty .sched-empty-text { margin-top: 7px; font-size: 13.5px; }
+}
+
+/* Узкий десктоп: календарь и день — друг под другом. */
+@media (min-width: 861px) and (max-width: 1080px) {
+  .sched-monthview { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sched-sheet-panel, .sched-sheet-backdrop { animation: none; }
+}

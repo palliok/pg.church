@@ -16,12 +16,6 @@ function fromToday(days, hours = 12, minutes = 0) {
   return date;
 }
 
-// Ближайший день недели (0 — воскресенье) после сегодняшнего, как Carbon::next().
-function nextWeekday(weekday, hours, minutes = 0) {
-  const shift = (weekday - new Date().getDay() + 7) % 7 || 7;
-  return fromToday(shift, hours, minutes);
-}
-
 const iso = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00+03:00`;
 
 const dateParts = (date) => ({
@@ -153,7 +147,8 @@ const sermon = {
   durationLabel: 'Слушать 42 мин',
 };
 
-function event(id, { title, tag, startsAt, place, desc, main = false, live: hasStream = false, withSermon = false, hymnNums = [] }) {
+// category — направление для фильтра расписания; бэкенд его пока не отдаёт (см. eventCategory в src/api/events.js).
+function event(id, { title, tag, category, startsAt, minutes, place, desc, main = false, live: hasStream = false, withSermon = false, hymnNums = [] }) {
   const weekday = WEEKDAYS[startsAt.getDay()];
   const time = `${pad(startsAt.getHours())}:${pad(startsAt.getMinutes())}`;
   const hymns = songs.filter((song) => hymnNums.includes(song.num));
@@ -162,11 +157,12 @@ function event(id, { title, tag, startsAt, place, desc, main = false, live: hasS
     id,
     title,
     tag,
+    category,
     main,
     live: hasStream,
     streamUrl: null,
     startsAt: iso(startsAt),
-    endsAt: null,
+    endsAt: iso(new Date(startsAt.getTime() + minutes * 60_000)),
     allDay: false,
     ...dateParts(startsAt),
     dow: startsAt.getDay() || 7,
@@ -183,55 +179,102 @@ function event(id, { title, tag, startsAt, place, desc, main = false, live: hasS
   };
 }
 
-// Расписание на четыре недели вперёд: воскресное служение, молитва по средам, молодёжь по пятницам.
+// Еженедельные встречи: [день недели (0 — воскресенье), часы, минуты, длительность в минутах, через неделю?, событие].
+const WEEKLY = [
+  [0, 11, 0, 120, false, {
+    title: 'Богослужение',
+    tag: 'Воскресенье',
+    category: 'Богослужение',
+    place: 'Главный зал',
+    desc: [
+      'Воскресное богослужение — время совместного поклонения, молитвы и слова. Приходите заранее, чтобы найти место и познакомиться с теми, кто рядом.',
+      'После служения — чай и общение в фойе. Детская программа проходит параллельно, для малышей открыта комната с 10:45.',
+    ],
+    main: true,
+    live: true,
+  }],
+  [0, 14, 0, 90, true, {
+    title: 'Обед общения',
+    tag: 'Общение',
+    category: 'Общение',
+    place: 'Кафе церкви',
+    desc: ['После богослужения остаёмся на простой обед — познакомиться и поговорить без спешки.'],
+  }],
+  [3, 19, 0, 90, false, {
+    title: 'Молитвенная встреча',
+    tag: 'Будни',
+    category: 'Молитва',
+    place: 'Малый зал',
+    desc: ['Собираемся вместе, чтобы молиться друг за друга, за город и за тех, кто ищет Бога.'],
+  }],
+  [4, 19, 30, 90, false, {
+    title: 'Малая группа',
+    tag: 'Общение',
+    category: 'Общение',
+    place: 'Каб. 2',
+    desc: ['Несколько человек читают Библию, говорят о жизни и молятся друг за друга. Приходить можно без подготовки.'],
+  }],
+  [5, 19, 30, 120, false, {
+    title: 'Молодёжная встреча',
+    tag: 'Молодёжь',
+    category: 'Молодёжь',
+    place: 'Молодёжный зал',
+    desc: ['Игры, обсуждение и время в слове для тех, кому от 14 до 25.'],
+  }],
+  [6, 11, 0, 120, true, {
+    title: 'Детский клуб',
+    tag: 'Дети',
+    category: 'Дети',
+    place: 'Детская комната',
+    desc: ['Истории из Библии, поделки и игры для детей от 5 до 11 лет.'],
+  }],
+];
+
+// Расписание от трёх недель назад до шести недель вперёд, чтобы листать месяцы.
+// Проповедь и гимны — у ближайшего воскресного богослужения.
 function buildEvents() {
   const list = [];
 
-  for (let week = 0; week < 4; week += 1) {
-    const sunday = nextWeekday(0, 11);
-    sunday.setDate(sunday.getDate() + week * 7);
-    const wednesday = nextWeekday(3, 19);
-    wednesday.setDate(wednesday.getDate() + week * 7);
-    const friday = nextWeekday(5, 19, 30);
-    friday.setDate(friday.getDate() + week * 7);
+  for (let days = -21; days <= 42; days += 1) {
+    const date = fromToday(days, 0);
 
-    list.push(event(list.length + 1, {
-      title: 'Богослужение',
-      tag: 'Воскресенье',
-      startsAt: sunday,
-      place: 'Главный зал',
-      desc: [
-        'Воскресное богослужение — время совместного поклонения, молитвы и слова. Приходите заранее, чтобы найти место и познакомиться с теми, кто рядом.',
-        'После служения — чай и общение в фойе. Детская программа проходит параллельно, для малышей открыта комната с 10:45.',
-      ],
-      main: true,
-      live: true,
-      withSermon: week === 0,
-      hymnNums: week === 0 ? [88, 214] : [],
-    }));
-    list.push(event(list.length + 1, {
-      title: 'Молитвенная встреча',
-      tag: 'Будни',
-      startsAt: wednesday,
-      place: 'Малый зал',
-      desc: ['Собираемся вместе, чтобы молиться друг за друга, за город и за тех, кто ищет Бога.'],
-    }));
-    list.push(event(list.length + 1, {
-      title: 'Молодёжная встреча',
-      tag: 'Молодёжь',
-      startsAt: friday,
-      place: 'Молодёжный зал',
-      desc: ['Игры, обсуждение и время в слове для тех, кому от 14 до 25.'],
-    }));
+    for (const [weekday, hours, minutes, duration, biweekly, props] of WEEKLY) {
+      if (date.getDay() !== weekday) continue;
+      if (biweekly && Math.floor((days + 21) / 7) % 2 === 1) continue;
+
+      const startsAt = fromToday(days, hours, minutes);
+      const nextSunday = props.main && days > 0 && days <= 7;
+
+      list.push({
+        ...props,
+        startsAt,
+        minutes: duration,
+        withSermon: nextSunday,
+        hymnNums: nextSunday ? [88, 214] : [],
+      });
+    }
   }
 
-  return list.sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+  return list
+    .sort((a, b) => a.startsAt - b.startsAt)
+    .map((props, index) => event(index + 1, props));
 }
 
 const events = buildEvents();
 
 // В списке расписания проповедь и гимны не загружаются — как в EventController::index.
 const eventSummary = ({ sermon: _sermon, hymns: _hymns, hymnIds: _hymnIds, ...rest }) => rest;
+
+// GET /events: from и to — даты «2026-10-01», без from — с сегодняшнего дня, limit — до 50 по умолчанию.
+function eventsBetween(params) {
+  const from = params.get('from') ?? iso(fromToday(0, 0)).slice(0, 10);
+  const to = params.get('to') ?? '9999-12-31';
+
+  return events
+    .filter((item) => item.startsAt.slice(0, 10) >= from && item.startsAt.slice(0, 10) <= to)
+    .slice(0, Number(params.get('limit')) || 50)
+    .map(eventSummary);
+}
 
 // ===== Объявления =====
 // Формат опережает бэкенд: дата, isNew, when, where и contact пока есть только здесь,
@@ -338,7 +381,7 @@ const ROUTES = [
   [/^\/live$/, live],
   [/^\/announcements$/, () => announcements],
   [/^\/donation$/, () => donation],
-  [/^\/events$/, (params) => events.slice(0, Number(params.get('limit')) || 50).map(eventSummary)],
+  [/^\/events$/, eventsBetween],
   [/^\/events\/(\d+)$/, (_params, id) => findById(events, id)],
   [/^\/events\/(\d+)\/sermon$/, (_params, id) => findById(events, id)?.sermon],
   [/^\/songs$/, (params) => (params.get('q') ? searchSongs(params.get('q')) : songs)],

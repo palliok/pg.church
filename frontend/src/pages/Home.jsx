@@ -127,16 +127,20 @@ export default function Home() {
           </div>
           <div className="home-schedule-list" style={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: 10 }}>
             {homeEvents.map((e) => (
-              <Link key={e.id} to={`/schedule/${e.id}`} className="card-row" style={{ padding: '8px 0' }}>
-                <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 46, height: 46, borderRadius: 14, background: '#0d0d0d', color: '#fff', flex: '0 0 auto' }}>
-                  <span style={{ fontFamily: 'var(--f-head)', fontWeight: 800, fontSize: 16, lineHeight: 1 }}>{e.day}</span>
-                  <span style={{ fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 7.5, letterSpacing: '.1em', opacity: 0.65, marginTop: 2 }}>{e.mon}</span>
+              <Link
+                key={e.id}
+                to={`/schedule/${e.id}`}
+                className={`home-sched-row${e.main ? ' is-main' : ''}${['Молодёжь', 'Дети'].includes(e.category) ? ' is-peach' : ''}`}
+              >
+                <span className="home-sched-chip">
+                  <span className="home-sched-day">{e.day}</span>
+                  <span className="home-sched-mon">{e.mon}</span>
                 </span>
                 <span style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: 'block', fontFamily: 'var(--f-head)', fontWeight: 600, fontSize: 17, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.title}</span>
-                  <span style={{ display: 'block', font: '500 11.5px var(--f-body)', color: 'var(--c-gray-text)', marginTop: 2 }}>{e.when}</span>
+                  <span className="home-sched-title">{e.title}</span>
+                  <span className="home-sched-sub">{[e.dowLabel, e.timeRange].filter(Boolean).join(' · ')}</span>
                 </span>
-                <span style={{ color: 'var(--c-gray-text-mute)' }}>↗</span>
+                <span className="home-sched-knob" aria-hidden="true">↗</span>
               </Link>
             ))}
             {eventsError && (

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { getLang, t } from '../i18n.js';
-import { dayLabel, formatDate } from './dates.js';
+import { dayLabel, formatDate, isoTime } from './dates.js';
 import { useApi } from './useApi.js';
 
 function toSermon(sermon) {
@@ -35,6 +35,38 @@ function dateLabels(raw) {
   }
 }
 
+// Направления расписания (фильтр и цвета на странице расписания). Ключ — значение поля category.
+export const EVENT_CATEGORIES = ['Богослужение', 'Молодёжь', 'Молитва', 'Дети', 'Общение'];
+
+const WEEKDAYS_SHORT = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+
+// Поле category пока есть только в моках (src/api/mocks.js). Бэкенд отдаёт лишь свободный тег из админки
+// («Воскресенье», «Будни», «Молодёжь»), поэтому направление угадываем по тегу и названию.
+const CATEGORY_HINTS = [
+  ['Молодёжь', /молод/i],
+  ['Дети', /дет/i],
+  ['Молитва', /молит/i],
+  ['Общение', /групп|общени|обед|чаепити/i],
+  ['Богослужение', /богослуж|воскрес|крещени|причасти|спевк/i],
+];
+
+function eventCategory(raw) {
+  if (raw.category) return raw.category;
+  if (raw.main) return 'Богослужение';
+
+  const text = `${raw.tag ?? ''} ${raw.title}`;
+  return CATEGORY_HINTS.find(([, pattern]) => pattern.test(text))?.[0] ?? null;
+}
+
+// Время события: «11:00–13:00», «19:00» без окончания или «Весь день».
+function timeRange(raw) {
+  if (raw.allDay) return t('Весь день');
+
+  const start = isoTime(raw.startsAt);
+  const end = raw.endsAt && raw.endsAt.slice(0, 10) === raw.startsAt.slice(0, 10) ? isoTime(raw.endsAt) : null;
+  return end && end !== start ? `${start}–${end}` : start;
+}
+
 // Приводит событие из API к виду, который ждут страницы: тексты переводятся
 // словарём, как раньше моки, подписи даты — на языке сайта.
 function toEvent(raw) {
@@ -50,6 +82,9 @@ function toEvent(raw) {
     addr: t(raw.addr),
     desc: raw.desc.map(t),
     when: [labels.dowLabel, raw.timeLabel, place].filter(Boolean).join(' · '),
+    dowShort: t(WEEKDAYS_SHORT[raw.dow - 1]),
+    timeRange: timeRange(raw),
+    category: eventCategory(raw),
   };
 
   if (raw.sermon) event.sermon = toSermon(raw.sermon);
@@ -58,9 +93,10 @@ function toEvent(raw) {
   return event;
 }
 
-// Расписание начиная с сегодняшнего дня.
-export function useEvents({ limit } = {}) {
-  const { data, ...status } = useApi(limit ? `/events?limit=${limit}` : '/events');
+// Расписание: без from — начиная с сегодняшнего дня; from и to — даты «2026-10-01».
+export function useEvents({ limit, from, to } = {}) {
+  const query = new URLSearchParams(Object.entries({ from, to, limit }).filter(([, value]) => value != null)).toString();
+  const { data, ...status } = useApi(query ? `/events?${query}` : '/events');
   const events = useMemo(() => (data ?? []).map(toEvent), [data]);
 
   return { events, ...status };
