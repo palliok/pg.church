@@ -1,6 +1,7 @@
 /* Расписание. Макеты: «Расписание» в App.dc.html (телефон) и Site.dc.html (десктоп). Сначала телефон, от 861px — десктоп. */
 
-.sched-page { padding: 26px 18px 48px; }
+/* С .container, иначе его padding: 0 32px перебивает верхний отступ — как у .container.ann-page. */
+.container.sched-page { padding: 26px 18px 48px; }
 
 /* Части только для десктопа (.sched-d) или только для телефона (.sched-m); свой display они берут из своих классов. */
 @media (max-width: 860px) { .sched-d { display: none !important; } }
@@ -8,10 +9,10 @@
 
 /* ===== Шапка ===== */
 .sched-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.sched-eyebrow { font: 700 10px var(--f-head); letter-spacing: .16em; text-transform: uppercase; color: #a3a3a3; }
 .sched-title { font-size: 38px; font-weight: 800; line-height: 1; letter-spacing: -.035em; }
 
-.sched-filter-round { position: relative; flex: 0 0 auto; width: 46px; height: 46px; border: none; border-radius: 99px; background: var(--c-ink); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+/* Отрицательные поля: кнопка выше заголовка, но не сдвигает его вниз — отступ сверху как у других страниц. */
+.sched-filter-round { position: relative; flex: 0 0 auto; width: 46px; height: 46px; margin: -4px 0; border: none; border-radius: 99px; background: var(--c-ink); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .sched-badge { position: absolute; top: 1px; right: 1px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: var(--c-main); color: var(--c-ink); font: 800 10px var(--f-head); display: flex; align-items: center; justify-content: center; }
 .sched-badge--inline { position: static; min-width: 22px; height: 22px; padding: 0 6px; font-size: 11px; }
 
@@ -149,10 +150,10 @@
 
 /* ===== Десктоп ===== */
 @media (min-width: 861px) {
-  .sched-page { padding: 26px 32px 48px; }
+  .container.sched-page { padding: 26px 32px 48px; }
 
   .sched-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
-  .sched-title { margin-top: 8px; font-size: 54px; font-weight: 900; line-height: .9; letter-spacing: -.04em; }
+  .sched-title { font-size: 54px; font-weight: 900; line-height: .9; letter-spacing: -.04em; }
   .sched-controls { flex-direction: row; align-items: center; gap: 10px; margin-top: 0; }
 
   .sched-monthnav { gap: 3px; padding: 4px; border-radius: 99px; background: var(--c-panel); }
