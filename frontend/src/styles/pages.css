@@ -61,7 +61,7 @@
 
   .home-hero { flex: 1; min-height: min-content; }
   .home-address { flex: none; }
-  .home-address .contacts-card-map { height: 110px; }
+  .home-address .contacts-card-map { height: 125px; }
 
   /* На главной — три последних объявления, остальные на странице объявлений. */
   .home-announcements { flex: none; }
