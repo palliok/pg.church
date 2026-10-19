@@ -175,6 +175,35 @@ input, textarea, select { font-family: inherit; }
 .site-footer-legal span {
   display: block;
 }
+
+/* Шапка десктопа: логотип, меню, языки и «Поддержать». */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 18px 32px 14px;
+}
+
+.site-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 999px;
+  background: var(--c-panel);
+}
+
+/* В одну строку шапка помещается примерно с 1130px (длиннее всего меню на киргизском).
+   Уже — меню переносится на отдельную строку под логотипом: ::after разрывает строку. */
+@media (max-width: 1180px) {
+  .site-header { flex-wrap: wrap; row-gap: 0; }
+  .site-header::after { content: ''; order: 1; flex-basis: 100%; }
+  .site-header-nav { order: 2; margin-top: 14px; }
+}
 @media (max-width: 860px) {
   .desktop-only { display: none !important; }
   .mobile-only { display: block !important; }

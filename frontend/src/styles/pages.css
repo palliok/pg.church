@@ -229,7 +229,7 @@
     border: 0;
     background: transparent;
     color: var(--c-gray-text);
-    padding: 7px 10px;
+    padding: 7px;
     border-radius: 99px;
     font-family: var(--f-head);
     font-weight: 700;
@@ -240,8 +240,8 @@
   .home-mobile-lang button.active {
     background: var(--c-ink);
     color: #fff;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 9px;
+    padding-right: 9px;
   }
 
   .home-mobile-hero {
@@ -387,11 +387,13 @@
 
 }
 
+/* Шапка из resources/Mobile Header.html помещается в одну строку примерно с 370px;
+   на экранах уже переключатель языков встаёт отдельной строкой над логотипом. */
 @media (max-width: 370px) {
+  .home-mobile-header { flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 8px; }
+  .home-mobile-lang { order: -1; align-self: flex-end; }
   .home-mobile-hero-title { font-size: 45px; }
   .home-mobile-hero-meta { display: none; }
-  .home-mobile-lang button { padding-left: 8px; padding-right: 8px; }
-  .home-mobile-lang button.active { padding-left: 10px; padding-right: 10px; }
 }
 
 @media (max-width: 860px) {

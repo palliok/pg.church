@@ -1,37 +1,43 @@
+/* Логотип: размеры и цвета — из resources/Logo.html. */
 .church-brand {
   display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
+  align-items: center;
+  gap: 13px;
   min-width: 0;
+  white-space: nowrap;
   color: var(--c-ink);
 }
 
-.church-brand-name {
+.church-brand-word {
+  font: 900 36px/.85 var(--f-head);
+  letter-spacing: -.045em;
+}
+
+.church-brand-dot {
+  color: var(--c-main);
+}
+
+.church-brand-side {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  white-space: nowrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
 }
 
-.church-brand-name strong {
-  font: 800 24px var(--f-head);
-  letter-spacing: -.025em;
-}
-
-.church-brand-name > span {
-  font: 500 20px var(--f-body);
-  color: var(--c-gray-text);
+.church-brand-name {
+  font: 800 16px/1 var(--f-head);
+  letter-spacing: -.02em;
 }
 
 .church-brand-city {
-  font: 500 14px var(--f-body);
-  color: var(--c-gray-text-mute);
+  font: 500 12.5px var(--f-body);
+  color: var(--c-gray-text);
 }
 
+/* На телефоне — по resources/Mobile Header.html: так логотип и языки помещаются в одну строку. */
 @media (max-width: 860px) {
-  .church-brand-name { gap: 7px; }
-  .church-brand-name strong { font-size: 17px; letter-spacing: -.02em; }
-  .church-brand-name > span { font-size: 15px; }
-  .church-brand-city { font-size: 13px; }
+  .church-brand { gap: 8px; }
+  .church-brand-word { font-size: 26px; }
+  .church-brand-name { font-size: 12.5px; }
+  .church-brand-city { font-size: 10.5px; }
 }

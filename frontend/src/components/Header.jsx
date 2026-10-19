@@ -15,19 +15,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   return (
-    <div
-      className="desktop-only"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 24,
-        padding: '18px 32px 14px',
-        maxWidth: 'var(--content-max)',
-        margin: '0 auto',
-        width: '100%',
-      }}
-    >
+    <div className="desktop-only site-header">
       <button
         onClick={() => navigate('/')}
         style={{
@@ -41,16 +29,7 @@ export default function Header() {
         <ChurchBrand />
       </button>
 
-      <nav
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
-          padding: 5,
-          borderRadius: 999,
-          background: 'var(--c-panel)',
-        }}
-      >
+      <nav className="site-header-nav">
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}
