@@ -46,20 +46,6 @@
   .home-mobile-hero .home-hero-title-img { width: 85%; margin: auto 0 -10px -10px; }
 }
 
-/* Строка расписания на главной: главное событие — тёмной плашкой, остальные — с линией сверху. */
-.home-sched-row { display: flex; align-items: center; gap: 13px; padding: 9px 0; border-top: 1px solid rgba(13,13,13,.14); color: var(--c-ink); }
-.home-sched-row.is-main { padding: 11px 12px; border-top: none; border-radius: 16px; background: var(--c-ink); color: #fff; }
-.home-sched-row.is-main + .home-sched-row { border-top: none; }
-.home-sched-chip { flex: 0 0 44px; height: 44px; border-radius: 13px; background: #fff; color: var(--c-ink); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.home-sched-row.is-peach .home-sched-chip { background: var(--c-third); }
-.home-sched-row.is-main .home-sched-chip { background: var(--c-main); }
-.home-sched-day { font: 800 16px/1 var(--f-head); }
-.home-sched-mon { font: 700 7.5px var(--f-head); letter-spacing: .1em; opacity: .65; margin-top: 2px; }
-.home-sched-title { display: block; font: 600 17px/1.1 var(--f-head); letter-spacing: -.015em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.home-sched-sub { display: block; margin-top: 3px; font: 600 11px var(--f-body); color: var(--c-gray-text); }
-.home-sched-row.is-main .home-sched-sub { color: rgba(255,255,255,.6); }
-.home-sched-knob { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 99px; background: #fff; color: var(--c-ink); display: flex; align-items: center; justify-content: center; font-size: 13px; }
-
 /* Десктоп: три колонки, у каждой своя стопка блоков разной высоты.
    Слева Евангелие тянется, адрес компактный; в центре объявления по содержимому,
    расписание — на всю оставшуюся высоту; справа тянется «Поддержать». */
@@ -76,12 +62,10 @@
   .home-address .contacts-card-map { height: 125px; }
 
   .home-announcements { flex: none; }
-  .home-schedule { flex: 1; min-height: 0; padding: 16px !important; }
-  /* Расписание занимает остаток колонки и показывает столько событий, сколько влезает целиком:
-     лишние строки переносятся во вторую колонку списка, а она скрыта. Высота списка
-     не влияет на высоту сетки (flex-basis 0), её задают Евангелие и правая колонка. */
-  .home-schedule-list { flex: 1 1 0 !important; min-height: 0; contain: size; flex-wrap: wrap; align-content: flex-start; column-gap: 40px; overflow: hidden; }
-  .home-schedule-list > * { width: 100%; }
+  /* Расписание занимает остаток колонки и показывает столько событий, сколько влезает (HomeSchedule.jsx).
+     Высота списка не влияет на высоту сетки, её задают Евангелие и правая колонка. */
+  .home-schedule { flex: 1; min-height: 0; }
+  .home-schedule .home-sched-list { contain: size; }
 
   .home-donate-column { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   .home-donate { flex: 1; padding: 16px 18px !important; gap: 14px; }
@@ -111,8 +95,6 @@
   .home-donate { flex: 1; }
   .home-address { grid-column: 2 / 3; grid-row: auto; }
   .home-schedule { grid-column: 1 / 3; }
-  /* Без растягивания по высоте хватает пяти ближайших событий. */
-  .home-schedule-list > :nth-child(n + 6) { display: none; }
   .home-about { grid-column: 1 / 3; grid-row: auto; min-height: 340px; }
   .home-announcements { grid-column: 1 / 3; grid-row: auto; }
 }
@@ -328,62 +310,6 @@
     margin: 0;
     text-wrap: balance;
   }
-
-  .home-mobile-next {
-    border-radius: 24px;
-    background: var(--c-second);
-    color: #fff;
-    padding: 18px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  .home-mobile-next-label {
-    display: inline-flex;
-    background: #fff;
-    color: var(--c-ink);
-    padding: 6px 11px;
-    border-radius: 8px;
-    font-family: var(--f-head);
-    font-weight: 700;
-    font-size: 9px;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-  }
-
-  .home-mobile-next-title {
-    font-family: var(--f-head);
-    font-weight: 800;
-    font-size: 26px;
-    line-height: 1;
-    letter-spacing: -.025em;
-    text-transform: uppercase;
-    margin-top: 12px;
-  }
-
-  .home-mobile-next-meta {
-    font: 600 12px var(--f-body);
-    opacity: .85;
-    margin-top: 7px;
-  }
-
-  .home-mobile-arrow {
-    flex: 0 0 auto;
-    width: 46px;
-    height: 46px;
-    border: 0;
-    border-radius: 99px;
-    background: #fff;
-    color: var(--c-ink);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-  }
-
-
 }
 
 /* Mobile home: tighter top spacing (equal gap above and below the logo row),

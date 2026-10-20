@@ -1,16 +1,36 @@
 import { t, getLang, langPath } from '../i18n.js';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Announcements from '../components/Announcements.jsx';
 import ArrowKnob from '../components/ArrowKnob.jsx';
+import HomeSchedule, { ScheduleCarousel } from '../components/HomeSchedule.jsx';
 import ChurchBrand from '../components/ChurchBrand.jsx';
 import ContactsCard from '../components/ContactsCard.jsx';
 import { useChurch } from '../api/church.js';
+import { daysFromToday } from '../api/dates.js';
 import { useEvents } from '../api/events.js';
 import gospelTitle from '../assets/gospel-title.png';
 
+// Текущее время, обновляется раз в минуту: «через 3 часа» и прошедшие события на главной.
+function useNow() {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return now;
+}
+
 export default function Home() {
-  const { events: homeEvents, error: eventsError } = useEvents({ limit: 12 });
-  const nextEvent = homeEvents[0];
+  const { events: homeEvents, loading: eventsLoading, error: eventsError } = useEvents({ limit: 30 });
+  const now = useNow();
+  // API отдаёт события с начала сегодняшнего дня — закончившиеся сегодня убираем.
+  // Событие на весь день без окончания идёт до конца своего дня.
+  const upcoming = useMemo(() => homeEvents.filter((e) => (e.allDay && !e.endsAt ? daysFromToday(e) >= 0 : Date.parse(e.endsAt ?? e.startsAt) > now)), [homeEvents, now]);
+  // Карусель на телефоне — события на неделю вперёд от текущего момента.
+  const week = useMemo(() => upcoming.filter((e) => Date.parse(e.startsAt) < now + 7 * 86_400_000), [upcoming, now]);
   const duty = useChurch()?.duty;
   // Вопрос «Кто такой Иисус?» нарисован картинкой только по-русски, на en/ky — текстом.
   const titleImage = getLang() === 'ru';
@@ -54,16 +74,8 @@ export default function Home() {
           )}
         </Link>
 
-        {nextEvent && (
-          <Link to={`/schedule/${nextEvent.id}`} className="home-mobile-next">
-            <div style={{ minWidth: 0 }}>
-              <div className="home-mobile-next-label">{t('Ближайшее')} · {nextEvent.dateLabel}</div>
-              <div className="home-mobile-next-title">{nextEvent.title}</div>
-              <div className="home-mobile-next-meta">{nextEvent.when}</div>
-            </div>
-            <span className="home-mobile-arrow">↗</span>
-          </Link>
-        )}
+        {/* Только после загрузки: иначе прокрутка с привязкой зацепится за «В календарь» и уедет в конец. */}
+        {!eventsLoading && !eventsError && <ScheduleCarousel events={week} now={now} />}
 
         <Announcements />
 
@@ -117,36 +129,7 @@ export default function Home() {
         <Announcements className="home-announcements" />
 
         {/* Расписание */}
-        <div className="home-schedule" style={{ borderRadius: 24, background: 'var(--c-panel)', padding: '20px 20px 16px', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-            <div className="h-display" style={{ fontSize: 26, whiteSpace: 'nowrap' }}>Расписание</div>
-            <Link to="/schedule" aria-label={t('Всё расписание')}>
-              <ArrowKnob size={38} as="span" />
-            </Link>
-          </div>
-          <div className="home-schedule-list" style={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: 10 }}>
-            {homeEvents.map((e) => (
-              <Link
-                key={e.id}
-                to={`/schedule/${e.id}`}
-                className={`home-sched-row${e.main ? ' is-main' : ''}${['Молодёжь', 'Дети'].includes(e.category) ? ' is-peach' : ''}`}
-              >
-                <span className="home-sched-chip">
-                  <span className="home-sched-day">{e.day}</span>
-                  <span className="home-sched-mon">{e.mon}</span>
-                </span>
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  <span className="home-sched-title">{e.title}</span>
-                  <span className="home-sched-sub">{[e.dowLabel, e.timeRange].filter(Boolean).join(' · ')}</span>
-                </span>
-                <span className="home-sched-knob" aria-hidden="true">↗</span>
-              </Link>
-            ))}
-            {eventsError && (
-              <div role="alert" style={{ font: '500 12.5px/1.5 var(--f-body)', color: 'var(--c-gray-text)' }}>Не удалось загрузить данные.</div>
-            )}
-          </div>
-        </div>
+        <HomeSchedule className="home-schedule" events={upcoming} loading={eventsLoading} error={eventsError} now={now} />
 
         </div>
 

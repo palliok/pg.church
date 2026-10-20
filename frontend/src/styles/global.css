@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Onest:wght@400;500;600;700&display=swap');
+/* Иконки водяных знаков расписания — только перечисленные в EVENT_ICONS (src/api/events.js), имена по алфавиту. */
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0&icon_names=celebration,church,groups,local_cafe,menu_book,music_note,toys,volunteer_activism,water_drop,wine_bar&display=block');
 
 :root {
   --c-bg: #ffffff;

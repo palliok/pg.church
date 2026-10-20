@@ -147,8 +147,10 @@ const sermon = {
   durationLabel: 'Слушать 42 мин',
 };
 
-// category — направление для фильтра расписания; бэкенд его пока не отдаёт (см. eventCategory в src/api/events.js).
-function event(id, { title, tag, category, startsAt, minutes, place, desc, main = false, live: hasStream = false, withSermon = false, hymnNums = [] }) {
+// Поля, которых бэкенд пока не отдаёт (описаны в README фронтенда, раздел «Моки»):
+// category — направление (цвет и фильтр расписания), icon — водяной знак на карточке события.
+// main — «важное» событие: в ленте расписания оно показывается крупной цветной карточкой.
+function event(id, { title, tag, category, icon = null, startsAt, minutes, place, desc, main = false, live: hasStream = false, withSermon = false, hymnNums = [] }) {
   const weekday = WEEKDAYS[startsAt.getDay()];
   const time = `${pad(startsAt.getHours())}:${pad(startsAt.getMinutes())}`;
   const hymns = songs.filter((song) => hymnNums.includes(song.num));
@@ -158,6 +160,7 @@ function event(id, { title, tag, category, startsAt, minutes, place, desc, main 
     title,
     tag,
     category,
+    icon,
     main,
     live: hasStream,
     streamUrl: null,
@@ -179,12 +182,15 @@ function event(id, { title, tag, category, startsAt, minutes, place, desc, main 
   };
 }
 
-// Еженедельные встречи: [день недели (0 — воскресенье), часы, минуты, длительность в минутах, через неделю?, событие].
-const WEEKLY = [
-  [0, 11, 0, 120, false, {
+// Регулярные встречи: [день недели (0 — воскресенье), часы, минуты, длительность в минутах, повтор, событие].
+// Повтор: 'week' — каждую неделю, 'twoWeeks' — через неделю, 'month' — в первый такой день месяца.
+// У «Малой группы» нет иконки — на карточке вместо неё число дня.
+const REGULAR = [
+  [0, 11, 0, 120, 'week', {
     title: 'Богослужение',
     tag: 'Воскресенье',
     category: 'Богослужение',
+    icon: 'church',
     place: 'Главный зал',
     desc: [
       'Воскресное богослужение — время совместного поклонения, молитвы и слова. Приходите заранее, чтобы найти место и познакомиться с теми, кто рядом.',
@@ -193,40 +199,80 @@ const WEEKLY = [
     main: true,
     live: true,
   }],
-  [0, 14, 0, 90, true, {
+  [0, 13, 15, 45, 'month', {
+    title: 'Причастие',
+    tag: 'Воскресенье',
+    category: 'Таинство',
+    icon: 'wine_bar',
+    place: 'Главный зал',
+    desc: ['Вечеря Господня в первое воскресенье месяца — вспоминаем жертву Христа и благодарим Его вместе.'],
+    main: true,
+  }],
+  [0, 14, 0, 90, 'twoWeeks', {
     title: 'Обед общения',
     tag: 'Общение',
     category: 'Общение',
+    icon: 'local_cafe',
     place: 'Кафе церкви',
     desc: ['После богослужения остаёмся на простой обед — познакомиться и поговорить без спешки.'],
   }],
-  [3, 19, 0, 90, false, {
+  [1, 19, 0, 120, 'week', {
+    title: 'Хор',
+    tag: 'Будни',
+    category: 'Общение',
+    icon: 'music_note',
+    place: 'Главный зал',
+    desc: ['Репетиция церковного хора. Новым голосам рады — прослушивания нет.'],
+  }],
+  [2, 19, 0, 90, 'week', {
+    title: 'Разбор Библии',
+    tag: 'Будни',
+    category: 'Общение',
+    icon: 'menu_book',
+    place: 'Малый зал',
+    desc: ['Читаем книгу Библии главу за главой, задаём вопросы и ищем ответы вместе.'],
+  }],
+  [3, 19, 0, 90, 'week', {
     title: 'Молитвенная встреча',
     tag: 'Будни',
     category: 'Молитва',
+    icon: 'volunteer_activism',
     place: 'Малый зал',
     desc: ['Собираемся вместе, чтобы молиться друг за друга, за город и за тех, кто ищет Бога.'],
   }],
-  [4, 19, 30, 90, false, {
+  [4, 19, 30, 90, 'week', {
     title: 'Малая группа',
     tag: 'Общение',
     category: 'Общение',
     place: 'Каб. 2',
     desc: ['Несколько человек читают Библию, говорят о жизни и молятся друг за друга. Приходить можно без подготовки.'],
   }],
-  [5, 19, 30, 120, false, {
+  [5, 19, 30, 120, 'week', {
     title: 'Молодёжная встреча',
     tag: 'Молодёжь',
     category: 'Молодёжь',
+    icon: 'celebration',
     place: 'Молодёжный зал',
     desc: ['Игры, обсуждение и время в слове для тех, кому от 14 до 25.'],
+    live: true,
   }],
-  [6, 11, 0, 120, true, {
+  [6, 11, 0, 120, 'twoWeeks', {
     title: 'Детский клуб',
     tag: 'Дети',
     category: 'Дети',
+    icon: 'toys',
     place: 'Детская комната',
     desc: ['Истории из Библии, поделки и игры для детей от 5 до 11 лет.'],
+    main: true,
+  }],
+  [6, 12, 0, 90, 'month', {
+    title: 'Крещение',
+    tag: 'Суббота',
+    category: 'Таинство',
+    icon: 'water_drop',
+    place: 'Главный зал',
+    desc: ['Водное крещение по вере. Если хотите креститься, напишите пастору — перед крещением проходят несколько встреч.'],
+    main: true,
   }],
 ];
 
@@ -238,12 +284,13 @@ function buildEvents() {
   for (let days = -21; days <= 42; days += 1) {
     const date = fromToday(days, 0);
 
-    for (const [weekday, hours, minutes, duration, biweekly, props] of WEEKLY) {
+    for (const [weekday, hours, minutes, duration, repeat, props] of REGULAR) {
       if (date.getDay() !== weekday) continue;
-      if (biweekly && Math.floor((days + 21) / 7) % 2 === 1) continue;
+      if (repeat === 'twoWeeks' && Math.floor((days + 21) / 7) % 2 === 1) continue;
+      if (repeat === 'month' && date.getDate() > 7) continue;
 
       const startsAt = fromToday(days, hours, minutes);
-      const nextSunday = props.main && days > 0 && days <= 7;
+      const nextSunday = props.title === 'Богослужение' && days > 0 && days <= 7;
 
       list.push({
         ...props,

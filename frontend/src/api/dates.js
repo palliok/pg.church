@@ -38,16 +38,54 @@ export function churchToday() {
   return { year, month, day };
 }
 
-const MONTHS_GENITIVE = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+// Сколько дней от сегодняшнего дня (по времени церкви) до даты: 0 — сегодня, 1 — завтра, −1 — вчера.
+export function daysFromToday({ year, month, day }) {
+  const today = churchToday();
 
-// Месяц с годом под числом дня: «октября 2026», «October 2026», «октябрь 2026».
-export function monthYearLabel({ year, month }) {
+  return Math.round((Date.UTC(year, month - 1, day) - Date.UTC(today.year, today.month - 1, today.day)) / 86_400_000);
+}
+
+// День события относительно сегодня: «Сегодня», «Завтра» или «Сб 27».
+export function relativeDay(event) {
+  const days = daysFromToday(event);
+  if (days === 0) return t('Сегодня');
+  if (days === 1) return t('Завтра');
+
+  return `${event.dowShort} ${event.day}`;
+}
+
+// Сколько осталось до начала: «через 40 мин», «через 3 часа» (short — «через 3 ч») или «идёт сейчас».
+// Считается только в пределах суток; для прошедших, дальних событий и событий на весь день — null.
+export function startsIn(event, { short = false, now = Date.now() } = {}) {
+  if (event.allDay) return null;
+
+  const start = Date.parse(event.startsAt);
+  const end = event.endsAt ? Date.parse(event.endsAt) : start;
+  if (now >= start) return now < end ? t('идёт сейчас') : null;
+
+  const minutes = Math.ceil((start - now) / 60_000);
+  if (minutes >= 24 * 60) return null;
+  if (minutes < 60) return inTime(minutes, 'min');
+
+  return inTime(Math.round(minutes / 60), short ? 'h' : 'hours');
+}
+
+// «через N …» на языке сайта: словарём такое не перевести — число стоит внутри фразы.
+function inTime(n, unit) {
   switch (getLang()) {
     case 'en':
-      return formatDate({ year, month, day: 1 }, 'en', { month: 'long', year: 'numeric' });
+      return `in ${n} ${{ min: 'min', h: 'h', hours: n === 1 ? 'hour' : 'hours' }[unit]}`;
     case 'ky':
-      return `${t(MONTHS[month - 1]).toLowerCase()} ${year}`;
+      return `${n} ${unit === 'min' ? 'мүнөттөн' : 'сааттан'} кийин`;
     default:
-      return `${MONTHS_GENITIVE[month - 1]} ${year}`;
+      return `через ${n} ${{ min: 'мин', h: 'ч', hours: hoursWord(n) }[unit]}`;
   }
+}
+
+function hoursWord(n) {
+  const a = n % 10;
+  const b = n % 100;
+  if (a === 1 && b !== 11) return 'час';
+  if (a >= 2 && a <= 4 && (b < 10 || b >= 20)) return 'часа';
+  return 'часов';
 }

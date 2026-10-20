@@ -3,29 +3,35 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useChurch } from '../api/church.js';
-import { churchToday, dayLabel, monthYearLabel } from '../api/dates.js';
+import { churchToday, dayLabel, daysFromToday } from '../api/dates.js';
 import { EVENT_CATEGORIES, useEvents } from '../api/events.js';
 import CalendarOptions from '../components/CalendarOptions.jsx';
+import { EventChip, EventWatermark, LiveBadge, LiveDot } from '../components/EventVisuals.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
+import { eventTheme, themeVars } from '../eventTheme.js';
 import './Schedule.css';
 
 const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
 const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
-// Цвет точки и тон карточки по направлению; главное событие недели — всегда синее.
-const CATEGORY_STYLE = {
-  'Богослужение': { color: '#02407d', tone: 'purple' },
-  'Молодёжь': { color: '#f9c9a5', tone: 'peach' },
-  'Дети': { color: '#f9c9a5', tone: 'peach' },
-  'Молитва': { color: '#0d0d0d', tone: 'dark' },
-  'Общение': { color: '#00b7e3', tone: 'yellow' },
+// Тон карточки дня в календаре «Месяц» по направлению; главное событие недели — всегда синее.
+// Цвет точек — из темы направления (src/eventTheme.js), как в ленте.
+const CATEGORY_TONE = {
+  'Богослужение': 'purple',
+  'Таинство': 'purple',
+  'Молодёжь': 'peach',
+  'Дети': 'peach',
+  'Молитва': 'dark',
+  'Общение': 'yellow',
 };
 const LEGEND = [['#02407d', 'Богослужение'], ['#f9c9a5', 'Молодёжь и дети'], ['#0d0d0d', 'Молитва'], ['#00b7e3', 'Общение']];
 
-const categoryColor = (e) => CATEGORY_STYLE[e.category]?.color ?? '#a3a3a3';
-const eventTone = (e) => (e.main ? 'purple' : CATEGORY_STYLE[e.category]?.tone ?? 'dark');
+const categoryColor = (e) => (e.category ? eventTheme(e).bg : '#a3a3a3');
+const eventTone = (e) => (e.main ? 'purple' : CATEGORY_TONE[e.category] ?? 'dark');
 const categoryLabel = (category) => t(category === 'Общение' ? 'Малые группы' : category);
 const pad = (n) => String(n).padStart(2, '0');
+// Сколько прошедших дней лента текущего месяца показывает сразу, остальные — по кнопке.
+const PAST_DAYS_SHOWN = 2;
 const daysInMonth = ({ year, month }) => new Date(Date.UTC(year, month, 0)).getUTCDate();
 
 // «1 событие», «3 события», «7 событий»; в английском — event/events, в киргизском форма одна.
@@ -72,7 +78,6 @@ export default function Schedule() {
   const selDay = pickedDay ?? todayNum ?? (byDay.keys().next().value ?? 1);
 
   const filterCount = cats.length + (online ? 1 : 0);
-  const summary = `${filtered.length} ${eventsWord(filtered.length)} · ${t(MONTHS[ym.month - 1]).toLowerCase()} ${ym.year}`;
 
   function goMonth(next) {
     setYm(next);
@@ -140,7 +145,6 @@ export default function Schedule() {
           </>
         )}
         <span style={{ flex: 1 }} />
-        <span className="sched-d sched-summary"><span className="sched-summary-dot" />{summary}</span>
         <Subscribe />
       </div>
 
@@ -166,7 +170,7 @@ export default function Schedule() {
       {(loading || error) ? (
         <div style={{ marginTop: 24 }}><LoadStatus error={error} onRetry={retry} /></div>
       ) : view === 'list' ? (
-        <ListView byDay={byDay} ym={ym} todayNum={todayNum} hasFilters={filterCount > 0} onReset={resetFilters} />
+        <ListView key={monthPrefix} byDay={byDay} ym={ym} todayNum={todayNum} hasFilters={filterCount > 0} onReset={resetFilters} />
       ) : (
         <MonthView ym={ym} byDay={byDay} selDay={selDay} todayNum={todayNum} onPick={setPickedDay} />
       )}
@@ -253,8 +257,32 @@ function MonthNav({ ym, onChange }) {
   );
 }
 
-// Лента: на десктопе — дни с карточками событий, на телефоне — строки, главное событие — синей карточкой.
+// Лента (макет resources/design_handoff_schedule): дни по порядку, в дне сначала важные события
+// крупными карточками (на десктопе до трёх в ряд), затем остальные строками.
+// Прошедшие дни бледнее, сегодняшний отделён жирной линией. В текущем месяце дни раньше позавчерашнего
+// спрятаны под кнопку. key у ListView — месяц, так что в новом месяце они снова спрятаны.
 function ListView({ byDay, ym, todayNum, hasFilters, onReset }) {
+  const startRef = useRef(null);
+  const feedRef = useRef(null);
+  const [showPast, setShowPast] = useState(false);
+
+  const days = [...byDay.entries()];
+  const hiddenDays = todayNum == null ? [] : days.filter(([day]) => day < todayNum - PAST_DAYS_SHOWN);
+  const hiddenCount = hiddenDays.reduce((sum, [, items]) => sum + items.length, 0);
+  const visibleDays = showPast ? days : days.slice(hiddenDays.length);
+
+  // В ленте текущего месяца сразу прокручиваем к её началу: над сегодняшним днём только кнопка
+  // «Показать прошедшие» и пара прошедших дней. Срабатывает, когда лента появляется (новый месяц,
+  // возврат из «Месяц»), — от смены фильтров страница не прыгает.
+  useEffect(() => {
+    if (todayNum != null) startRef.current?.scrollIntoView({ block: 'start' });
+  }, [todayNum]);
+
+  // Раскрытые прошедшие дни появляются выше — показываем их с начала месяца.
+  useEffect(() => {
+    if (showPast) feedRef.current?.firstElementChild?.scrollIntoView({ block: 'start' });
+  }, [showPast]);
+
   if (byDay.size === 0) {
     return (
       <div className="sched-empty">
@@ -271,67 +299,89 @@ function ListView({ byDay, ym, todayNum, hasFilters, onReset }) {
     );
   }
 
-  const days = [...byDay.entries()];
+  return (
+    <div className="sched-feed-wrap" ref={startRef}>
+      {hiddenCount > 0 && (
+        <button type="button" className="sched-feed-past" onClick={() => setShowPast((on) => !on)} aria-expanded={showPast}>
+          {/* Через t(): React меняет текст в том же узле, а translatePage() такие правки не видит. */}
+          <span>{showPast ? t('Скрыть прошедшие') : t('Показать прошедшие')}</span>
+          {!showPast && <span className="sched-feed-past-count">{hiddenCount} {eventsWord(hiddenCount)}</span>}
+        </button>
+      )}
+
+      <div className="sched-feed" ref={feedRef}>
+        {visibleDays.map(([day, items]) => {
+          const featured = items.filter((e) => e.main);
+          const classes = ['sched-feed-day', day === todayNum && 'is-today', daysFromToday({ ...ym, day }) < 0 && 'is-past'].filter(Boolean).join(' ');
+
+          return (
+            <section key={day} className={classes}>
+              <div className="sched-feed-date">
+                <span className="sched-feed-num">{day}</span>
+                <span className="sched-feed-dow">
+                  {items[0].dowLabel}
+                  {day === todayNum && <EventChip tone="ink">Сегодня</EventChip>}
+                </span>
+              </div>
+              <div className="sched-feed-items">
+                {featured.length > 0 && (
+                  <div className="sched-feed-cards" style={{ '--cols': Math.min(featured.length, 3) }}>
+                    {featured.map((e) => <FeedCard key={e.id} event={e} />)}
+                  </div>
+                )}
+                {items.filter((e) => !e.main).map((e) => <FeedRow key={e.id} event={e} />)}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Важное событие ленты — карточка цвета направления с водяным знаком.
+function FeedCard({ event: e }) {
+  return (
+    <Link to={`/schedule/${e.id}`} className="sched-feed-card" style={themeVars(e)}>
+      <EventWatermark event={e} />
+      <div className="sched-feed-card-top">
+        {e.category && <EventChip>{categoryLabel(e.category)}</EventChip>}
+        {e.live && <LiveBadge />}
+      </div>
+      <div className="sched-feed-card-bottom">
+        <div className={`sched-feed-card-time${e.allDay ? ' is-allday' : ''}`}>{e.timeLabel ?? t('Весь день')}</div>
+        <div className="sched-feed-card-foot">
+          <div style={{ minWidth: 0 }}>
+            <div className="sched-feed-card-title">{e.title}</div>
+            <div className="sched-feed-card-sub">{[e.place, e.endLabel].filter(Boolean).join(' · ')}</div>
+          </div>
+          <span className="sched-feed-card-knob" aria-hidden="true">↗</span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// Обычное событие ленты — серая строка с квадратом времени цвета направления.
+// Направление в подписи — только на десктопе, на телефоне на него нет места.
+function FeedRow({ event: e }) {
+  const sub = [e.place, e.endLabel].filter(Boolean).join(' · ');
 
   return (
-    <>
-      <div className="sched-d sched-month-label">{t(MONTHS[ym.month - 1])} {ym.year}</div>
-
-      <div className="sched-d sched-lenta">
-        {days.map(([day, items]) => (
-          <div key={day} className={`sched-lenta-day${day === todayNum ? ' is-today' : ''}`}>
-            <div className="sched-lenta-date">
-              <span className="sched-lenta-num">{day}</span>
-              <span style={{ minWidth: 0, paddingTop: 5 }}>
-                <span className="sched-lenta-dow">{items[0].dowLabel}</span>
-                <span className="sched-lenta-month">{monthYearLabel(ym)}</span>
-                {items.length > 1 && <span className="sched-lenta-count">{items.length} {eventsWord(items.length)}</span>}
-                {day === todayNum && <span className="sched-today-badge">Сегодня</span>}
-              </span>
-            </div>
-            <div className="sched-lenta-items">
-              {items.map((e) => (
-                <Link key={e.id} to={`/schedule/${e.id}`} className={`sched-lenta-card${e.main ? ` is-filled tone-${eventTone(e)}` : ''}`}>
-                  <span className="sched-lenta-time">{e.timeRange}</span>
-                  <span className="sched-dot" style={{ '--dot': categoryColor(e) }} />
-                  <span style={{ flex: 1, minWidth: 0 }}>
-                    <span className="sched-lenta-title">{e.title}</span>
-                    <span className="sched-lenta-sub">{[e.place, e.category && categoryLabel(e.category)].filter(Boolean).join(' · ')}</span>
-                  </span>
-                  {e.live && <span className="sched-live"><span className="sched-live-dot" />Трансляция</span>}
-                  <span className="sched-knob" aria-hidden="true">↗</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="sched-m sched-rows">
-        {days.flatMap(([, items]) => items).map((e) => (e.main ? (
-          <Link key={e.id} to={`/schedule/${e.id}`} className="sched-main-card">
-            <div style={{ minWidth: 0 }}>
-              <div className="sched-main-chip">{t('Главное')} · {dayLabel(e)}</div>
-              <div className="sched-main-title">{e.title}</div>
-              <div className="sched-main-sub">{[e.dowLabel, e.timeLabel, e.place].filter(Boolean).join(' · ')}</div>
-            </div>
-            <span className="sched-main-knob" aria-hidden="true">↗</span>
-          </Link>
-        ) : (
-          <Link key={e.id} to={`/schedule/${e.id}`} className={`sched-row tone-${eventTone(e)}`}>
-            <span className="sched-row-chip">
-              <span className="sched-row-day">{e.day}</span>
-              <span className="sched-row-mon">{e.mon}</span>
-            </span>
-            <span style={{ flex: 1, minWidth: 0 }}>
-              <span className="sched-row-title">{e.title}</span>
-              <span className="sched-row-sub">{[e.dowShort, e.timeLabel, e.place].filter(Boolean).join(' · ')}</span>
-            </span>
-            <span className="sched-row-knob" aria-hidden="true">↗</span>
-          </Link>
-        )))}
-      </div>
-    </>
+    <Link to={`/schedule/${e.id}`} className="sched-feed-row">
+      <span className={`sched-feed-time${e.allDay ? ' is-allday' : ''}`} style={themeVars(e)}>{e.timeLabel ?? t('Весь день')}</span>
+      <span className="sched-feed-body">
+        <span className="sched-feed-title-line">
+          <span className="sched-feed-title">{e.title}</span>
+          {e.live && <LiveDot />}
+        </span>
+        <span className="sched-feed-sub">
+          {sub}
+          {e.category && <span className="sched-d">{sub && ' · '}{categoryLabel(e.category)}</span>}
+        </span>
+      </span>
+      <span className="sched-feed-knob" aria-hidden="true">↗</span>
+    </Link>
   );
 }
 
