@@ -6,11 +6,14 @@ import ChurchBrand from '../components/ChurchBrand.jsx';
 import ContactsCard from '../components/ContactsCard.jsx';
 import { useChurch } from '../api/church.js';
 import { useEvents } from '../api/events.js';
+import gospelTitle from '../assets/gospel-title.png';
 
 export default function Home() {
   const { events: homeEvents, error: eventsError } = useEvents({ limit: 12 });
   const nextEvent = homeEvents[0];
   const duty = useChurch()?.duty;
+  // Вопрос «Кто такой Иисус?» нарисован картинкой только по-русски, на en/ky — текстом.
+  const titleImage = getLang() === 'ru';
 
   return (
     <div className="home-wrap page-enter container" style={{ paddingLeft: 0, paddingRight: 0, maxWidth: 'var(--content-max)' }}>
@@ -38,13 +41,17 @@ export default function Home() {
         </div>
 
         <Link to="/story/jesus" className="home-mobile-hero">
-          <div className="home-mobile-hero-title">
-            {getLang() === 'ky' ? null : <>{t('Кто такой')}<br /></>}
-            <span>{t('Иисус?')}</span>
-          </div>
           <p className="home-mobile-hero-text">
             Всё началось задолго до сотворения мира. И с тех пор вся история связана с Ним.
           </p>
+          {titleImage ? (
+            <img className="home-hero-title-img" src={gospelTitle} alt="Кто такой Иисус?" />
+          ) : (
+            <div className="home-mobile-hero-title">
+              {getLang() === 'ky' ? null : <>{t('Кто такой')}<br /></>}
+              <span>{t('Иисус?')}</span>
+            </div>
+          )}
         </Link>
 
         {nextEvent && (
@@ -68,7 +75,7 @@ export default function Home() {
         <div className="home-left">
         <div className="home-top-left">
         {/* Евангелие */}
-        {/* Текст сверху, чтобы внизу картинки были видны Иисус и дети. */}
+        {/* Подпись сверху, вопрос внизу на холмах — между ними Иисус с детьми. */}
         <Link
           to="/story/jesus"
           className="home-hero"
@@ -84,16 +91,20 @@ export default function Home() {
             textDecoration: 'none',
           }}
         >
-          <div className="h-display" style={{ fontSize: 28 }}>
-            Кто такой
-            <span style={{ display: 'block', fontWeight: 900, fontSize: 'clamp(44px, 5vw, 72px)', lineHeight: 0.85, letterSpacing: '-.05em', marginTop: 6, color: 'var(--c-main)' }}>
-              Иисус?
-            </span>
-          </div>
           {/* Узкая колонка — чтобы текст не заходил на Иисуса справа. */}
-          <p style={{ font: '500 15px/1.5 var(--f-body)', color: 'rgba(255,255,255,.8)', maxWidth: 240, margin: '14px 0 0' }}>
+          <p style={{ font: '500 16px/1.45 var(--f-body)', color: 'rgba(255,255,255,.65)', maxWidth: 240, margin: 0, textWrap: 'balance' }}>
             Всё началось задолго до сотворения мира. И с тех пор вся история связана с Ним.
           </p>
+          {titleImage ? (
+            <img className="home-hero-title-img" src={gospelTitle} alt="Кто такой Иисус?" />
+          ) : (
+            <div className="h-display" style={{ fontSize: 34, marginTop: 'auto', paddingTop: 24 }}>
+              Кто такой
+              <span style={{ display: 'block', fontWeight: 900, fontSize: 'clamp(56px, 6.5vw, 96px)', lineHeight: 0.85, letterSpacing: '-.05em', marginTop: 4, color: 'var(--c-main)' }}>
+                Иисус?
+              </span>
+            </div>
+          )}
         </Link>
         </div>
 

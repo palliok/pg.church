@@ -17,7 +17,8 @@
 .home-schedule { min-width: 0; }
 
 /* Фон блока «Евангелие»: широкая картинка на планшете, вертикальная — на десктопе и телефоне.
-   Картинка сама тёмная, без затемнения. Текст сверху слева, Иисус с детьми внизу справа — картинка прижата к низу. */
+   Картинка сама тёмная, без затемнения. Подпись сверху слева, Иисус с детьми посередине справа,
+   вопрос внизу на холмах — картинка прижата к низу. */
 .home-hero, .home-mobile-hero {
   background-color: #0d2f36;
   background-position: right bottom;
@@ -30,8 +31,19 @@
 @media (min-width: 1081px) {
   .home-hero {
     background-image: url('../assets/gospel-vert.jpg');
-    background-position: center bottom;
+    /* Низкий блок обрезает картинку: срезаем больше пустого неба, чем холмов, чтобы осталась голова Иисуса. */
+    background-position: center 85%;
   }
+}
+/* Вопрос-картинка внизу блока, фон у неё прозрачный. */
+.home-hero-title-img { display: block; width: 100%; max-width: 480px; height: auto; margin-top: auto; padding-top: 20px; }
+/* Вопрос ближе к левому нижнему углу, чем подпись: отступ блока 32px, у картинки — 12px. */
+.home-hero .home-hero-title-img { margin: auto 0 -20px -20px; }
+/* На планшете и телефоне персонажи ближе к левому краю — вопрос уже, чтобы не закрывать детей. */
+@media (max-width: 1080px) {
+  .home-hero .home-hero-title-img { max-width: 300px; }
+  /* На телефоне отступ блока 20px, у картинки — 10px. */
+  .home-mobile-hero .home-hero-title-img { width: 85%; margin: auto 0 -10px -10px; }
 }
 
 /* Строка расписания на главной: главное событие — тёмной плашкой, остальные — с линией сверху. */
@@ -281,7 +293,7 @@
     position: relative;
     border-radius: 24px;
     overflow: hidden;
-    min-height: 440px;
+    min-height: 400px;
     background-image: url('../assets/gospel-hor.jpg');
     color: #fff;
     display: flex;
@@ -290,25 +302,33 @@
     padding: 22px 20px 20px;
   }
 
+  /* Вопрос — внизу блока, на холмах. */
   .home-mobile-hero-title {
+    margin-top: auto;
+    padding-top: 20px;
     font-family: var(--f-head);
     font-weight: 900;
-    font-size: 38px;
+    font-size: 24px;
     line-height: .9;
     letter-spacing: -.03em;
     text-transform: uppercase;
   }
 
   .home-mobile-hero-title span {
+    display: inline-block;
+    margin-top: 2px;
+    font-size: 58px;
+    letter-spacing: -.05em;
     color: var(--c-main);
   }
 
   .home-mobile-hero-text {
-    font: 500 13.5px/1.5 var(--f-body);
-    color: rgba(255,255,255,.8);
+    font: 500 14px/1.45 var(--f-body);
+    color: rgba(255,255,255,.65);
     /* Узкая колонка — чтобы не заходить на Иисуса справа. */
     max-width: 200px;
-    margin: 10px 0 0;
+    margin: 0;
+    text-wrap: balance;
   }
 
   .home-mobile-next {
@@ -380,15 +400,9 @@
 @media (max-width: 640px) {
   .home-mobile-hero {
     background-image: url('../assets/gospel-vert.jpg');
-    /* Масштаб от высоты блока: пустой фон слева и сверху обрезается, Иисус с детьми крупнее,
-       но на любой ширине телефона остаются под текстом. */
-    background-size: auto 122%;
-    background-position: right bottom;
+    /* На узких телефонах картинка шире блока: край слева обрезается, Иисус с детьми крупнее. */
+    background-size: max(100%, 350px) auto;
   }
-}
-/* Шире телефона картинка по высоте уже не закрывает блок по ширине. */
-@media (min-width: 431px) and (max-width: 640px) {
-  .home-mobile-hero { background-size: cover; }
 }
 
 /* Шапка из resources/Mobile Header.html помещается в одну строку примерно с 370px;
@@ -396,9 +410,7 @@
 @media (max-width: 370px) {
   .home-mobile-header { flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 8px; }
   .home-mobile-lang { order: -1; align-self: flex-end; }
-  .home-mobile-hero-title { font-size: 34px; }
-  /* Узкий блок: Иисус ближе к тексту — картинка мельче, чтобы он оказался ниже подписи. */
-  .home-mobile-hero { background-size: auto 106%; }
+  .home-mobile-hero-title span { font-size: 50px; }
 }
 
 @media (max-width: 860px) {
