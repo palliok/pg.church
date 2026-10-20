@@ -277,10 +277,11 @@ function eventsBetween(params) {
 }
 
 // ===== Объявления =====
-// Формат опережает бэкенд: дата, isNew, when, where и contact пока есть только здесь,
-// /api/v1/announcements отдаёт { id, title, body }.
+// Формат опережает бэкенд: дата, important, details и contact пока есть только здесь,
+// /api/v1/announcements отдаёт { id, title, body }. details — строки с иконками в карточке:
+// { type: 'when' | 'where', text } и ссылки { type: 'link', text, url }.
 
-function announcement(id, isNew, daysAgo, title, body, { when = null, where = null, contact = null } = {}) {
+function announcement(id, daysAgo, title, body, { important = false, when = null, where = null, links = [], contact = null } = {}) {
   const date = fromToday(-daysAgo);
   const tel = contact ? `tel:+${contact.phone.replace(/\D/g, '').replace(/^8(\d{10})$/, '7$1')}` : null;
 
@@ -288,30 +289,41 @@ function announcement(id, isNew, daysAgo, title, body, { when = null, where = nu
     id,
     title,
     body,
-    isNew,
+    important,
     ...dateParts(date),
     date: dayAndMonth(date),
-    when,
-    where,
+    details: [
+      ...(when ? [{ type: 'when', text: when }] : []),
+      ...(where ? [{ type: 'where', text: where }] : []),
+      ...links.map(([text, url]) => ({ type: 'link', text, url })),
+    ],
     contact: contact ? { ...contact, tel } : null,
   };
 }
 
+// По дате, новые сверху — как будет отдавать бэкенд.
 const announcements = [
-  announcement(1, true, 0, 'Сбор продуктов для нуждающихся', 'Приносите крупы, консервы и средства гигиены. Всё передадим семьям нашего района.', {
+  announcement(1, 0, 'Сбор продуктов для нуждающихся', 'Приносите крупы, консервы и средства гигиены. Всё передадим семьям нашего района.', {
     when: 'До конца месяца, после служений', where: 'Фойе, стол у входа', contact: { name: 'Ольга', phone: '+7 911 000-12-34' },
   }),
-  announcement(2, true, 2, 'Запись в детский лагерь', 'Открыта запись на летнюю смену для детей 7–12 лет. Мест: 30.', {
-    when: '14–20 июля', where: 'База «Сосновый бор», Ленобласть', contact: { name: 'Марина', phone: '8 911 000-45-67' },
+  announcement(2, 2, 'Запись в детский лагерь', 'Открыта запись на летнюю смену для детей 7–12 лет. Мест: 30.', {
+    important: true,
+    when: '14–20 июля',
+    where: 'База «Сосновый бор», Ленобласть',
+    links: [['Анкета для записи', 'https://forms.yandex.ru/'], ['Что взять с собой', 'https://pg.church/']],
+    contact: { name: 'Марина', phone: '8 911 000-45-67' },
   }),
-  announcement(3, true, 4, 'Нужны волонтёры на кухню', 'Ищем помощников для воскресных обедов. Можно прийти один раз и попробовать.', {
-    where: 'Кухня, цокольный этаж',
+  announcement(3, 4, 'Нужны волонтёры на кухню', 'Ищем помощников для чаепития после воскресного служения.', {
+    when: 'По воскресеньям, 12:30', contact: { name: 'Олег', phone: '+7 931 000-78-90' },
   }),
-  announcement(4, false, 12, 'Членское собрание после богослужения', 'В воскресенье после богослужения — членское собрание церкви в главном зале.\nПросим членов церкви остаться.', {
-    where: 'Главный зал',
+  announcement(4, 6, 'Изучение Библии для молодёжи', 'Каждую пятницу разбираем Евангелие от Марка. Приходите с друзьями.', {
+    when: 'Пятница, 19:00', where: 'Малый зал', links: [['Чат молодёжи в Telegram', 'https://t.me/']],
   }),
-  announcement(5, false, 25, 'Субботник на территории церкви', 'Берите перчатки и хорошее настроение — приведём двор в порядок к лету.', {
-    when: 'Суббота, 10:00', where: 'Двор церкви', contact: { name: 'Игорь', phone: '+7 911 000-77-88' },
+  announcement(5, 9, 'Членское собрание после богослужения', 'В воскресенье после богослужения — членское собрание церкви в главном зале.\nПросим членов церкви остаться.', {
+    important: true, where: 'Главный зал',
+  }),
+  announcement(6, 14, 'Генеральная уборка зала', 'Приглашаем всех, кто может помочь подготовить зал к зиме.', {
+    when: 'Суббота, 10:00', contact: { name: 'Олег', phone: '+7 931 000-78-90' },
   }),
 ];
 

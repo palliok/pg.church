@@ -1,275 +1,343 @@
-/* ===== Блок на главной (тёмный, с числом новых) ===== */
-.ann-home {
-  border-radius: var(--radius-lg);
-  background: var(--c-ink);
-  color: #fff;
-  padding: 18px;
+/* Цвета макета объявлений (resources/handoff_announcements_p5). */
+.ann-home, .ann-page {
+  --ann-important: #e5322d;
+  --ann-muted: #55555a;
+  --ann-hint: #8a8a90;
 }
 
-.ann-home-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
-.ann-home-count { display: flex; align-items: flex-end; gap: 12px; min-width: 0; }
-
-.ann-home-num {
-  font-family: var(--f-head);
-  font-weight: 900;
-  font-size: 96px;
-  line-height: .78;
-  letter-spacing: -.06em;
-  color: var(--c-main);
+/* ===== Водяной знак и пометки ===== */
+.ann-megaphone {
+  position: absolute;
+  display: flex;
+  transform: rotate(-24deg);
+  opacity: .16;
+  pointer-events: none;
 }
+.ann-megaphone svg { width: 100%; height: 100%; }
 
-.ann-home-words {
-  font-family: var(--f-head);
-  font-weight: 800;
-  font-size: 20px;
-  line-height: 1;
-  letter-spacing: -.02em;
-  text-transform: uppercase;
-  padding-bottom: 2px;
-}
-
-.ann-home-knob {
+.ann-important {
   flex: 0 0 auto;
-  width: 46px;
-  height: 46px;
+  align-self: center;
   border-radius: 99px;
-  background: #fff;
-  color: var(--c-ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
+  padding: 3px 9px;
+  background: var(--ann-important);
+  color: #fff;
+  font: 700 11px var(--f-body);
+  letter-spacing: .02em;
 }
 
-.ann-home-list { display: flex; flex-direction: column; margin-top: 18px; }
+/* ===== Блок на главной: карточка-стопка ===== */
+.ann-home { display: flex; flex-direction: column; min-width: 0; }
 
-.ann-home-row {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  padding: 12px 0;
-  border-top: 1px solid rgba(255, 255, 255, .14);
-}
-
-.ann-home-date { flex: 0 0 50px; font: 600 11.5px var(--f-body); color: var(--c-white-55); text-transform: uppercase; }
-.ann-home-title { min-width: 0; font-family: var(--f-head); font-weight: 700; font-size: 16px; line-height: 1.2; }
-
-/* ===== Страница объявлений ===== */
-.container.ann-page { padding: 26px 18px 48px; }
-
-.h-display.ann-page-title { font-weight: 800; font-size: min(38px, 9.4vw); line-height: .9; letter-spacing: -.035em; }
-
-/* На телефоне новые объявления — карусель до краёв экрана. */
-.ann-cards {
-  display: flex;
-  gap: 10px;
-  margin: 20px -18px 0;
-  padding: 0 18px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-padding: 0 18px;
-  scrollbar-width: none;
-}
-.ann-cards::-webkit-scrollbar { display: none; }
-
-.ann-past-heading {
-  margin: 28px 0 0;
-  font-family: var(--f-head);
-  font-weight: 800;
-  font-size: 22px;
-  line-height: 1;
-  letter-spacing: -.02em;
-}
-
-.ann-past-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-
-/* ===== Карточка нового объявления ===== */
-.ann-card {
-  flex: 0 0 300px;
-  max-width: calc(100vw - 54px);
-  scroll-snap-align: start;
-  min-height: 420px;
+.ann-home-card {
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+  min-height: 150px;
   border-radius: var(--radius-lg);
   background: var(--c-ink);
   color: #fff;
-  padding: 18px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
 }
+.ann-home-card:hover { color: #fff; }
+.ann-home-card > :not(.ann-megaphone) { position: relative; }
+.ann-home-card .ann-megaphone { right: -20px; bottom: -30px; width: 190px; height: 190px; }
 
-.ann-card-date { font: 600 12px var(--f-body); color: rgba(255, 255, 255, .65); }
+.ann-home-date { font: 600 11px var(--f-body); color: rgba(255, 255, 255, .7); }
 
-.ann-card-title {
-  margin: 10px 0 0;
+.ann-home-title {
+  max-width: 260px;
+  margin: 10px 0 16px;
   font-family: var(--f-head);
   font-weight: 800;
-  font-size: 22px;
-  line-height: 1.12;
-  letter-spacing: -.02em;
+  font-size: 24px;
+  line-height: .98;
+  letter-spacing: -.035em;
+}
+
+.ann-home-more {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 8px 14px;
+  border-radius: 99px;
+  background: #fff;
+  color: var(--c-ink);
+  font: 600 12px var(--f-body);
+}
+
+/* Краешки следующих объявлений под карточкой. */
+.ann-home-layer { position: relative; display: block; margin-top: -2px; }
+.ann-home-layer.is-first { z-index: 2; height: 12px; margin-inline: 14px; background: #3a3a3d; border-radius: 0 0 18px 18px; }
+.ann-home-layer.is-second { z-index: 1; height: 10px; margin-inline: 30px; background: var(--ann-hint); border-radius: 0 0 16px 16px; }
+
+.ann-home-foot { display: flex; justify-content: flex-end; margin-top: 12px; }
+
+.ann-home-all {
+  border: 1.5px solid var(--c-ink);
+  border-radius: 99px;
+  padding: 9px 18px;
+  color: var(--c-ink);
+  font: 600 14px var(--f-body);
+  transition: background .15s ease, color .15s ease;
+}
+.ann-home-all:hover { background: var(--c-ink); color: #fff; }
+
+/* ===== Страница ===== */
+
+
+.ann-empty { margin-top: 30px; padding: 56px 20px; border-radius: var(--radius-lg); background: var(--c-panel); text-align: center; }
+
+/* ===== Открытое объявление: чёрная карточка ===== */
+.ann-card {
+  --ann-pad-x: 22px;
+  --ann-pad-bottom: 22px;
+  --ann-share: 46px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 26px;
+  background: var(--c-ink);
+  color: #fff;
+  padding: 24px var(--ann-pad-x) var(--ann-pad-bottom);
+}
+.ann-card > :not(.ann-megaphone, .ann-card-share) { position: relative; }
+/* Последний блок не заходит под кнопку «Поделиться» в правом нижнем углу. */
+.ann-card > :nth-last-child(2) { margin-right: calc(var(--ann-share) + 10px); }
+.ann-card.no-call { min-height: 0; }
+.ann-card.no-call > :nth-last-child(2) { min-height: var(--ann-share); }
+.ann-card .ann-megaphone { right: -34px; top: -24px; width: 200px; height: 200px; }
+
+.ann-card-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ann-card-date { font: 600 12px var(--f-body); color: rgba(255, 255, 255, .7); }
+.ann-card .ann-important { padding: 4px 10px; }
+.ann-card-badge { border: 1px solid rgba(255, 255, 255, .45); border-radius: 99px; padding: 3px 9px; font: 600 11px var(--f-body); }
+
+.ann-card-title {
+  max-width: 320px;
+  margin: 12px 0 0;
+  font-family: var(--f-head);
+  font-weight: 800;
+  font-size: 30px;
+  line-height: .97;
+  letter-spacing: -.035em;
+  text-wrap: balance;
 }
 
 .ann-card-body {
-  margin: 8px 0 0;
-  font: 500 14px/1.5 var(--f-body);
-  color: rgba(255, 255, 255, .85);
+  margin: 14px 0 0;
+  font: 400 15px/1.5 var(--f-body);
+  color: rgba(255, 255, 255, .84);
   white-space: pre-line;
+  text-wrap: pretty;
 }
 
-.ann-card .ann-details { margin-top: auto; padding-top: 10px; }
+.ann-facts { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.ann-fact { display: flex; align-items: center; gap: 12px; }
 
-/* ===== Строки деталей ===== */
-.ann-details { display: flex; flex-direction: column; }
-
-.ann-detail { display: flex; align-items: center; gap: 12px; padding: 9px 0; color: inherit; }
-
-.ann-detail-icon {
-  flex: 0 0 34px;
-  height: 34px;
+.ann-fact-icon {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
   border-radius: 99px;
-  background: #fff;
-  color: var(--c-ink);
+  background: rgba(255, 255, 255, .1);
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.ann-detail-icon.is-phone { background: var(--c-main); }
 
-.ann-detail-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.ann-detail-label { font: 600 11px var(--f-body); color: var(--c-gray-text); }
-.ann-card .ann-detail-label { color: rgba(255, 255, 255, .6); }
-.ann-detail-value { font: 600 14px/1.3 var(--f-body); }
+.ann-fact-text { font: 600 14px/1.35 var(--f-body); }
 
-.ann-detail-phone {
-  font-family: var(--f-head);
-  font-weight: 800;
-  font-size: 16px;
+.ann-fact.is-link { align-self: flex-start; color: #fff; }
+.ann-fact.is-link .ann-fact-text { text-decoration: underline; text-decoration-color: rgba(255, 255, 255, .35); text-underline-offset: 3px; transition: text-decoration-color .15s ease; }
+.ann-fact.is-link:hover { color: #fff; }
+.ann-fact.is-link:hover .ann-fact-text { text-decoration-color: #fff; }
+.ann-fact.is-link .ann-fact-icon { transition: background .15s ease; }
+.ann-fact.is-link:hover .ann-fact-icon { background: rgba(255, 255, 255, .2); }
+.ann-fact-arrow { margin-left: -4px; font-size: 13px; color: rgba(255, 255, 255, .6); }
+
+.ann-card-call {
+  min-height: var(--ann-share);
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 99px;
+  padding: 12px 16px;
+  background: #fff;
+  color: var(--c-ink);
+  font: 600 15px var(--f-body);
   white-space: nowrap;
 }
+.ann-card-call:hover { color: var(--c-ink); }
 
-/* ===== Прошедшее объявление ===== */
-.ann-past { border-radius: 20px; background: var(--c-panel); }
-
-.ann-past-toggle {
-  width: 100%;
+.ann-card-share {
+  position: absolute;
+  right: var(--ann-pad-x);
+  bottom: var(--ann-pad-bottom);
+  width: var(--ann-share);
+  height: var(--ann-share);
+  border: 1.5px solid rgba(255, 255, 255, .4);
+  border-radius: 99px;
+  background: transparent;
+  color: #fff;
   display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 12px 12px 14px;
-  border: 0;
-  background: none;
-  color: var(--c-ink);
-  text-align: left;
-  cursor: pointer;
-  font: inherit;
-}
-
-.ann-past-date {
-  flex: 0 0 46px;
-  height: 50px;
-  border-radius: 14px;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: border-color .15s ease;
 }
+.ann-card-share:hover { border-color: #fff; }
 
-.ann-past-day { font-family: var(--f-head); font-weight: 900; font-size: 20px; line-height: 1; letter-spacing: -.04em; }
-.ann-past-mon { margin-top: 2px; font: 600 9.5px var(--f-body); color: var(--c-gray-text); text-transform: lowercase; }
+/* ===== Телефон: колода ===== */
+.ann-deck { display: flex; flex-direction: column; margin-top: 26px; }
+.ann-split { display: none; }
 
-.ann-past-title {
+.ann-deck-card { position: relative; border-radius: 26px; box-shadow: 0 -6px 20px rgba(0, 0, 0, .10), 0 10px 24px rgba(0, 0, 0, .10); }
+
+.ann-tab {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 0;
+  color: var(--c-ink);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: margin .25s, background .25s, filter .15s;
+}
+.ann-tab:hover { filter: brightness(.97); }
+.ann-tab.is-above { padding: 14px 18px 30px; border-radius: 20px 20px 0 0; }
+.ann-tab.is-below { padding: 30px 18px 14px; border-radius: 0 0 20px 20px; }
+
+.ann-tab-date { flex: 0 0 52px; display: flex; flex-direction: column; }
+.ann-tab-date .ann-day { font-family: var(--f-head); font-weight: 900; font-size: 22px; line-height: .9; letter-spacing: -.045em; }
+.ann-tab-date .ann-month { margin-top: 3px; font: 600 12px var(--f-body); color: var(--ann-muted); }
+
+.ann-tab-title {
   flex: 1;
   min-width: 0;
   font-family: var(--f-head);
   font-weight: 700;
-  font-size: 16px;
-  line-height: 1.2;
-  letter-spacing: -.01em;
-}
-
-.ann-past-plus {
-  flex: 0 0 auto;
-  width: 30px;
-  height: 30px;
-  border-radius: 99px;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--f-head);
-  font-weight: 700;
   font-size: 15px;
-  transition: transform .25s;
+  line-height: 1.18;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-.ann-past.is-open .ann-past-plus { transform: rotate(45deg); }
 
-.ann-past-panel { padding: 0 14px 14px; }
-.ann-past-panel:not([hidden]) { animation: ann-in .25s ease; }
 
-.ann-past-body {
-  margin: 0;
-  padding-top: 4px;
-  font: 500 13.5px/1.5 var(--f-body);
-  color: #3a3a3a;
-  white-space: pre-line;
+/* ===== Тост ===== */
+.ann-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--tabbar-h) + 28px);
+  z-index: 50;
+  transform: translateX(-50%);
+  border-radius: 99px;
+  padding: 12px 20px;
+  background: var(--c-ink);
+  color: #fff;
+  font: 600 14px var(--f-body);
+  white-space: nowrap;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+  animation: ann-toast-in .2s ease;
 }
-.ann-past .ann-details { margin-top: 8px; }
 
-@keyframes ann-in {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: none; }
+@keyframes ann-toast-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translateX(-50%); }
 }
 
 /* ===== Десктоп ===== */
 @media (min-width: 861px) {
-  .container.ann-page { padding: 26px 32px 56px; }
-  .h-display.ann-page-title { font-weight: 900; font-size: 54px; letter-spacing: -.04em; }
+  /* Блок на главной в сетке крупнее, чем на телефоне. */
+  .ann-home-card { min-height: 190px; padding: 22px 24px; border-radius: 26px; }
+  .ann-home-card .ann-megaphone { right: -24px; bottom: -36px; width: 220px; height: 220px; }
+  .ann-home-date { font-size: 12px; }
+  .ann-home-title { max-width: 300px; font-size: 30px; }
 
-  .ann-cards {
+
+  .ann-deck { display: none; }
+  .ann-split {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-    gap: 16px;
-    margin: 28px 0 0;
-    padding: 0;
-    overflow: visible;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    gap: 28px;
+    align-items: start;
+    margin-top: 32px;
   }
 
-  .ann-card { max-width: none; padding: 26px; }
-  .ann-card-date { font-size: 13px; }
-  .ann-card-title { margin-top: 12px; font-size: 30px; line-height: 1.1; letter-spacing: -.025em; }
-  .ann-card-body { margin-top: 10px; max-width: 560px; font-size: 15px; line-height: 1.55; }
-  .ann-card .ann-details { padding-top: 18px; }
+  .ann-list { display: flex; flex-direction: column; gap: 8px; }
 
-  .ann-detail { gap: 14px; }
-  .ann-detail-icon { flex-basis: 38px; height: 38px; }
-  .ann-detail-icon svg { width: 17px; height: 17px; }
-  .ann-detail-text { gap: 3px; }
-  .ann-detail-label { font-size: 12px; }
-  .ann-detail-value { font-size: 15px; line-height: 1.35; }
-  .ann-detail-phone { font-size: 18px; }
-
-  .ann-past-heading { margin-top: 44px; font-size: 28px; }
-  .ann-past-list { gap: 10px; margin-top: 14px; }
-
-  .ann-past { border-radius: 22px; }
-  .ann-past-toggle { gap: 18px; padding: 14px 16px 14px 14px; }
-  .ann-past-date { flex-basis: 56px; height: 58px; border-radius: 16px; }
-  .ann-past-day { font-size: 24px; }
-  .ann-past-mon { font-size: 11px; }
-  .ann-past-title { font-size: 20px; letter-spacing: -.015em; }
-  .ann-past-plus { width: 40px; height: 40px; }
-
-  .ann-past-panel:not([hidden]) {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    gap: 32px;
-    padding: 0 22px 22px 88px;
+  .ann-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 0;
+    border-radius: 20px;
+    padding: 16px 16px 16px 20px;
+    background: var(--c-panel);
+    color: var(--c-ink);
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    transition: background .15s;
   }
-  .ann-past-body { padding-top: 0; font-size: 15px; line-height: 1.55; }
-  .ann-past .ann-details { margin-top: 0; }
+  .ann-row:hover { background: var(--c-panel-hover); }
+  .ann-row.is-active { background: var(--c-ink); color: #fff; cursor: default; }
+
+  .ann-row-date { flex: 0 0 46px; display: flex; flex-direction: column; align-items: flex-start; }
+  .ann-row-date .ann-day { font-family: var(--f-head); font-weight: 900; font-size: 30px; line-height: .85; letter-spacing: -.05em; }
+  .ann-row-date .ann-month { margin-top: 4px; font: 600 14px var(--f-body); color: var(--ann-muted); }
+  .ann-row.is-active .ann-month { color: rgba(255, 255, 255, .65); }
+
+  .ann-row-title {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 4px;
+    font-family: var(--f-head);
+    font-weight: 700;
+    font-size: 17px;
+    line-height: 1.15;
+    letter-spacing: -.01em;
+  }
+
+  .ann-row-arrow {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border: 1.5px solid currentColor;
+    border-radius: 99px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  .ann-row.is-active .ann-row-arrow { opacity: 0; }
+
+  .ann-split-card { position: sticky; top: 24px; }
+
+  .ann-card.is-large { --ann-pad-x: 34px; --ann-pad-bottom: 30px; border-radius: 28px; padding-top: 34px; }
+  .ann-card.is-large .ann-megaphone { right: -40px; top: -30px; width: 300px; height: 300px; }
+  .ann-card.is-large .ann-card-date { font-size: 13px; }
+  .ann-card.is-large .ann-card-title { max-width: 440px; margin-top: 14px; font-size: 40px; line-height: .96; letter-spacing: -.04em; }
+  .ann-card.is-large .ann-card-body { max-width: 520px; margin-top: 18px; font-size: 16px; line-height: 1.55; color: rgba(255, 255, 255, .82); }
+  .ann-card.is-large .ann-facts { margin-top: 24px; }
+  .ann-card.is-large .ann-fact-icon { width: 36px; height: 36px; }
+  .ann-card.is-large .ann-fact-text { font-size: 15px; }
+  .ann-card.is-large .ann-card-call { max-width: 360px; margin-top: 26px; }
+
+  .ann-toast { bottom: 28px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ann-past-plus { transition: none; }
-  .ann-past-panel:not([hidden]) { animation: none; }
+  .ann-tab, .ann-row { transition: none; }
+  .ann-toast { animation: none; }
 }

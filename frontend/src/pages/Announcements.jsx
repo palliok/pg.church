@@ -1,38 +1,155 @@
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAnnouncements } from '../api/announcements.js';
-import { AnnouncementCard, PastAnnouncement } from '../components/AnnouncementCards.jsx';
+import { AnnouncementCard, ImportantPill } from '../components/AnnouncementCards.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
+import { t } from '../i18n.js';
 
-// Объявления: новые — карточками (на телефоне каруселью), прошедшие — раскрывающимся списком «Ранее».
-export default function Announcements() {
-  const { fresh, past, loading, error, retry } = useAnnouncements();
-  const empty = !loading && !error && fresh.length === 0 && past.length === 0;
+// Вкладки колоды светлеют с удалением от открытой карточки.
+const SHADES = ['#e3e3e7', '#ebebee', '#f1f1f3', '#f5f5f7', '#f8f8f9'];
+
+// Вкладка колоды выше или ниже открытой карточки: чем дальше, тем светлее и уже.
+// Ближние к карточке лежат поверх дальних.
+function tabStyle(index, activeIndex, count) {
+  const distance = Math.abs(index - activeIndex);
+  const above = index < activeIndex;
+  const inset = Math.min(distance - 1, 4) * 8;
+
+  return {
+    zIndex: above ? index + 1 : count - index,
+    marginLeft: inset,
+    marginRight: inset,
+    marginTop: above ? (index ? -14 : 0) : -16,
+    background: SHADES[Math.min(distance, SHADES.length) - 1],
+  };
+}
+
+function DateBlock({ item, className }) {
+  if (!item.day) return null;
 
   return (
-    <div className="page-enter container ann-page">
-      <h1 className="h-display ann-page-title">Объявления</h1>
+    <span className={className}>
+      <span className="ann-day">{item.day}</span>
+      <span className="ann-month">{item.month}</span>
+    </span>
+  );
+}
+
+// Объявления одной страницей, по дате. Открытое — чёрная карточка, остальные —
+// вкладки (на телефоне колодой вокруг карточки, на десктопе списком слева).
+// ?a=<id> открывает нужное объявление: этой ссылкой делятся.
+export default function Announcements() {
+  const { items, loading, error, retry } = useAnnouncements();
+  const [params, setParams] = useSearchParams();
+  const [fromLink, setFromLink] = useState(() => params.has('a'));
+  const [toast, setToast] = useState('');
+  const deckCardRef = useRef(null);
+  const toastTimer = useRef(null);
+
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  const linked = items.find((item) => String(item.id) === params.get('a'));
+  const active = linked ?? items[0];
+  const activeIndex = items.indexOf(active);
+
+  const select = (item) => {
+    setFromLink(false);
+    setParams({ a: String(item.id) }, { replace: true });
+
+    // На телефоне карточка могла уехать выше экрана — возвращаем её в поле зрения.
+    requestAnimationFrame(() => {
+      const top = deckCardRef.current?.getBoundingClientRect().top;
+      if (top < 0) window.scrollTo({ top: window.scrollY + top - 80, behavior: 'smooth' });
+    });
+  };
+
+  const showToast = (text) => {
+    clearTimeout(toastTimer.current);
+    setToast(text);
+    toastTimer.current = setTimeout(() => setToast(''), 2000);
+  };
+
+  // Системное меню «Поделиться», а где его нет — ссылка в буфер обмена.
+  const share = async (item) => {
+    const url = new URL(window.location.href);
+    url.search = `?a=${item.id}`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: item.title, url: url.toString() });
+        return;
+      }
+      await navigator.clipboard.writeText(url.toString());
+      showToast(t('Ссылка скопирована'));
+    } catch (shareError) {
+      // Пользователь закрыл меню «Поделиться» — это не ошибка.
+      if (shareError?.name !== 'AbortError') showToast(t('Не удалось скопировать ссылку'));
+    }
+  };
+
+  return (
+    <div className="page-enter container ann-page" style={{ padding: '26px 16px 48px' }}>
+      <h1 className="h-display" style={{ fontSize: 'clamp(34px, 6vw, 54px)' }}>Объявления</h1>
 
       {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
 
-      {empty && (
-        <div style={{ marginTop: 30, padding: '56px 20px', borderRadius: 24, background: 'var(--c-panel)', textAlign: 'center' }}>
+      {!loading && !error && items.length === 0 && (
+        <div className="ann-empty">
           <div className="h-display" style={{ fontSize: 22 }}>Объявлений пока нет</div>
         </div>
       )}
 
-      {fresh.length > 0 && (
-        <div className="ann-cards">
-          {fresh.map((item) => <AnnouncementCard key={item.id} item={item} />)}
-        </div>
-      )}
-
-      {past.length > 0 && (
+      {active && (
         <>
-          <h2 className="ann-past-heading">Ранее</h2>
-          <div className="ann-past-list">
-            {past.map((item) => <PastAnnouncement key={item.id} item={item} />)}
+          {/* Телефон: колода */}
+          <div className="ann-deck">
+            {items.map((item, index) => (index === activeIndex ? (
+              <div key={item.id} ref={deckCardRef} className="ann-deck-card" style={{ zIndex: items.length + 1, marginTop: index ? -16 : 0 }}>
+                <AnnouncementCard item={item} fromLink={fromLink && item === linked} onShare={share} />
+              </div>
+            ) : (
+              <button
+                key={item.id}
+                type="button"
+                className={`ann-tab ${index < activeIndex ? 'is-above' : 'is-below'}`}
+                style={tabStyle(index, activeIndex, items.length)}
+                onClick={() => select(item)}
+              >
+                <DateBlock item={item} className="ann-tab-date" />
+                <span className="ann-tab-title">{item.title}</span>
+                {item.important && <ImportantPill />}
+              </button>
+            )))}
+          </div>
+
+          {/* Десктоп: список слева, открытая карточка справа */}
+          <div className="ann-split">
+            <div className="ann-list">
+              {items.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`ann-row ${item === active ? 'is-active' : ''}`}
+                  aria-current={item === active ? 'true' : undefined}
+                  onClick={() => select(item)}
+                >
+                  <DateBlock item={item} className="ann-row-date" />
+                  <span className="ann-row-title">
+                    <span>{item.title}</span>
+                    {item.important && <ImportantPill />}
+                  </span>
+                  <span className="ann-row-arrow" aria-hidden="true">→</span>
+                </button>
+              ))}
+            </div>
+            <div className="ann-split-card">
+              <AnnouncementCard item={active} fromLink={fromLink && active === linked} onShare={share} className="is-large" />
+            </div>
           </div>
         </>
       )}
+
+      {toast && <div className="ann-toast" role="status">{toast}</div>}
     </div>
   );
 }

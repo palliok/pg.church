@@ -75,9 +75,7 @@
   .home-address { flex: none; }
   .home-address .contacts-card-map { height: 125px; }
 
-  /* На главной — три последних объявления, остальные на странице объявлений. */
   .home-announcements { flex: none; }
-  .home-announcements .ann-home-row:nth-child(n + 4) { display: none; }
   .home-schedule { flex: 1; min-height: 0; padding: 16px !important; }
   /* Расписание занимает остаток колонки и показывает столько событий, сколько влезает целиком:
      лишние строки переносятся во вторую колонку списка, а она скрыта. Высота списка
