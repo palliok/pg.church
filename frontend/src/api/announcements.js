@@ -1,17 +1,37 @@
 import { useMemo } from 'react';
 import { getLang, t } from '../i18n.js';
-import { dayLabel, formatDate } from './dates.js';
+import { dayLabel, formatDate, isoDate } from './dates.js';
 import { useApi } from './useApi.js';
 
 const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+const WEEKDAYS = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 
 // Месяц для вкладки под числом: «июня», «June». Для киргизского Intl в Chrome
 // не знает месяцев — берём из словаря.
-function monthLabel(raw) {
+function monthLabel(date) {
   const lang = getLang();
-  if (lang === 'ky') return t(MONTHS[raw.month - 1]).toLowerCase();
+  if (lang === 'ky') return t(MONTHS[date.month - 1]).toLowerCase();
 
-  return formatDate(raw, lang, { day: 'numeric', month: 'long' }).replace(/\d+/, '').trim();
+  return formatDate(date, lang, { day: 'numeric', month: 'long' }).replace(/\d+/, '').trim();
+}
+
+// День события для карточки: «28 июня, суббота», «June 28, Saturday».
+function eventLabel(date) {
+  const lang = getLang();
+  const weekday = lang === 'ky'
+    ? t(WEEKDAYS[new Date(Date.UTC(date.year, date.month - 1, date.day)).getUTCDay()])
+    : formatDate(date, lang, { weekday: 'long' });
+
+  // По-английски день недели с заглавной: «June 28, Saturday».
+  return `${dayLabel(date)}, ${lang === 'en' ? weekday : weekday.toLowerCase()}`;
+}
+
+// Конкретный день события { day, month, label } или null, если объявление без даты.
+function toEventDate(value) {
+  if (!value) return null;
+  const date = isoDate(value);
+
+  return { day: date.day, month: monthLabel(date), label: eventLabel(date) };
 }
 
 const DETAIL_TYPES = ['when', 'where', 'link'];
@@ -25,28 +45,32 @@ function toDetails(details) {
     .map((detail) => ({ ...detail, text: t(detail.text) }));
 }
 
-// Дата, «Важно», детали и контакт пока есть только в моках (src/api/mocks.js):
+// Даты, «Важно», детали и контакт пока есть только в моках (src/api/mocks.js):
 // бэкенд отдаёт { id, title, body } — тогда объявление показывается без даты и деталей.
+// Дату публикации на сайте не показываем, только день события, если он назначен.
 function toAnnouncement(raw) {
-  const hasDate = raw.year != null;
-
   return {
     id: raw.id,
+    publishedAt: raw.publishedAt ?? null,
     important: Boolean(raw.important),
     title: t(raw.title),
     body: raw.body ? t(raw.body) : null,
-    day: hasDate ? raw.day : null,
-    month: hasDate ? monthLabel(raw) : null,
-    dateLabel: hasDate ? dayLabel(raw) : null,
+    eventDate: toEventDate(raw.eventDate),
     details: toDetails(raw.details),
     contact: raw.contact ? { ...raw.contact, name: raw.contact.name ? t(raw.contact.name) : null } : null,
   };
 }
 
-// Объявления по дате, новые сверху. Пока загружаются или при ошибке —
+// Новые сверху; без даты публикации — в порядке ответа API.
+const byPublished = (a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? '');
+
+// Объявления по дате публикации, новые сверху. Пока загружаются или при ошибке —
 // пустой список: блок на главной просто не показывается.
 export function useAnnouncements() {
   const { data, loading, error, retry } = useApi('/announcements');
 
-  return useMemo(() => ({ items: (data ?? []).map(toAnnouncement), loading, error, retry }), [data, loading, error, retry]);
+  return useMemo(
+    () => ({ items: (data ?? []).map(toAnnouncement).sort(byPublished), loading, error, retry }),
+    [data, loading, error, retry],
+  );
 }

@@ -277,12 +277,15 @@ function eventsBetween(params) {
 }
 
 // ===== Объявления =====
-// Формат опережает бэкенд: дата, important, details и contact пока есть только здесь,
-// /api/v1/announcements отдаёт { id, title, body }. details — строки с иконками в карточке:
-// { type: 'when' | 'where', text } и ссылки { type: 'link', text, url }.
+// Формат опережает бэкенд: publishedAt, eventDate, important, details и contact пока есть
+// только здесь, /api/v1/announcements отдаёт { id, title, body }.
+// publishedAt — когда опубликовано (для сортировки, на сайте не показывается);
+// eventDate — конкретный день события «YYYY-MM-DD» или null, если дня нет.
+// details — строки с иконками: { type: 'when' | 'where', text } и ссылки { type: 'link', text, url }.
 
-function announcement(id, daysAgo, title, body, { important = false, when = null, where = null, links = [], contact = null } = {}) {
-  const date = fromToday(-daysAgo);
+const isoDay = (date) => iso(date).slice(0, 10);
+
+function announcement(id, daysAgo, title, body, { important = false, eventIn = null, when = null, where = null, links = [], contact = null } = {}) {
   const tel = contact ? `tel:+${contact.phone.replace(/\D/g, '').replace(/^8(\d{10})$/, '7$1')}` : null;
 
   return {
@@ -290,8 +293,8 @@ function announcement(id, daysAgo, title, body, { important = false, when = null
     title,
     body,
     important,
-    ...dateParts(date),
-    date: dayAndMonth(date),
+    publishedAt: iso(fromToday(-daysAgo)),
+    eventDate: eventIn === null ? null : isoDay(fromToday(eventIn)),
     details: [
       ...(when ? [{ type: 'when', text: when }] : []),
       ...(where ? [{ type: 'where', text: where }] : []),
@@ -320,10 +323,10 @@ const announcements = [
     when: 'Пятница, 19:00', where: 'Малый зал', links: [['Чат молодёжи в Telegram', 'https://t.me/']],
   }),
   announcement(5, 9, 'Членское собрание после богослужения', 'В воскресенье после богослужения — членское собрание церкви в главном зале.\nПросим членов церкви остаться.', {
-    important: true, where: 'Главный зал',
+    important: true, eventIn: (7 - new Date().getDay()) % 7 || 7, where: 'Главный зал',
   }),
   announcement(6, 14, 'Генеральная уборка зала', 'Приглашаем всех, кто может помочь подготовить зал к зиме.', {
-    when: 'Суббота, 10:00', contact: { name: 'Олег', phone: '+7 931 000-78-90' },
+    eventIn: (6 - new Date().getDay() + 7) % 7 || 7, when: 'Суббота, 10:00', contact: { name: 'Олег', phone: '+7 931 000-78-90' },
   }),
 ];
 

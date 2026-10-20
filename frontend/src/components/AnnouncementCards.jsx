@@ -53,14 +53,14 @@ function Fact({ detail }) {
     : <div className="ann-fact">{content}</div>;
 }
 
-// Открытое объявление — чёрная карточка: дата и пометки, заголовок, текст,
+// Открытое объявление — чёрная карточка: день события (если назначен) и пометки, заголовок, текст,
 // «когда», «где» и ссылки, кнопка звонка и «Поделиться». fromLink — пришли по ссылке ?a=.
 export function AnnouncementCard({ item, fromLink = false, onShare, className = '' }) {
   return (
     <article className={`ann-card ${item.contact ? '' : 'no-call'} ${className}`}>
       <Megaphone />
       <div className="ann-card-meta">
-        {item.dateLabel && <span className="ann-card-date">{item.dateLabel}</span>}
+        {item.eventDate && <span className="ann-card-date">{item.eventDate.label}</span>}
         {item.important && <ImportantPill />}
         {fromLink && <span className="ann-card-badge">по ссылке</span>}
       </div>

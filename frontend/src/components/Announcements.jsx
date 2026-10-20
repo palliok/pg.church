@@ -16,7 +16,6 @@ export default function Announcements({ className = '' }) {
     <section className={`ann-home ${className}`}>
       <Link to="/announcements" className="ann-home-card">
         <Megaphone />
-        {latest.dateLabel && <span className="ann-home-date">{latest.dateLabel}</span>}
         <span className="ann-home-title">{latest.title}</span>
         <span className="ann-home-more">Подробнее</span>
       </Link>

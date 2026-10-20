@@ -24,13 +24,14 @@ function tabStyle(index, activeIndex, count) {
   };
 }
 
+// Число и месяц дня события; у объявления без даты колонки нет.
 function DateBlock({ item, className }) {
-  if (!item.day) return null;
+  if (!item.eventDate) return null;
 
   return (
     <span className={className}>
-      <span className="ann-day">{item.day}</span>
-      <span className="ann-month">{item.month}</span>
+      <span className="ann-day">{item.eventDate.day}</span>
+      <span className="ann-month">{item.eventDate.month}</span>
     </span>
   );
 }
