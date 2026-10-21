@@ -1,7 +1,6 @@
 /* Страница события (макет design_handoff_overview, блоки 08–09, вариант 1A). Сначала телефон, от 861px — десктоп. */
 
-/* С .container, иначе его padding: 0 32px перебивает верхний отступ. */
-.container.ev-page { padding: 14px 12px 28px; color: var(--c-ink); }
+.ev-page { color: var(--c-ink); }
 
 /* Цвета панели по типу события: богослужение, разовое событие, регулярная встреча. */
 .ev-layout {
@@ -147,7 +146,6 @@
 
 /* ===== Десктоп: слева заголовок, описание, проповедь и гимны; справа панель и «Рядом по датам» ===== */
 @media (min-width: 861px) {
-  .container.ev-page { padding: 28px 32px 56px; }
   .ev-back { padding: 6px 10px 4px; font-size: 13px; }
 
   .ev-layout {

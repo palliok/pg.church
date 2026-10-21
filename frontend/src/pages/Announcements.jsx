@@ -91,7 +91,7 @@ export default function Announcements() {
 
   return (
     <div className="page-enter container ann-page">
-      <h1 className="ann-title">Объявления</h1>
+      <h1 className="page-title">Объявления</h1>
 
       {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
 

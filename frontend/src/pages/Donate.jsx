@@ -37,7 +37,7 @@ export default function Donate() {
   }
 
   return (
-    <div className="page-enter container" style={{ padding: '26px 16px 48px' }}>
+    <div className="page-enter container">
       <div className="donate-layout">
         <div style={{ borderRadius: 24, background: 'var(--c-main)', color: '#231f20', padding: 'clamp(24px, 4vw, 40px)' }}>
           <div style={{ display: 'inline-flex', background: '#231f20', color: '#fff', padding: '8px 13px', borderRadius: 9, fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase' }}>

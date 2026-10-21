@@ -29,9 +29,8 @@ export default function Media() {
   const blog = usePosts('blog');
 
   return (
-    <div className="page-enter container" style={{ padding: '26px 16px 48px' }}>
-      <div className="eyebrow">Медиа</div>
-      <h1 className="h-display" style={{ fontSize: 'clamp(34px, 6vw, 54px)', marginTop: 8 }}>Новости и блог</h1>
+    <div className="page-enter container">
+      <h1 className="page-title">Новости и блог</h1>
 
       {isEmpty(news) && isEmpty(blog) && (
         <div style={{ marginTop: 30, padding: '56px 20px', borderRadius: 24, background: 'var(--c-panel)', textAlign: 'center' }}>

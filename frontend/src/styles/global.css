@@ -218,6 +218,12 @@ input, textarea, select { font-family: inherit; }
   .mobile-header-lang { order: -1; align-self: flex-end; }
 }
 
+/* Заголовок страницы («Расписание», «Объявления»…) — один стиль на всех страницах. */
+.page-title { margin: 0; color: var(--c-ink); font: 700 34px/.95 var(--f-sans); letter-spacing: -.05em; }
+@media (min-width: 861px) {
+  .page-title { font-size: 48px; letter-spacing: -.055em; }
+}
+
 /* В одну строку шапка помещается примерно с 1130px (длиннее всего меню на киргизском).
    Уже — меню переносится на отдельную строку под логотипом: ::after разрывает строку. */
 @media (max-width: 1180px) {

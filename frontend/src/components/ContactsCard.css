@@ -1,113 +1,109 @@
-/* По макету resources/export/address-*.png: узкий блок — всё столбиком,
-   широкий — адрес слева, телефон и соцсети справа в одну строку. */
-.contacts-card {
-  container-type: inline-size;
-  border-radius: 24px;
+/* Блок «Адрес»: карта сверху, под ней плашка с адресом, метро, телефоном и соцсетями
+   (оформление — макет design_handoff_overview, блок 13). Узкий блок — плашка столбиком;
+   от 500px — адрес слева, телефон и соцсети справа в одну строку, компактно (колонка главной);
+   от 760px — то же в размерах макета. */
+.contacts-card { container-type: inline-size; min-width: 0; }
+
+.contacts-card-inner {
+  position: relative;
   overflow: hidden;
-  background: var(--c-panel);
-  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 26px;
+  background: var(--c-page);
 }
 
-.contacts-card-map { position: relative; width: 100%; height: 200px; overflow: hidden; background: var(--c-panel); }
+.contacts-card-map { position: relative; height: 200px; background: var(--c-page); }
 .contacts-card-map iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
 
-.contacts-card-body { padding: 16px 16px 18px; }
-.contacts-card-place { min-width: 0; }
+.contacts-card-plate {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  color: var(--c-ink);
+}
+
+.contacts-card-place { display: flex; flex-direction: column; gap: 9px; min-width: 0; }
 
 .contacts-card-address {
-  display: block;
   color: var(--c-ink);
-  font-family: var(--f-sans);
-  font-weight: 700;
-  /* Адрес в одну строку: в узком блоке шрифт уменьшается вместе с его шириной. */
-  font-size: clamp(18px, 7.6cqi, 28px);
-  line-height: 1;
+  font: 700 24px/.95 var(--f-sans);
+  letter-spacing: -.05em;
   white-space: nowrap;
-  letter-spacing: -.03em;
-  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+.contacts-card-address:hover { color: var(--c-ink); text-decoration: underline; text-underline-offset: 3px; }
 
-.contacts-card-metro {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  font: 500 16px var(--f-sans);
-  color: var(--c-gray-text);
-}
-.contacts-card-metro-icon {
-  width: 20px;
-  height: 20px;
-  flex: 0 0 auto;
-  border-radius: 99px;
-  background: var(--c-second);
-  color: #fff;
-  font: 700 10px var(--f-sans);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
+.contacts-card-metro { display: flex; align-items: center; gap: 8px; min-width: 0; font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.contacts-card-metro-icon { flex: 0 0 auto; width: 20px; height: 20px; border-radius: var(--radius-pill); background: var(--c-second); color: #fff; display: inline-flex; align-items: center; justify-content: center; font: 700 10px var(--f-sans); }
+.contacts-card-metro-dot { flex: 0 0 auto; width: 3px; height: 3px; border-radius: var(--radius-pill); background: #b9b9b3; }
+.contacts-card-metro-num { font: 400 18px/.8 var(--f-num); letter-spacing: -.04em; }
+.contacts-card-metro-rest { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--c-gray-text); }
 
-.contacts-card-actions { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+.contacts-card-actions { display: flex; align-items: center; gap: 6px; }
 
 .contacts-card-phone {
   flex: 1;
   min-width: 0;
   height: 44px;
-  padding: 0 20px;
-  border-radius: 99px;
-  background: var(--c-ink);
-  color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
+  background: var(--c-ink);
+  color: #fff;
+  font: 700 15px var(--f-sans);
   white-space: nowrap;
-  font: 700 17px var(--f-sans);
-  transition: transform .15s ease, background .15s ease;
+  transition: background .2s;
 }
-.contacts-card-phone:hover { background: #2a2a2a; }
-.contacts-card-phone:active { transform: scale(.97); }
+.contacts-card-phone:hover { background: #3a3536; color: #fff; }
 
-.contacts-card-social.icon-circle {
+.contacts-card-social {
+  flex: 0 0 44px;
   width: 44px;
   height: 44px;
-  background: #fff;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 1px rgba(35, 31, 32, .2);
   color: var(--c-ink);
-  font: 700 12px var(--f-sans);
-  transition: background .15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 400 10px var(--f-mono);
+  letter-spacing: .04em;
+  transition: background .2s, color .2s, box-shadow .2s;
 }
-.contacts-card-social.icon-circle:hover { background: rgba(255, 255, 255, .7); }
+.contacts-card-social:hover { background: var(--c-ink); color: #fff; box-shadow: none; }
 
-/* Десктоп: адрес и метро слева, телефон и соцсети справа в одну строку.
-   С 500px — компактно, чтобы влезть в колонку главной; с 760px — размеры макета. */
 @container (min-width: 500px) {
-  .contacts-card-body {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 16px 16px 18px 18px;
-  }
-  .contacts-card-place { flex: 1; }
-
-  .contacts-card-address { font-size: clamp(17px, 3.4cqi, 34px); }
-  .contacts-card-metro { gap: 8px; margin-top: 6px; font-size: 14px; }
+  .contacts-card-plate { flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 16px 16px 18px; }
+  .contacts-card-place { flex: 1; gap: 8px; }
+  .contacts-card-address { font-size: clamp(18px, 4cqi, 24px); }
+  .contacts-card-metro { gap: 6px; font-size: 10px; }
   .contacts-card-metro-icon { width: 18px; height: 18px; font-size: 9px; }
-
-  .contacts-card-actions { flex: none; gap: 6px; margin-top: 0; }
-  .contacts-card-phone { flex: none; height: 40px; padding: 0 16px; font-size: 14px; }
-  .contacts-card-social.icon-circle { width: 36px; height: 36px; font-size: 10px; }
+  .contacts-card-metro-num { font-size: 16px; }
+  .contacts-card-actions { flex: 0 0 auto; }
+  .contacts-card-phone { flex: none; height: 40px; padding: 0 16px; gap: 6px; font-size: 14px; }
+  .contacts-card-social { flex-basis: 36px; width: 36px; height: 36px; }
 }
 
 @container (min-width: 760px) {
+  .contacts-card-inner { border-radius: 30px; }
   .contacts-card-map { height: 308px; }
 
-  .contacts-card-body { gap: 24px; padding: 20px 20px 22px 28px; }
+  .contacts-card-plate { gap: 24px; padding: 22px 22px 22px 28px; }
 
-  .contacts-card-metro { gap: 10px; margin-top: 10px; font-size: 18px; }
-  .contacts-card-metro-icon { width: 24px; height: 24px; font-size: 11px; }
+  .contacts-card-place { gap: 12px; }
+  .contacts-card-address { font-size: 34px; letter-spacing: -.055em; }
+  .contacts-card-metro { gap: 10px; font-size: 13px; }
+  .contacts-card-metro-icon { width: 24px; height: 24px; font-size: 12px; }
+  .contacts-card-metro-dot { width: 4px; height: 4px; }
+  .contacts-card-metro-num { font-size: 22px; }
 
   .contacts-card-actions { gap: 8px; }
-  .contacts-card-phone { height: 46px; padding: 0 24px; font-size: 17px; }
-  .contacts-card-social.icon-circle { width: 40px; height: 40px; font-size: 11px; }
+  .contacts-card-phone { height: 48px; padding: 0 22px 0 18px; gap: 10px; font-size: 17px; letter-spacing: -.01em; }
+  .contacts-card-social { flex-basis: 48px; width: 48px; height: 48px; font-size: 11px; }
 }

@@ -2,16 +2,8 @@ import ContactsCard from '../components/ContactsCard.jsx';
 
 export default function About() {
   return (
-    <div
-      className="page-enter container"
-      style={{ padding: '26px 16px 48px' }}
-    >
-      <h1
-        className="h-display"
-        style={{ fontSize: 'clamp(34px, 6vw, 54px)' }}
-      >
-        О церкви
-      </h1>
+    <div className="page-enter container">
+      <h1 className="page-title">О церкви</h1>
 
       <div className="split-layout" style={{ marginTop: 26 }}>
         <div>

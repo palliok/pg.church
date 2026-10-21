@@ -138,8 +138,7 @@
 .ann-home-all:hover { background: var(--c-main); box-shadow: none; }
 
 /* ===== Страница ===== */
-.container.ann-page { padding: 24px 18px 28px; color: var(--c-ink); }
-.ann-title { margin: 0; padding: 0 2px; font: 700 44px/.9 var(--f-sans); letter-spacing: -.06em; }
+.ann-page { color: var(--c-ink); }
 
 .ann-empty { margin-top: 30px; padding: 56px 20px; border-radius: var(--radius-lg); background: var(--c-panel); text-align: center; }
 
@@ -291,8 +290,6 @@
   .ann-home-layer { display: block; }
   .ann-home-foot { display: flex; }
 
-  .container.ann-page { padding: 40px 32px 64px; }
-  .ann-title { padding: 0; font-size: 72px; line-height: .88; letter-spacing: -.065em; }
 
   .ann-deck { display: none; }
   .ann-split {

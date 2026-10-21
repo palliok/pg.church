@@ -92,10 +92,6 @@ export function ScheduleCarousel({ events, now }) {
         <span className="home-carousel-bottom">
           <span className="home-carousel-title">{moreTitle()}</span>
           <span className="home-carousel-more-sub">Все события месяца</span>
-          <span className="home-carousel-foot">
-            <span />
-            <span className="home-carousel-knob" aria-hidden="true">↗</span>
-          </span>
         </span>
       </Link>
     </div>
@@ -129,10 +125,11 @@ function CarouselCard({ event: e, now }) {
       <span className="home-carousel-bottom">
         <span className="home-carousel-time">{e.timeLabel ?? t('Весь день')}</span>
         <span className="home-carousel-title">{e.title}</span>
-        <span className="home-carousel-foot">
-          {e.place ? <EventTag>{e.place}</EventTag> : <span />}
-          <span className="home-carousel-knob" aria-hidden="true">↗</span>
-        </span>
+        {e.place && (
+          <span className="home-carousel-foot">
+            <EventTag>{e.place}</EventTag>
+          </span>
+        )}
       </span>
     </Link>
   );

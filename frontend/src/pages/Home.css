@@ -148,6 +148,7 @@
     background-position: center 85%;
   }
   .home-address { flex: none; }
+  /* На десктопе карта ниже, чем на телефоне: Евангелие забирает остальную высоту колонки. */
   .home-address .contacts-card-map { height: 125px; }
 
   .home-announcements { flex: none; }

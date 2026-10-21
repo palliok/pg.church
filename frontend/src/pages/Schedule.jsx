@@ -93,10 +93,10 @@ export default function Schedule() {
   const viewTabs = [['list', 'Лента', 'Списком'], ['month', 'Месяц', 'Календарь']];
 
   return (
-    <div className="page-enter container sched-page">
+    <div className="page-enter container">
       <div className="sched-head">
         <div className="sched-title-row">
-          <h1 className="h-display sched-title">Расписание</h1>
+          <h1 className="page-title">Расписание</h1>
           <button type="button" className="sched-m sched-filter-round" onClick={() => setSheetOpen(true)} aria-label="Фильтр">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4" /></svg>
             {filterCount > 0 && <span className="sched-badge">{filterCount}</span>}
