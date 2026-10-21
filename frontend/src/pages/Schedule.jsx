@@ -19,10 +19,10 @@ const CATEGORY_STYLE = {
   'Таинство': { color: '#02407d', tone: 'purple' },
   'Молодёжь': { color: '#f9c9a5', tone: 'peach' },
   'Дети': { color: '#f9c9a5', tone: 'peach' },
-  'Молитва': { color: '#0d0d0d', tone: 'dark' },
+  'Молитва': { color: '#231f20', tone: 'dark' },
   'Общение': { color: '#00b7e3', tone: 'yellow' },
 };
-const LEGEND = [['#02407d', 'Богослужение'], ['#f9c9a5', 'Молодёжь и дети'], ['#0d0d0d', 'Молитва'], ['#00b7e3', 'Общение']];
+const LEGEND = [['#02407d', 'Богослужение'], ['#f9c9a5', 'Молодёжь и дети'], ['#231f20', 'Молитва'], ['#00b7e3', 'Общение']];
 
 const categoryColor = (e) => CATEGORY_STYLE[e.category]?.color ?? '#a3a3a3';
 const eventTone = (e) => (e.main ? 'purple' : CATEGORY_STYLE[e.category]?.tone ?? 'dark');
@@ -505,7 +505,7 @@ function Subscribe() {
       </button>
       {open && (
         <div className="sched-subscribe-pop">
-          <div style={{ font: '500 13px/1.5 var(--f-body)', color: 'var(--c-gray-text)' }}>
+          <div style={{ font: '500 13px/1.5 var(--f-sans)', color: 'var(--c-gray-text)' }}>
             Расписание появится в вашем календаре и будет обновляться само.
           </div>
           <CalendarOptions

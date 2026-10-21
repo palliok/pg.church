@@ -41,7 +41,7 @@ export default function Header() {
               alignItems: 'center',
               padding: '10px 16px',
               borderRadius: 999,
-              fontFamily: 'var(--f-head)',
+              fontFamily: 'var(--f-sans)',
               fontWeight: 700,
               fontSize: 12,
               letterSpacing: '.02em',
@@ -76,7 +76,7 @@ export default function Header() {
                 key={lng}
                 type="button"
                 onClick={() => { window.location.href = langPath(code); }}
-                style={{ border: 'none', fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 11, color: active ? '#fff' : 'var(--c-gray-text)', background: active ? 'var(--c-ink)' : 'transparent', padding: '8px 12px', borderRadius: 999, cursor: 'pointer' }}
+                style={{ border: 'none', fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 11, color: active ? '#fff' : 'var(--c-gray-text)', background: active ? 'var(--c-ink)' : 'transparent', padding: '8px 12px', borderRadius: 999, cursor: 'pointer' }}
               >{lng}</button>
             );
           })}

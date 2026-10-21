@@ -116,7 +116,7 @@ export default function TabBar() {
                 <span
                   style={{
                     display: isActive ? 'inline' : 'none',
-                    fontFamily: 'var(--f-head)',
+                    fontFamily: 'var(--f-sans)',
                     fontWeight: 700,
                     fontSize: 11,
                     letterSpacing: '.03em',

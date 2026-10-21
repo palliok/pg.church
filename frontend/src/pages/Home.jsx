@@ -2,7 +2,6 @@ import { t, getLang, langPath } from '../i18n.js';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Announcements from '../components/Announcements.jsx';
-import ArrowKnob from '../components/ArrowKnob.jsx';
 import HomeSchedule, { ScheduleCarousel } from '../components/HomeSchedule.jsx';
 import ChurchBrand from '../components/ChurchBrand.jsx';
 import ContactsCard from '../components/ContactsCard.jsx';
@@ -10,6 +9,7 @@ import { useChurch } from '../api/church.js';
 import { daysFromToday } from '../api/dates.js';
 import { useEvents } from '../api/events.js';
 import gospelTitle from '../assets/gospel-title.png';
+import './Home.css';
 
 // Текущее время, обновляется раз в минуту: «через 3 ч» и прошедшие события на главной.
 function useNow() {
@@ -76,133 +76,79 @@ export default function Home() {
 
         {/* Второстепенный блок: пока грузится и при ошибке не показываем. Без событий на неделе
             остаётся карточка «В календарь». */}
-        {!eventsLoading && !eventsError && <ScheduleCarousel events={week} now={now} />}
+        {!eventsLoading && !eventsError && (
+          <section className="home-mobile-near">
+            <div className="home-mobile-near-head">
+              <h2>Ближайшее</h2>
+              <Link to="/schedule">Всё →</Link>
+            </div>
+            <ScheduleCarousel events={week} now={now} />
+          </section>
+        )}
 
         <Announcements />
 
         <ContactsCard />
       </div>
 
-      <div className="home-grid" style={{ padding: '0 18px' }}>
-
+      {/* Десктоп: три колонки, у каждой своя стопка блоков. */}
+      <div className="home-grid">
         <div className="home-left">
-        <div className="home-top-left">
-        {/* Евангелие */}
-        {/* Подпись сверху, вопрос внизу на холмах — между ними Иисус с детьми. */}
-        <Link
-          to="/story/jesus"
-          className="home-hero"
-          style={{
-            position: 'relative',
-            overflow: 'hidden',
-            borderRadius: 24,
-            color: '#fff',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            padding: 32,
-            textDecoration: 'none',
-          }}
-        >
+        {/* Евангелие: подпись сверху, вопрос внизу на холмах — между ними Иисус с детьми. */}
+        <Link to="/story/jesus" className="home-hero">
           {/* Узкая колонка — чтобы текст не заходил на Иисуса справа. */}
-          <p style={{ font: '500 16px/1.45 var(--f-body)', color: 'rgba(255,255,255,.65)', maxWidth: 240, margin: 0, textWrap: 'balance' }}>
+          <p className="home-hero-text">
             Всё началось задолго до сотворения мира. И с тех пор вся история связана с Ним.
           </p>
           {titleImage ? (
             <img className="home-hero-title-img" src={gospelTitle} alt="Кто такой Иисус?" />
           ) : (
-            <div className="h-display" style={{ fontSize: 34, marginTop: 'auto', paddingTop: 24 }}>
-              Кто такой
-              <span style={{ display: 'block', fontWeight: 900, fontSize: 'clamp(56px, 6.5vw, 96px)', lineHeight: 0.85, letterSpacing: '-.05em', marginTop: 4, color: 'var(--c-main)' }}>
-                Иисус?
-              </span>
+            <div className="h-display home-hero-title">
+              {/* На киргизском вопрос — одна фраза «Иса ким?», без «Кто такой». */}
+              {getLang() === 'ky' ? null : t('Кто такой')}
+              <span>{t('Иисус?')}</span>
             </div>
           )}
         </Link>
-        </div>
 
-        {/* Адрес */}
         <ContactsCard className="home-address" />
         </div>
 
-        <div className="home-schedule-column">
-        {/* Объявления */}
+        <div className="home-center">
         <Announcements className="home-announcements" />
 
-        {/* Расписание */}
         <HomeSchedule className="home-schedule" events={upcoming} loading={eventsLoading} error={eventsError} now={now} />
-
         </div>
 
+        {/* Правая колонка: пожертвование и «Кто мы». */}
         <div className="home-right">
-        {/* Пожертвование */}
-        <div className="home-donate-column">
-        <Link
-          to="/donate"
-          className="home-donate"
-          style={{
-            position: 'relative',
-            overflow: 'hidden',
-            borderRadius: 24,
-            background: 'var(--c-main)',
-            color: '#0d0d0d',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: '22px 18px',
-          }}
-        >
-          <div style={{ alignSelf: 'flex-start', background: '#0d0d0d', color: '#fff', padding: '7px 12px', borderRadius: 9, fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase' }}>
-            Пожертвование
-          </div>
-          <div>
-            <div className="h-display" style={{ fontSize: 24, lineHeight: 0.92 }}>Поддержать<br />служение</div>
-            <span className="pill-btn" style={{ marginTop: 16, padding: '6px 6px 6px 20px', background: '#0d0d0d', color: '#fff' }}>
-              <span style={{ fontSize: 11.5 }}>Пожертвовать</span>
-              <ArrowKnob size={34} bg="var(--c-main)" fg="#0d0d0d" />
+        <Link to="/donate" className="home-donate">
+          <span className="home-label">Пожертвование</span>
+          <span className="home-donate-body">
+            <span className="home-donate-title">Поддержать служение</span>
+            <span className="home-pill is-dark is-small">
+              Пожертвовать
+              <span className="home-pill-knob">↗</span>
             </span>
-          </div>
+          </span>
         </Link>
-        </div>
 
-        {/* Кто мы */}
-        <Link
-          to="/about"
-          className="home-about"
-          style={{
-            position: 'relative',
-            overflow: 'hidden',
-            borderRadius: 24,
-            backgroundColor: '#0d0d0d',
-            backgroundImage:
-              'linear-gradient(to top, rgba(5,5,5,.93) 7%, rgba(5,5,5,.25) 54%, rgba(5,5,5,.45) 100%), repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 11px, transparent 11px 22px)',
-            color: '#fff',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-end',
-            padding: 26,
-          }}
-        >
-          <div className="h-display" style={{ fontSize: 48 }}>Кто мы</div>
-          <p style={{ font: '500 14px/1.5 var(--f-body)', color: 'rgba(255,255,255,.72)', maxWidth: 300, margin: '11px 0 0' }}>
-            Наша история, во что мы верим и команда, которая ждёт именно тебя.
-          </p>
+        <Link to="/about" className="home-about">
+          <span className="home-knob is-light home-about-knob">↗</span>
+          <span className="home-about-title">Кто мы</span>
+          <p className="home-about-text">Наша история, во что мы верим и команда, которая ждёт именно тебя.</p>
           {duty?.shifts.length > 0 && (
-          <div style={{ marginTop: 18, padding: 16, borderRadius: 18, background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)' }}>
-            <div style={{ fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 8.5, letterSpacing: '.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,.5)' }}>
-              {[t('Дежурство служителей'), duty.hours].filter(Boolean).join(' · ')}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginTop: 12 }}>
-              {duty.shifts.map((d, i) => (
-                <div key={i} className="card-row">
-                  <span className="icon-circle" style={{ flex: '0 0 30px', height: 30, background: 'rgba(255,255,255,.12)', fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 10, textTransform: 'uppercase' }}>
-                    {d.dow}
+            <span className="home-duty">
+              <span className="home-label">{[t('Дежурство служителей'), duty.hours].filter(Boolean).join(' · ')}</span>
+              <span className="home-duty-list">
+                {duty.shifts.map((d, i) => (
+                  <span key={i} className="home-duty-row">
+                    <span className="home-duty-dow">{d.dow}</span>
+                    <span className="home-duty-name">{d.name}</span>
                   </span>
-                  <span style={{ font: '600 13.5px var(--f-body)', color: '#fff' }}>{d.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+                ))}
+              </span>
+            </span>
           )}
         </Link>
         </div>

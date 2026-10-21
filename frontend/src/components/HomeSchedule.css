@@ -1,65 +1,68 @@
-/* Блок «Расписание» на главной (десктоп). Макет: resources/design_handoff_schedule_2b, «Главная · десктоп». */
+/* Блок «Расписание» на главной (десктоп). Макет: resources/design_handoff_overview, блок 04. */
 
-.home-sched { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 14px; border-radius: 30px; background: #fff; box-shadow: inset 0 0 0 1px var(--sch-line); color: var(--sch-ink); overflow: hidden; }
+.home-sched { display: flex; flex-direction: column; gap: 6px; min-width: 0; border-radius: 22px; background: #fff; color: var(--c-ink); overflow: hidden; }
 
-/* Ближайшее событие — голубая карточка с числом дня на фоне */
-.home-sched-next { position: relative; overflow: hidden; flex: 0 0 auto; display: flex; flex-direction: column; gap: 4px; padding: 18px 18px 16px; border-radius: 22px; background: var(--sch-cyan); color: var(--sch-ink); transition: background .2s; }
-.home-sched-next:hover { background: var(--sch-cyan-hover); }
+/* Ближайшее событие — тёмная карточка с числом дня на фоне */
+.home-sched-next { position: relative; overflow: hidden; flex: 0 0 auto; display: flex; flex-direction: column; gap: 4px; padding: 16px 16px 14px; border-radius: 22px; background: var(--c-ink); color: #fff; }
+.home-sched-next:hover { color: #fff; }
 .home-sched-next > * { position: relative; }
-.home-sched-next .home-sched-next-mark { position: absolute; right: -6px; top: -18px; font: 400 150px/1 var(--f-sch-num); letter-spacing: -.06em; color: rgba(35,31,32,.1); pointer-events: none; user-select: none; }
-.home-sched-next-label { font: 400 11px var(--f-sch-mono); letter-spacing: .04em; text-transform: uppercase; }
-.home-sched-next-time { margin-top: 22px; font: 400 58px/1 var(--f-sch-num); letter-spacing: -.05em; }
-.home-sched-next-title { font: 700 26px/1.05 var(--f-sch); letter-spacing: -.05em; overflow-wrap: anywhere; }
-.home-sched-next-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
-.home-sched-next-place { min-width: 0; font: 400 11px var(--f-sch-mono); letter-spacing: .02em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.home-sched-next-knob { flex: 0 0 auto; width: 36px; height: 36px; border-radius: var(--radius-pill); background: var(--sch-ink); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.home-sched-next .home-sched-next-mark { position: absolute; right: -6px; top: -18px; font: 400 150px/1 var(--f-num); letter-spacing: -.06em; color: rgba(255,255,255,.14); pointer-events: none; user-select: none; }
+.home-sched-next-label { font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
+.home-sched-next-title { margin-top: 14px; font: 700 26px/1.05 var(--f-sans); letter-spacing: -.05em; overflow-wrap: anywhere; }
+.home-sched-next-time { font: 400 32px/1 var(--f-num); letter-spacing: -.04em; }
+.home-sched-next-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; padding-right: 4px; }
+.home-sched-next-place { display: flex; align-items: center; gap: 4px; min-width: 0; font: 400 11px var(--f-mono); letter-spacing: .02em; text-transform: uppercase; }
+.home-sched-next-place > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.home-sched-next:hover .home-sched-next-foot svg { transform: translateX(3px); }
+.home-sched-next-foot svg { transition: transform .2s; }
 
-/* Следующие события: строки делят высоту списка поровну (их число считает useFitCount). */
-.home-sched-list { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; padding-top: 4px; overflow: hidden; }
-.home-sched-item { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 0 10px; border-radius: 16px; color: var(--sch-ink); transition: background .2s; }
-.home-sched-item:hover { background: var(--sch-cyan); }
-.home-sched-date { display: flex; flex-direction: column; gap: 3px; }
-.home-sched-date-num { font: 400 26px/.9 var(--f-sch-num); letter-spacing: -.04em; }
-.home-sched-date-dow { font: 400 10px var(--f-sch-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--sch-muted); }
-.home-sched-item-title { display: flex; align-items: center; gap: 7px; min-width: 0; }
-.home-sched-live { flex: 0 0 7px; height: 7px; border-radius: 50%; background: var(--c-signal); }
-.home-sched-item-name { min-width: 0; font: 700 17px var(--f-sch); letter-spacing: -.035em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.home-sched-item-time { font: 400 13px var(--f-sch-mono); }
-.home-sched-note { padding: 0 10px; font: 400 13px/1.5 var(--f-sch); color: var(--sch-muted); }
+/* Следующие события: плашка даты, название, время и место, стрелка. Что не влезло — обрезается и уходит под кнопку. */
+.home-sched-list { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.home-sched-item { flex: 0 0 auto; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 6px 12px 6px 8px; border-radius: 22px; color: var(--c-ink); transition: background .2s; }
+.home-sched-item:hover { background: var(--c-main); color: var(--c-ink); }
+.home-sched-date { width: 56px; height: 56px; border-radius: 16px; background: var(--c-page); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+.home-sched-date-num { font: 400 24px/.9 var(--f-num); letter-spacing: -.04em; }
+.home-sched-date-mon { font: 400 9px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--c-gray-text); }
+.home-sched-item-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.home-sched-item-name { min-width: 0; font: 700 17px/1.05 var(--f-sans); letter-spacing: -.035em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.home-sched-item-time { font: 400 15px var(--f-num); letter-spacing: -.02em; }
+.home-sched-item-place { display: flex; align-items: center; gap: 4px; min-width: 0; font: 400 10px var(--f-mono); letter-spacing: .02em; text-transform: uppercase; color: var(--c-body); }
+.home-sched-item-place > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.home-sched-note { padding: 0 10px; font: 400 13px/1.5 var(--f-sans); color: var(--c-gray-text); }
 
-.home-sched-all { display: flex; align-items: center; justify-content: space-between; padding: 12px 10px 4px; border-top: 1px solid var(--sch-line); color: var(--sch-ink); font: 400 12px var(--f-sch-mono); letter-spacing: .04em; text-transform: uppercase; }
-.home-sched-all:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* Кнопка наезжает на низ списка, белая тень над ней растворяет строку, ушедшую под неё. */
+.home-sched-all { position: relative; z-index: 1; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; height: 44px; margin-top: -30px; box-shadow: 0 -14px 18px 8px #fff; border-radius: var(--radius-pill); background: var(--c-main); color: var(--c-ink); font: 400 12px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; transition: background .2s; }
+.home-sched-all:hover { background: var(--c-main-hover); color: var(--c-ink); }
 
 /* Узкий десктоп: блок во всю ширину сетки и по высоте содержимого — карточка слева, список справа. */
 @media (max-width: 1080px) {
   .home-sched { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 14px; }
-  .home-sched-list { min-height: calc(4 * 58px + 4px); }
-  .home-sched-all { grid-column: 1 / -1; }
+  .home-sched-list { flex: none; height: calc(4 * 68px); }
+  .home-sched-all { grid-column: 1 / -1; margin-top: 0; box-shadow: none; }
 }
 
-/* ===== Мобильная главная: карусель расписания (макет «Главная · мобилка») ===== */
+/* ===== Мобильная главная: карусель расписания (макет design_handoff_overview, блок 05) ===== */
 /* Карусель во всю ширину экрана: отрицательные поля компенсируют отступы .home-mobile (14px). */
 .home-carousel { display: flex; gap: 10px; margin: 0 -14px; padding: 0 14px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-left: 14px; overscroll-behavior-x: contain; }
 
-.home-carousel-card { --tag-h: 28px; --tag-px: 11px; --tag-fs: 11px; flex: 0 0 270px; height: 340px; scroll-snap-align: start; display: flex; flex-direction: column; padding: 18px; border-radius: 30px; background: #fff; box-shadow: inset 0 0 0 1px var(--sch-line); color: var(--sch-ink); }
-.home-carousel-card.is-today { --tag-line: rgba(255,255,255,.4); background: var(--sch-ink); box-shadow: none; color: #fff; }
-.home-carousel-card.is-live { background: var(--sch-cyan); box-shadow: none; }
+.home-carousel-card { --tag-h: 28px; --tag-px: 11px; --tag-fs: 11px; flex: 0 0 270px; height: 340px; scroll-snap-align: start; display: flex; flex-direction: column; padding: 18px; border-radius: 30px; background: #fff; box-shadow: inset 0 0 0 1px var(--c-line); color: var(--c-ink); }
+.home-carousel-card.is-today { --tag-line: rgba(255,255,255,.4); background: var(--c-ink); box-shadow: none; color: #fff; }
+.home-carousel-card.is-live { background: var(--c-main); box-shadow: none; }
 /* Последняя карточка «В календарь» — на тёплом сером, как сегодняшний день в ленте. */
-.home-carousel-card.is-more { background: var(--sch-today); box-shadow: none; }
+.home-carousel-card.is-more { background: var(--c-warm); box-shadow: none; }
 
 .home-carousel-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .home-carousel-date { display: flex; flex-direction: column; gap: 4px; }
-.home-carousel-num { font: 400 64px/.85 var(--f-sch-num); letter-spacing: -.05em; }
-.home-carousel-label { font: 400 11px var(--f-sch-mono); letter-spacing: .04em; text-transform: uppercase; opacity: .7; }
+.home-carousel-num { font: 400 64px/.85 var(--f-num); letter-spacing: -.05em; }
+.home-carousel-label { font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; opacity: .7; }
 .home-carousel-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; --tag-h: 26px; --tag-px: 10px; --tag-fs: 10px; }
-.home-carousel-soon { padding: 6px 11px; border-radius: var(--radius-pill); background: var(--sch-cyan); color: var(--sch-ink); font: 400 10px var(--f-sch-mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.home-carousel-soon { padding: 6px 11px; border-radius: var(--radius-pill); background: var(--c-main); color: var(--c-ink); font: 400 10px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
 
 .home-carousel-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.home-carousel-when { display: flex; align-items: baseline; gap: 10px; }
-.home-carousel-time { font: 400 24px var(--f-sch-num); letter-spacing: -.03em; }
-.home-carousel-more-sub { font: 400 11px var(--f-sch-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--sch-muted); }
-.home-carousel-title { font: 700 28px/1 var(--f-sch); letter-spacing: -.05em; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.home-carousel-time { font: 400 24px var(--f-num); letter-spacing: -.03em; }
+.home-carousel-more-sub { font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-gray-text); }
+.home-carousel-title { font: 700 28px/1 var(--f-sans); letter-spacing: -.05em; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .home-carousel-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; min-width: 0; }
 .home-carousel-foot .ev-tag { min-width: 0; overflow: hidden; text-overflow: ellipsis; display: inline-block; line-height: var(--tag-h); }
-.home-carousel-knob { flex: 0 0 auto; width: 40px; height: 40px; border-radius: var(--radius-pill); background: var(--sch-ink); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-.is-today .home-carousel-knob { background: #fff; color: var(--sch-ink); }
+.home-carousel-knob { flex: 0 0 auto; width: 40px; height: 40px; border-radius: var(--radius-pill); background: var(--c-ink); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.is-today .home-carousel-knob { background: #fff; color: var(--c-ink); }

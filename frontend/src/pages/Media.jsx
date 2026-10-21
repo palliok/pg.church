@@ -16,9 +16,9 @@ const cover = (post, index) => ({
 
 const isEmpty = ({ posts, loading, error }) => !loading && !error && posts.length === 0;
 
-function Chip({ label, color = '#fff', text = '#0d0d0d' }) {
+function Chip({ label, color = '#fff', text = '#231f20' }) {
   return (
-    <span style={{ background: color, color: text, padding: '3px 9px', borderRadius: 999, fontFamily: 'var(--f-head)', fontWeight: 700, fontSize: 8.5, letterSpacing: '.06em', textTransform: 'uppercase' }}>
+    <span style={{ background: color, color: text, padding: '3px 9px', borderRadius: 999, fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 8.5, letterSpacing: '.06em', textTransform: 'uppercase' }}>
       {label}
     </span>
   );
@@ -47,9 +47,9 @@ export default function Media() {
           {news.posts.map((n, i) => (
             <article key={n.id} style={{ borderRadius: 22, background: 'var(--c-panel)', padding: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ height: 100, borderRadius: 14, ...cover(n, i) }} />
-              <div style={{ font: '600 11px var(--f-body)', color: 'var(--c-gray-text-soft)', textTransform: 'uppercase', letterSpacing: '.1em' }}>{n.date}</div>
+              <div style={{ font: '600 11px var(--f-sans)', color: 'var(--c-gray-text-soft)', textTransform: 'uppercase', letterSpacing: '.1em' }}>{n.date}</div>
               <h3 className="h-display" style={{ fontSize: 19, textTransform: 'none' }}>{n.title}</h3>
-              {n.excerpt && <p style={{ font: '500 13.5px/1.55 var(--f-body)', color: 'var(--c-gray-text)', margin: 0 }}>{n.excerpt}</p>}
+              {n.excerpt && <p style={{ font: '500 13.5px/1.55 var(--f-sans)', color: 'var(--c-gray-text)', margin: 0 }}>{n.excerpt}</p>}
               <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
                 {n.tags.map((t) => <Chip key={t.label} {...t} />)}
               </div>
@@ -66,9 +66,9 @@ export default function Media() {
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {blog.posts.map((b, i) => (
             <div key={b.id} className="card-row" style={{ padding: '16px 0', borderTop: '1px solid var(--c-line-soft)' }}>
-              <span style={{ flex: '0 0 30px', font: '600 11px var(--f-head)', color: 'var(--c-gray-text-mute)' }}>{`${String(i + 1).padStart(2, '0')} /`}</span>
+              <span style={{ flex: '0 0 30px', font: '600 11px var(--f-sans)', color: 'var(--c-gray-text-mute)' }}>{`${String(i + 1).padStart(2, '0')} /`}</span>
               <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'block', fontFamily: 'var(--f-head)', fontWeight: 600, fontSize: 17 }}>{b.title}</span>
+                <span style={{ display: 'block', fontFamily: 'var(--f-sans)', fontWeight: 600, fontSize: 17 }}>{b.title}</span>
                 <div style={{ display: 'flex', gap: 5, marginTop: 6 }}>
                   {b.tags.map((t) => <Chip key={t.label} {...t} />)}
                 </div>

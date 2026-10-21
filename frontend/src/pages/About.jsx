@@ -21,7 +21,7 @@ export default function About() {
               overflow: 'hidden',
               minHeight: 320,
               position: 'relative',
-              backgroundColor: '#0d0d0d',
+              backgroundColor: '#231f20',
               backgroundImage:
                 'linear-gradient(to top, rgba(5,5,5,.92) 10%, rgba(5,5,5,.2) 70%), repeating-linear-gradient(135deg, rgba(255,255,255,.04) 0 11px, transparent 11px 22px)',
               color: '#fff',
@@ -42,7 +42,7 @@ export default function About() {
 
             <p
               style={{
-                font: '500 15px/1.6 var(--f-body)',
+                font: '500 15px/1.6 var(--f-sans)',
                 color: 'rgba(255,255,255,.72)',
                 maxWidth: 480,
                 margin: '14px 0 0',
@@ -56,7 +56,7 @@ export default function About() {
 
           <p
             style={{
-              font: '500 16px/1.65 var(--f-body)',
+              font: '500 16px/1.65 var(--f-sans)',
               color: '#3a3a3a',
               marginTop: 22,
               maxWidth: 680,
@@ -104,7 +104,7 @@ export default function About() {
 
             <p
               style={{
-                font: '500 14px/1.6 var(--f-body)',
+                font: '500 14px/1.6 var(--f-sans)',
                 color: 'rgba(255,255,255,.78)',
                 margin: '14px 0 0',
               }}

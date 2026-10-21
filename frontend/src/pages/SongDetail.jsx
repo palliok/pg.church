@@ -28,7 +28,7 @@ function writeChords(on) {
   }
 }
 
-const panelBtn = (active) => ({ padding: '8px 14px', fontSize: 11, background: active ? '#0d0d0d' : 'transparent', color: active ? '#fff' : '#0d0d0d' });
+const panelBtn = (active) => ({ padding: '8px 14px', fontSize: 11, background: active ? '#231f20' : 'transparent', color: active ? '#fff' : '#231f20' });
 
 export default function SongDetail() {
   const { id } = useParams();
@@ -68,8 +68,8 @@ export default function SongDetail() {
   return (
     <div className="page-enter container" style={{ padding: '20px 16px 64px', maxWidth: 760 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        <Link to="/songs" className="pill-btn" style={{ padding: '0 20px 0 8px', height: 44, background: 'var(--c-panel)', color: '#0d0d0d' }}>
-          <ArrowKnob size={30} bg="#fff" fg="#0d0d0d" symbol="←" />
+        <Link to="/songs" className="pill-btn" style={{ padding: '0 20px 0 8px', height: 44, background: 'var(--c-panel)', color: '#231f20' }}>
+          <ArrowKnob size={30} bg="#fff" fg="#231f20" symbol="←" />
           <span style={{ fontSize: 11.5 }}>Сборник</span>
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -78,7 +78,7 @@ export default function SongDetail() {
               onClick={toggleChords}
               aria-pressed={chords}
               className="pill-btn"
-              style={{ padding: '0 18px', height: 44, fontSize: 11, background: chords ? '#0d0d0d' : 'var(--c-panel)', color: chords ? '#fff' : '#0d0d0d' }}
+              style={{ padding: '0 18px', height: 44, fontSize: 11, background: chords ? '#231f20' : 'var(--c-panel)', color: chords ? '#fff' : '#231f20' }}
             >
               Аккорды
             </button>
@@ -114,10 +114,10 @@ export default function SongDetail() {
       </div>
 
       <div style={{ marginTop: 24, display: 'flex', alignItems: 'baseline', gap: 16 }}>
-        <span style={{ fontFamily: 'var(--f-head)', fontWeight: 900, fontSize: 44, color: 'var(--c-gray-text-mute)' }}>{song.num}</span>
+        <span style={{ fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 44, color: 'var(--c-gray-text-mute)' }}>{song.num}</span>
         <h1 className="h-display" style={{ fontSize: 'clamp(30px, 5vw, 44px)', textTransform: 'none' }}>{song.title}</h1>
       </div>
-      <div style={{ font: '600 13px var(--f-body)', color: 'var(--c-gray-text)', marginTop: 6 }}>{song.sub}</div>
+      <div style={{ font: '600 13px var(--f-sans)', color: 'var(--c-gray-text)', marginTop: 6 }}>{song.sub}</div>
 
       <div style={{ marginTop: 30 }}>
         <SongText sections={sections} chords={chords} fontSize={FONT_SIZES[fontStep]} />

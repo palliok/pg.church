@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { getLang, t } from '../i18n.js';
-import { dayLabel, formatDate, isoDate, monthLabel } from './dates.js';
+import { dayLabel, formatDate, isoDate, monthLabel, shortDate } from './dates.js';
 import { useApi } from './useApi.js';
 
 const WEEKDAYS = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
@@ -16,12 +16,13 @@ function eventLabel(date) {
   return `${dayLabel(date)}, ${lang === 'en' ? weekday : weekday.toLowerCase()}`;
 }
 
-// Конкретный день события { day, month, label } или null, если объявление без даты.
+// Конкретный день события { day, month, label, dow, mon } или null, если объявление без даты.
+// dow и mon — короткие подписи для плашки даты на главной.
 function toEventDate(value) {
   if (!value) return null;
   const date = isoDate(value);
 
-  return { day: date.day, month: monthLabel(date), label: eventLabel(date) };
+  return { day: date.day, month: monthLabel(date), label: eventLabel(date), ...shortDate(date) };
 }
 
 const DETAIL_TYPES = ['when', 'where', 'link'];

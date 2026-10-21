@@ -1,111 +1,16 @@
-/* ===== Home bento grid ===== */
-.home-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 16px 18px 0;
-}
+/* ===== Главная ===== */
+/* Десктопная сетка главной — в pages/Home.css, здесь — мобильная версия. */
 
-.home-grid {
-  --home-gap: 14px;
-  display: grid;
-  gap: var(--home-gap);
-}
-
-/* Обёртки колонок нужны только для разметки: блоки сами встают в ячейки сетки. */
-.home-left, .home-top-left, .home-schedule-column, .home-right { display: contents; }
-.home-schedule { min-width: 0; }
-
-/* Фон блока «Евангелие»: широкая картинка на планшете, вертикальная — на десктопе и телефоне.
-   Картинка сама тёмная, без затемнения. Подпись сверху слева, Иисус с детьми посередине справа,
-   вопрос внизу на холмах — картинка прижата к низу. */
-.home-hero, .home-mobile-hero {
+/* Фон блока «Евангелие» на телефоне: картинка сама тёмная, без затемнения. Подпись сверху слева,
+   Иисус с детьми посередине справа, вопрос внизу на холмах — картинка прижата к низу. */
+.home-mobile-hero {
   background-color: #0d2f36;
   background-position: right bottom;
   background-size: cover;
   background-repeat: no-repeat;
 }
-.home-hero {
-  background-image: url('../assets/gospel-hor.jpg');
-}
-@media (min-width: 1081px) {
-  .home-hero {
-    background-image: url('../assets/gospel-vert.jpg');
-    /* Низкий блок обрезает картинку: срезаем больше пустого неба, чем холмов, чтобы осталась голова Иисуса. */
-    background-position: center 85%;
-  }
-}
-/* Вопрос-картинка внизу блока, фон у неё прозрачный. */
-.home-hero-title-img { display: block; width: 100%; max-width: 480px; height: auto; margin-top: auto; padding-top: 20px; }
-/* Вопрос ближе к левому нижнему углу, чем подпись: отступ блока 32px, у картинки — 12px. */
-.home-hero .home-hero-title-img { margin: auto 0 -20px -20px; }
-/* На планшете и телефоне персонажи ближе к левому краю — вопрос уже, чтобы не закрывать детей. */
-@media (max-width: 1080px) {
-  .home-hero .home-hero-title-img { max-width: 300px; }
-  /* На телефоне отступ блока 20px, у картинки — 10px. */
-  .home-mobile-hero .home-hero-title-img { width: 85%; margin: auto 0 -10px -10px; }
-}
-
-/* Десктоп: три колонки, у каждой своя стопка блоков разной высоты.
-   Слева Евангелие тянется, адрес компактный; в центре объявления по содержимому,
-   расписание — на всю оставшуюся высоту; справа тянется «Поддержать». */
-@media (min-width: 1081px) {
-  .home-grid {
-    grid-template-columns: minmax(0, 5fr) repeat(2, minmax(0, 3.5fr));
-    min-height: max(664px, calc(100dvh - 104px));
-  }
-
-  .home-left, .home-schedule-column, .home-right { display: flex; flex-direction: column; gap: var(--home-gap); min-width: 0; min-height: 0; }
-
-  .home-hero { flex: 1; min-height: min-content; }
-  .home-address { flex: none; }
-  .home-address .contacts-card-map { height: 125px; }
-
-  .home-announcements { flex: none; }
-  /* Расписание занимает остаток колонки и показывает столько событий, сколько влезает (HomeSchedule.jsx).
-     Высота списка не влияет на высоту сетки, её задают Евангелие и правая колонка. */
-  .home-schedule { flex: 1; min-height: 0; }
-  .home-schedule .home-sched-list { contain: size; }
-
-  .home-donate-column { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-  .home-donate { flex: 1; padding: 16px 18px !important; gap: 14px; }
-  .home-about { flex: none; padding: 20px !important; }
-}
-
-@media (min-width: 1081px) and (max-height: 850px) {
-  .home-grid { --home-gap: 8px; }
-}
-
-@media (min-width: 1081px) and (max-width: 1440px) {
-  .home-about { padding: 16px !important; }
-  .home-about > .h-display { font-size: 44px !important; }
-  .home-about > div:last-child { margin-top: 12px !important; }
-}
-
-@media (max-width: 1080px) {
-  .home-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: none;
-    /* «Поддержать служение» встаёт рядом с адресом, а не оставляет под ним дыру. */
-    grid-auto-flow: row dense;
-    min-height: 0;
-  }
-  .home-hero { grid-column: 1 / 3; grid-row: auto; min-height: 420px; }
-  .home-donate-column { display: flex; flex-direction: column; grid-column: 1 / 2; grid-row: auto; }
-  .home-donate { flex: 1; }
-  .home-address { grid-column: 2 / 3; grid-row: auto; }
-  .home-schedule { grid-column: 1 / 3; }
-  .home-about { grid-column: 1 / 3; grid-row: auto; min-height: 340px; }
-  .home-announcements { grid-column: 1 / 3; grid-row: auto; }
-}
-
-@media (max-width: 640px) {
-  .home-grid { grid-template-columns: 1fr; }
-  .home-hero, .home-donate-column, .home-address,
-  .home-schedule, .home-about, .home-announcements { grid-column: 1 / 2; }
-  .home-hero { min-height: 380px; }
-  .home-about { min-height: 300px; }
-}
+/* Вопрос-картинка внизу блока, фон у неё прозрачный. На телефоне отступ блока 20px, у картинки — 10px. */
+.home-hero-title-img { display: block; width: 85%; max-width: 480px; height: auto; margin: auto 0 -10px -10px; padding-top: 20px; }
 
 /* ===== Generic two-column detail layout (event/sermon/songs) ===== */
 .split-layout {
@@ -143,13 +48,13 @@
 .donate-bank-main { min-width: 0; }
 .donate-bank-qr { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; margin: 0; padding: 24px; border-radius: 18px; background: #fff; text-align: center; }
 .donate-bank-qr img { width: 100%; max-width: 272px; height: auto; }
-.donate-bank-qr figcaption { max-width: 240px; margin-top: 12px; font: 500 14px/1.5 var(--f-body); color: var(--c-gray-text); }
+.donate-bank-qr figcaption { max-width: 240px; margin-top: 12px; font: 500 14px/1.5 var(--f-sans); color: var(--c-gray-text); }
 .donate-bank-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; margin: 24px 0 0; }
 .donate-bank-details > div { min-width: 0; }
 .donate-bank-field-bank, .donate-bank-field-recipient { grid-column: 1 / -1; }
-.donate-bank-details dt, .donate-bank-purpose > div { font: 500 13px/1.5 var(--f-body); color: var(--c-gray-text); }
+.donate-bank-details dt, .donate-bank-purpose > div { font: 500 13px/1.5 var(--f-sans); color: var(--c-gray-text); }
 .donate-bank-details dd { margin: 5px 0 0; }
-.donate-bank-value { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 0; border: 0; border-radius: 3px; background: transparent; color: var(--c-ink); font: 600 16px/1.5 var(--f-body); text-align: left; cursor: copy; }
+.donate-bank-value { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 0; border: 0; border-radius: 3px; background: transparent; color: var(--c-ink); font: 600 16px/1.5 var(--f-sans); text-align: left; cursor: copy; }
 .donate-bank-value > span:first-child { min-width: 0; }
 .donate-bank-number { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .donate-bank-purpose { grid-column: 1 / -1; justify-self: start; max-width: 100%; padding: 18px 20px; border-radius: 18px; background: var(--c-main); }
@@ -159,7 +64,7 @@
 .donate-bank-value:focus-visible, .donate-bank-qr-download:focus-visible { outline: 2px solid var(--c-ink); outline-offset: 3px; }
 .donate-bank-value:disabled { cursor: wait; opacity: .6; }
 .donate-bank-qr-download { display: none; margin-top: 16px; padding: 13px 18px; background: var(--c-ink); color: #fff; font-size: 11px; }
-.donate-bank-indicator { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 18px; height: 18px; border-radius: 99px; font: 700 12px var(--f-body); color: var(--c-ink); }
+.donate-bank-indicator { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 18px; height: 18px; border-radius: 99px; font: 700 12px var(--f-sans); color: var(--c-ink); }
 .donate-bank-indicator[data-state="success"] { background: var(--c-main); }
 .donate-bank-purpose .donate-bank-indicator[data-state="success"] { background: #fff; }
 .donate-bank-indicator[data-state="error"] { background: var(--c-signal); color: #fff; }
@@ -250,7 +155,7 @@
     color: var(--c-gray-text);
     padding: 7px;
     border-radius: 99px;
-    font-family: var(--f-head);
+    font-family: var(--f-sans);
     font-weight: 700;
     font-size: 11px;
     cursor: pointer;
@@ -280,8 +185,8 @@
   .home-mobile-hero-title {
     margin-top: auto;
     padding-top: 20px;
-    font-family: var(--f-head);
-    font-weight: 900;
+    font-family: var(--f-sans);
+    font-weight: 700;
     font-size: 24px;
     line-height: .9;
     letter-spacing: -.03em;
@@ -297,7 +202,7 @@
   }
 
   .home-mobile-hero-text {
-    font: 500 14px/1.45 var(--f-body);
+    font: 500 14px/1.45 var(--f-sans);
     color: rgba(255,255,255,.65);
     /* Узкая колонка — чтобы не заходить на Иисуса справа. */
     max-width: 200px;

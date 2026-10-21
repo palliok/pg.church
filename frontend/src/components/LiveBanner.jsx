@@ -33,7 +33,7 @@ export default function LiveBanner() {
           display: 'inline-flex',
           alignItems: 'center',
           gap: 9,
-          fontFamily: 'var(--f-head)',
+          fontFamily: 'var(--f-sans)',
           fontWeight: 700,
           fontSize: 10,
           textTransform: 'uppercase',
@@ -43,10 +43,10 @@ export default function LiveBanner() {
         <span className="live-dot" />
         В эфире
       </span>
-      <span className="desktop-only" style={{ font: '500 13px var(--f-body)', color: 'rgba(255,255,255,.6)' }}>
+      <span className="desktop-only" style={{ font: '500 13px var(--f-sans)', color: 'rgba(255,255,255,.6)' }}>
         {live.text || t('Идёт воскресное богослужение — присоединяйся онлайн')}
       </span>
-      <span className="mobile-only" style={{ flex: 1, minWidth: 0, font: '500 11.5px var(--f-body)', color: 'rgba(255,255,255,.6)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      <span className="mobile-only" style={{ flex: 1, minWidth: 0, font: '500 11.5px var(--f-sans)', color: 'rgba(255,255,255,.6)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
         Идёт богослужение
       </span>
       <button

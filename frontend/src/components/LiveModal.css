@@ -1,7 +1,7 @@
 /* Модалка «Смотреть трансляцию». Макет: resources/…/design_handoff_live_modal (L13 — телефон, L13D — десктоп). */
 
 .live-modal { position: fixed; inset: 0; z-index: 100; display: flex; justify-content: center; }
-.live-modal-backdrop { position: absolute; inset: 0; background: rgba(13,13,13,.55); animation: liveFadeIn .22s ease-out; }
+.live-modal-backdrop { position: absolute; inset: 0; background: rgba(35,31,32,.55); animation: liveFadeIn .22s ease-out; }
 
 .live-modal-panel {
   position: relative;
@@ -19,25 +19,25 @@
 }
 
 .live-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; padding-top: 8px; }
-.live-modal-badge { display: flex; align-items: center; gap: 9px; font: 700 10px var(--f-head); letter-spacing: .14em; text-transform: uppercase; }
+.live-modal-badge { display: flex; align-items: center; gap: 9px; font: 700 10px var(--f-sans); letter-spacing: .14em; text-transform: uppercase; }
 .live-modal-close { flex: 0 0 auto; width: 44px; height: 44px; border: none; border-radius: 99px; background: rgba(255,255,255,.12); color: #fff; cursor: pointer; font-size: 15px; transition: background .15s; }
 .live-modal-close:hover { background: rgba(255,255,255,.2); }
 
-.live-modal-title { margin: 4px 0 0; font: 900 32px/.95 var(--f-head); letter-spacing: -.03em; text-transform: uppercase; }
-.live-modal-sub { margin: 8px 0 0; font: 500 13px var(--f-body); color: rgba(255,255,255,.6); }
+.live-modal-title { margin: 4px 0 0; font: 700 32px/.95 var(--f-sans); letter-spacing: -.03em; text-transform: uppercase; }
+.live-modal-sub { margin: 8px 0 0; font: 500 13px var(--f-sans); color: rgba(255,255,255,.6); }
 
 /* Плитки: колонок столько, сколько площадок (не больше трёх). */
 .live-modal-grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
 .live-tile { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 6px 14px; border-radius: 22px; background: rgba(255,255,255,.08); color: #fff; transition: background .15s; }
 .live-tile:hover { background: rgba(255,255,255,.16); }
-.live-tile-name { font: 700 12.5px var(--f-head); text-align: center; overflow-wrap: anywhere; }
+.live-tile-name { font: 700 12.5px var(--f-sans); text-align: center; overflow-wrap: anywhere; }
 
 /* Широкая строка: единственная площадка и трансляция с сурдопереводом. */
 .live-row { display: flex; align-items: center; gap: 14px; width: 100%; margin-top: 16px; padding: 10px; border-radius: 22px; background: rgba(255,255,255,.08); color: #fff; transition: background .15s, border-color .15s; }
 .live-row:hover { background: rgba(255,255,255,.16); }
 .live-row-text { flex: 1; min-width: 0; }
-.live-row-name { display: block; font: 700 16px var(--f-head); }
-.live-row-note { display: block; margin-top: 3px; font: 500 11.5px var(--f-body); color: rgba(255,255,255,.6); }
+.live-row-name { display: block; font: 700 16px var(--f-sans); }
+.live-row-note { display: block; margin-top: 3px; font: 500 11.5px var(--f-sans); color: rgba(255,255,255,.6); }
 .live-row-go { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 99px; background: var(--c-main); color: var(--c-ink); display: flex; align-items: center; justify-content: center; font-size: 15px; }
 
 .live-row--sign { margin-top: 10px; background: none; border: 1.5px solid rgba(255,255,255,.3); }
@@ -46,13 +46,13 @@
 .live-row--sign .live-row-note { margin-top: 2px; }
 .live-row--sign .live-row-go { background: #fff; }
 
-.live-modal-section { display: flex; align-items: center; gap: 10px; margin-top: 18px; font: 700 10px var(--f-head); letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+.live-modal-section { display: flex; align-items: center; gap: 10px; margin-top: 18px; font: 700 10px var(--f-sans); letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.55); }
 .live-modal-section::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.14); }
 
 .live-modal-handle { width: 44px; height: 4px; border-radius: 99px; background: rgba(255,255,255,.2); margin: 14px auto 0; }
 
 /* Значок площадки (PlatformIcon.jsx). */
-.live-icon { flex: 0 0 auto; width: 52px; height: 52px; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; font: 900 15px var(--f-head); letter-spacing: -.02em; }
+.live-icon { flex: 0 0 auto; width: 52px; height: 52px; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; font: 700 15px var(--f-sans); letter-spacing: -.02em; }
 .live-icon svg { display: block; width: 100%; height: 100%; }
 .live-icon--youtube { background: #ff0000; color: #fff; }
 .live-icon--youtube svg { width: 58%; height: 58%; }

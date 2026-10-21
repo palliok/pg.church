@@ -22,66 +22,99 @@
   padding: 3px 9px;
   background: var(--ann-important);
   color: #fff;
-  font: 700 11px var(--f-body);
+  font: 700 11px var(--f-sans);
   letter-spacing: .02em;
 }
 
-/* ===== Блок на главной: карточка-стопка ===== */
+/* ===== Блок на главной: карточка-стопка (макет design_handoff_overview, блоки 02 и 03) ===== */
 .ann-home { display: flex; flex-direction: column; min-width: 0; }
 
 .ann-home-card {
   position: relative;
   z-index: 3;
   overflow: hidden;
-  min-height: 150px;
-  border-radius: var(--radius-lg);
+  border-radius: 26px;
   background: var(--c-ink);
   color: #fff;
-  padding: 18px 20px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
+  gap: 16px;
 }
 .ann-home-card:hover { color: #fff; }
 .ann-home-card > :not(.ann-megaphone) { position: relative; }
-.ann-home-card .ann-megaphone { right: -20px; bottom: -30px; width: 190px; height: 190px; }
+.ann-home-card .ann-megaphone { right: -55px; top: -6px; width: 210px; height: 210px; }
+
+.ann-home-head { display: flex; flex-direction: column; gap: 10px; }
+
+.ann-home-important {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 99px;
+  background: var(--c-signal);
+  color: #fff;
+  font: 400 10px var(--f-mono);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
 
 .ann-home-title {
-  max-width: 260px;
-  margin: 0 0 16px;
-  font-family: var(--f-head);
-  font-weight: 800;
-  font-size: 24px;
-  line-height: .98;
-  letter-spacing: -.035em;
+  max-width: 240px;
+  font: 700 26px/1.02 var(--f-sans);
+  letter-spacing: -.045em;
+  text-wrap: balance;
 }
+
+.ann-home-date { display: flex; flex-direction: column; gap: 5px; }
+.ann-home-dow { font: 400 9px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: rgba(255, 255, 255, .55); }
+.ann-home-day { display: flex; align-items: baseline; gap: 5px; }
+.ann-home-num { font: 400 30px/.85 var(--f-num); letter-spacing: -.05em; }
+.ann-home-mon { font: 400 10px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
 
 .ann-home-more {
   align-self: flex-start;
-  margin-top: auto;
-  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  margin-top: 2px;
+  padding: 0 12px 0 14px;
   border-radius: 99px;
-  background: #fff;
-  color: var(--c-ink);
-  font: 600 12px var(--f-body);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3);
+  font: 400 10px var(--f-mono);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background .2s, color .2s, box-shadow .2s;
 }
+.ann-home-card:hover .ann-home-more { background: var(--c-main); color: var(--c-ink); box-shadow: none; }
 
-/* Краешки следующих объявлений под карточкой. */
-.ann-home-layer { position: relative; display: block; margin-top: -2px; }
-.ann-home-layer.is-first { z-index: 2; height: 12px; margin-inline: 14px; background: #3a3a3d; border-radius: 0 0 18px 18px; }
-.ann-home-layer.is-second { z-index: 1; height: 10px; margin-inline: 30px; background: var(--ann-hint); border-radius: 0 0 16px 16px; }
+/* Краешки следующих объявлений под карточкой; на телефоне по макету — только карточка. */
+.ann-home-layer { position: relative; display: none; margin-top: -2px; }
+.ann-home-layer.is-first { z-index: 2; height: 12px; margin-inline: 16px; background: var(--c-body); border-radius: 0 0 20px 20px; }
+.ann-home-layer.is-second { z-index: 1; height: 10px; margin-inline: 32px; background: var(--c-num); border-radius: 0 0 18px 18px; }
 
 /* На телефоне кнопки нет: на страницу ведут сама карточка и вкладка в нижнем меню. */
 .ann-home-foot { display: none; justify-content: flex-end; margin-top: 12px; }
 
 .ann-home-all {
-  border: 1.5px solid var(--c-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px 0 16px;
   border-radius: 99px;
-  padding: 9px 18px;
+  box-shadow: inset 0 0 0 1px var(--c-stroke);
   color: var(--c-ink);
-  font: 600 14px var(--f-body);
-  transition: background .15s ease, color .15s ease;
+  font: 400 11px var(--f-mono);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  transition: background .2s, box-shadow .2s;
 }
-.ann-home-all:hover { background: var(--c-ink); color: #fff; }
+.ann-home-all:hover { background: var(--c-main); box-shadow: none; }
 
 /* ===== Страница ===== */
 
@@ -108,15 +141,15 @@
 .ann-card .ann-megaphone { right: -34px; top: -24px; width: 200px; height: 200px; }
 
 .ann-card-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.ann-card-date { font: 600 12px var(--f-body); color: rgba(255, 255, 255, .7); }
+.ann-card-date { font: 600 12px var(--f-sans); color: rgba(255, 255, 255, .7); }
 .ann-card .ann-important { padding: 4px 10px; }
-.ann-card-badge { border: 1px solid rgba(255, 255, 255, .45); border-radius: 99px; padding: 3px 9px; font: 600 11px var(--f-body); }
+.ann-card-badge { border: 1px solid rgba(255, 255, 255, .45); border-radius: 99px; padding: 3px 9px; font: 600 11px var(--f-sans); }
 
 .ann-card-title {
   max-width: 320px;
   margin: 12px 0 0;
-  font-family: var(--f-head);
-  font-weight: 800;
+  font-family: var(--f-sans);
+  font-weight: 700;
   font-size: 30px;
   line-height: .97;
   letter-spacing: -.035em;
@@ -125,7 +158,7 @@
 
 .ann-card-body {
   margin: 14px 0 0;
-  font: 400 15px/1.5 var(--f-body);
+  font: 400 15px/1.5 var(--f-sans);
   color: rgba(255, 255, 255, .84);
   white-space: pre-line;
   text-wrap: pretty;
@@ -145,7 +178,7 @@
   justify-content: center;
 }
 
-.ann-fact-text { font: 600 14px/1.35 var(--f-body); }
+.ann-fact-text { font: 600 14px/1.35 var(--f-sans); }
 
 .ann-fact.is-link { align-self: flex-start; color: #fff; }
 .ann-fact.is-link .ann-fact-text { text-decoration: underline; text-decoration-color: rgba(255, 255, 255, .35); text-underline-offset: 3px; transition: text-decoration-color .15s ease; }
@@ -166,7 +199,7 @@
   padding: 12px 16px;
   background: #fff;
   color: var(--c-ink);
-  font: 600 15px var(--f-body);
+  font: 600 15px var(--f-sans);
   white-space: nowrap;
 }
 .ann-card-call:hover { color: var(--c-ink); }
@@ -212,13 +245,13 @@
 .ann-tab.is-below { padding: 30px 18px 14px; border-radius: 0 0 20px 20px; }
 
 .ann-tab-date { flex: 0 0 52px; display: flex; flex-direction: column; }
-.ann-tab-date .ann-day { font-family: var(--f-head); font-weight: 900; font-size: 22px; line-height: .9; letter-spacing: -.045em; }
-.ann-tab-date .ann-month { margin-top: 3px; font: 600 12px var(--f-body); color: var(--ann-muted); }
+.ann-tab-date .ann-day { font-family: var(--f-sans); font-weight: 700; font-size: 22px; line-height: .9; letter-spacing: -.045em; }
+.ann-tab-date .ann-month { margin-top: 3px; font: 600 12px var(--f-sans); color: var(--ann-muted); }
 
 .ann-tab-title {
   flex: 1;
   min-width: 0;
-  font-family: var(--f-head);
+  font-family: var(--f-sans);
   font-weight: 700;
   font-size: 15px;
   line-height: 1.18;
@@ -240,7 +273,7 @@
   padding: 12px 20px;
   background: var(--c-ink);
   color: #fff;
-  font: 600 14px var(--f-body);
+  font: 600 14px var(--f-sans);
   white-space: nowrap;
   box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
   animation: ann-toast-in .2s ease;
@@ -253,10 +286,7 @@
 
 /* ===== Десктоп ===== */
 @media (min-width: 861px) {
-  /* Блок на главной в сетке крупнее, чем на телефоне. */
-  .ann-home-card { min-height: 190px; padding: 22px 24px; border-radius: 26px; }
-  .ann-home-card .ann-megaphone { right: -24px; bottom: -36px; width: 220px; height: 220px; }
-  .ann-home-title { max-width: 300px; font-size: 30px; }
+  .ann-home-layer { display: block; }
   .ann-home-foot { display: flex; }
 
 
@@ -289,8 +319,8 @@
   .ann-row.is-active { background: var(--c-ink); color: #fff; cursor: default; }
 
   .ann-row-date { flex: 0 0 46px; display: flex; flex-direction: column; align-items: flex-start; }
-  .ann-row-date .ann-day { font-family: var(--f-head); font-weight: 900; font-size: 30px; line-height: .85; letter-spacing: -.05em; }
-  .ann-row-date .ann-month { margin-top: 4px; font: 600 14px var(--f-body); color: var(--ann-muted); }
+  .ann-row-date .ann-day { font-family: var(--f-sans); font-weight: 700; font-size: 30px; line-height: .85; letter-spacing: -.05em; }
+  .ann-row-date .ann-month { margin-top: 4px; font: 600 14px var(--f-sans); color: var(--ann-muted); }
   .ann-row.is-active .ann-month { color: rgba(255, 255, 255, .65); }
 
   .ann-row-title {
@@ -301,7 +331,7 @@
     align-items: center;
     column-gap: 8px;
     row-gap: 4px;
-    font-family: var(--f-head);
+    font-family: var(--f-sans);
     font-weight: 700;
     font-size: 17px;
     line-height: 1.15;

@@ -7,7 +7,7 @@ export function Megaphone({ className }) {
     <span className={`ann-megaphone ${className ?? ''}`} aria-hidden="true">
       <svg viewBox="0 0 24 24">
         <path d="M3 9h5l11-5.5v17L8 15H3a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1z" fill="#fff" />
-        <ellipse cx="19" cy="12" rx="2.2" ry="8.4" fill="#0d0d0d" stroke="#fff" strokeWidth="1.6" />
+        <ellipse cx="19" cy="12" rx="2.2" ry="8.4" fill="#231f20" stroke="#fff" strokeWidth="1.6" />
         <path d="M5 15l1.6 5.2h2.8L8.2 15" fill="#fff" />
       </svg>
     </span>

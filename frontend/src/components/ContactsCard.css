@@ -17,8 +17,8 @@
 .contacts-card-address {
   display: block;
   color: var(--c-ink);
-  font-family: var(--f-head);
-  font-weight: 800;
+  font-family: var(--f-sans);
+  font-weight: 700;
   /* Адрес в одну строку: в узком блоке шрифт уменьшается вместе с его шириной. */
   font-size: clamp(18px, 7.6cqi, 28px);
   line-height: 1;
@@ -32,7 +32,7 @@
   align-items: center;
   gap: 8px;
   margin-top: 8px;
-  font: 500 16px var(--f-body);
+  font: 500 16px var(--f-sans);
   color: var(--c-gray-text);
 }
 .contacts-card-metro-icon {
@@ -42,7 +42,7 @@
   border-radius: 99px;
   background: var(--c-second);
   color: #fff;
-  font: 700 10px var(--f-body);
+  font: 700 10px var(--f-sans);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -62,7 +62,7 @@
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  font: 700 17px var(--f-head);
+  font: 700 17px var(--f-sans);
   transition: transform .15s ease, background .15s ease;
 }
 .contacts-card-phone:hover { background: #2a2a2a; }
@@ -73,7 +73,7 @@
   height: 44px;
   background: #fff;
   color: var(--c-ink);
-  font: 700 12px var(--f-head);
+  font: 700 12px var(--f-sans);
   transition: background .15s ease;
 }
 .contacts-card-social.icon-circle:hover { background: rgba(255, 255, 255, .7); }

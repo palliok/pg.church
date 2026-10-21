@@ -62,7 +62,7 @@ export default function Songs() {
         <button
           onClick={() => songs.length > 0 && navigate(`/songs/${songs[Math.floor(Math.random() * songs.length)].id}`)}
           className="pill-btn"
-          style={{ padding: '0 8px 0 20px', height: 46, background: 'var(--c-panel)', color: '#0d0d0d' }}
+          style={{ padding: '0 8px 0 20px', height: 46, background: 'var(--c-panel)', color: '#231f20' }}
         >
           <span style={{ fontSize: 11.5 }}>Случайная</span>
           <span className="icon-circle" style={{ width: 32, height: 32, background: '#fff', fontSize: 15 }}>⤮</span>
@@ -77,7 +77,7 @@ export default function Songs() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder={t('Название, номер или строка')}
-              style={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'none', font: '500 14.5px var(--f-body)', color: '#0d0d0d' }}
+              style={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'none', font: '500 14.5px var(--f-sans)', color: '#231f20' }}
             />
             {q && (
               <button onClick={() => setQ('')} aria-label={t('Очистить')} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--c-gray-text-mute)' }}>✕</button>
@@ -90,7 +90,7 @@ export default function Songs() {
                 key={c.id}
                 onClick={() => setCat(c.id)}
                 className="pill-btn"
-                style={{ padding: '9px 15px', fontSize: 11, background: cat === c.id ? '#0d0d0d' : '#fff', color: cat === c.id ? '#fff' : '#0d0d0d' }}
+                style={{ padding: '9px 15px', fontSize: 11, background: cat === c.id ? '#231f20' : '#fff', color: cat === c.id ? '#fff' : '#231f20' }}
               >
                 {c.name}
               </button>
@@ -99,17 +99,17 @@ export default function Songs() {
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 18 }}>
             <span className="eyebrow" style={{ fontSize: 9.5 }}>Список</span>
-            <span style={{ font: '600 11.5px var(--f-body)', color: 'var(--c-gray-text-soft)' }}>{filtered.length} {t('песен')}</span>
+            <span style={{ font: '600 11.5px var(--f-sans)', color: 'var(--c-gray-text-soft)' }}>{filtered.length} {t('песен')}</span>
           </div>
 
           <div className="hide-scrollbar" style={{ maxHeight: 520, overflowY: 'auto', marginTop: 4, paddingRight: 4 }}>
             {filtered.map((s) => (
               <div key={s.id} className="card-row" style={{ padding: '10px 8px', borderRadius: 14 }}>
                 <Link to={`/songs/${s.id}`} style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 12, color: 'inherit' }}>
-                  <span style={{ flex: '0 0 30px', fontFamily: 'var(--f-head)', fontWeight: 800, fontSize: 15, color: 'var(--c-gray-text-mute)' }}>{s.num}</span>
+                  <span style={{ flex: '0 0 30px', fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 15, color: 'var(--c-gray-text-mute)' }}>{s.num}</span>
                   <span style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: 'block', fontFamily: 'var(--f-head)', fontWeight: 600, fontSize: 17, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.title}</span>
-                    <span style={{ display: 'block', font: '500 12px var(--f-body)', color: 'var(--c-gray-text)', marginTop: 2 }}>{s.sub}</span>
+                    <span style={{ display: 'block', fontFamily: 'var(--f-sans)', fontWeight: 600, fontSize: 17, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.title}</span>
+                    <span style={{ display: 'block', font: '500 12px var(--f-sans)', color: 'var(--c-gray-text)', marginTop: 2 }}>{s.sub}</span>
                   </span>
                 </Link>
                 <button
@@ -125,7 +125,7 @@ export default function Songs() {
             {!loading && !error && filtered.length === 0 && (
               <div style={{ padding: '34px 18px', borderRadius: 18, background: '#fff', textAlign: 'center', marginTop: 10 }}>
                 <div className="h-display" style={{ fontSize: 16 }}>Ничего не нашлось</div>
-                <div style={{ font: '500 12.5px/1.5 var(--f-body)', color: 'var(--c-gray-text-soft)', marginTop: 6 }}>
+                <div style={{ font: '500 12.5px/1.5 var(--f-sans)', color: 'var(--c-gray-text-soft)', marginTop: 6 }}>
                   Попробуйте номер песни или слово из первой строки.
                 </div>
               </div>
@@ -135,10 +135,10 @@ export default function Songs() {
 
         <div className="desktop-only">
           {preview && (
-            <div style={{ borderRadius: 24, overflow: 'hidden', background: '#fff', boxShadow: '0 0 0 1px rgba(13,13,13,.08)' }}>
+            <div style={{ borderRadius: 24, overflow: 'hidden', background: '#fff', boxShadow: '0 0 0 1px rgba(35,31,32,.08)' }}>
               <div
                 style={{
-                  position: 'relative', minHeight: 200, backgroundColor: '#0d0d0d',
+                  position: 'relative', minHeight: 200, backgroundColor: '#231f20',
                   backgroundImage: 'linear-gradient(to top, rgba(5,5,5,.92) 10%, rgba(5,5,5,.2) 70%), repeating-linear-gradient(135deg, rgba(255,255,255,.04) 0 11px, transparent 11px 22px)',
                   color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '28px 30px',
                 }}
@@ -148,7 +148,7 @@ export default function Songs() {
               </div>
               <div style={{ padding: 28 }}>
                 {previewSong && <SongText sections={previewSong.sections} gap={14} />}
-                <Link to={`/songs/${preview.id}`} className="pill-btn" style={{ marginTop: 10, padding: '11px 20px', background: '#0d0d0d', color: '#fff', fontSize: 11.5 }}>
+                <Link to={`/songs/${preview.id}`} className="pill-btn" style={{ marginTop: 10, padding: '11px 20px', background: '#231f20', color: '#fff', fontSize: 11.5 }}>
                   Открыть песню ↗
                 </Link>
               </div>

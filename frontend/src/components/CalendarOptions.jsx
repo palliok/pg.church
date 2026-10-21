@@ -15,13 +15,13 @@ export default function CalendarOptions({ options, style }) {
         const content = (
           <>
             <span style={{ flex: 1, minWidth: 0 }}>
-              <span style={{ display: 'block', font: '600 14px var(--f-body)' }}>{option.label}</span>
-              {option.hint && <span style={{ display: 'block', font: '500 12px var(--f-body)', color: 'var(--c-gray-text)', marginTop: 2 }}>{option.hint}</span>}
+              <span style={{ display: 'block', font: '600 14px var(--f-sans)' }}>{option.label}</span>
+              {option.hint && <span style={{ display: 'block', font: '500 12px var(--f-sans)', color: 'var(--c-gray-text)', marginTop: 2 }}>{option.hint}</span>}
             </span>
             <span aria-hidden="true" style={{ display: 'inline-flex', color: 'var(--c-gray-text-mute)' }}>{option.href ? '↗' : <CopyIcon />}</span>
           </>
         );
-        const rowStyle = { display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '12px 16px', border: 'none', borderRadius: 14, background: '#fff', color: '#0d0d0d', textAlign: 'left', cursor: 'pointer' };
+        const rowStyle = { display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '12px 16px', border: 'none', borderRadius: 14, background: '#fff', color: '#231f20', textAlign: 'left', cursor: 'pointer' };
 
         return option.href ? (
           <a key={option.label} href={option.href} style={rowStyle} {...(option.external ? { target: '_blank', rel: 'noreferrer' } : {})}>
