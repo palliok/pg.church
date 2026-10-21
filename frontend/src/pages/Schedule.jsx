@@ -6,28 +6,26 @@ import { useChurch } from '../api/church.js';
 import { churchToday, dayLabel, daysFromToday } from '../api/dates.js';
 import { EVENT_CATEGORIES, useEvents } from '../api/events.js';
 import CalendarOptions from '../components/CalendarOptions.jsx';
-import { EventChip, EventWatermark, LiveBadge, LiveDot } from '../components/EventVisuals.jsx';
+import { EventTag, LiveTag } from '../components/EventVisuals.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
-import { eventTheme, themeVars } from '../eventTheme.js';
 import './Schedule.css';
 
 const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
 const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
-// Тон карточки дня в календаре «Месяц» по направлению; главное событие недели — всегда синее.
-// Цвет точек — из темы направления (src/eventTheme.js), как в ленте.
-const CATEGORY_TONE = {
-  'Богослужение': 'purple',
-  'Таинство': 'purple',
-  'Молодёжь': 'peach',
-  'Дети': 'peach',
-  'Молитва': 'dark',
-  'Общение': 'yellow',
+// Цвет точки и тон карточки дня в календаре «Месяц» по направлению; главное событие недели — всегда синее.
+const CATEGORY_STYLE = {
+  'Богослужение': { color: '#02407d', tone: 'purple' },
+  'Таинство': { color: '#02407d', tone: 'purple' },
+  'Молодёжь': { color: '#f9c9a5', tone: 'peach' },
+  'Дети': { color: '#f9c9a5', tone: 'peach' },
+  'Молитва': { color: '#0d0d0d', tone: 'dark' },
+  'Общение': { color: '#00b7e3', tone: 'yellow' },
 };
 const LEGEND = [['#02407d', 'Богослужение'], ['#f9c9a5', 'Молодёжь и дети'], ['#0d0d0d', 'Молитва'], ['#00b7e3', 'Общение']];
 
-const categoryColor = (e) => (e.category ? eventTheme(e).bg : '#a3a3a3');
-const eventTone = (e) => (e.main ? 'purple' : CATEGORY_TONE[e.category] ?? 'dark');
+const categoryColor = (e) => CATEGORY_STYLE[e.category]?.color ?? '#a3a3a3';
+const eventTone = (e) => (e.main ? 'purple' : CATEGORY_STYLE[e.category]?.tone ?? 'dark');
 const categoryLabel = (category) => t(category === 'Общение' ? 'Малые группы' : category);
 const pad = (n) => String(n).padStart(2, '0');
 // Сколько прошедших дней лента текущего месяца показывает сразу, остальные — по кнопке.
@@ -257,9 +255,8 @@ function MonthNav({ ym, onChange }) {
   );
 }
 
-// Лента (макет resources/design_handoff_schedule): дни по порядку, в дне сначала важные события
-// крупными карточками (на десктопе до трёх в ряд), затем остальные строками.
-// Прошедшие дни бледнее, сегодняшний отделён жирной линией. В текущем месяце дни раньше позавчерашнего
+// Лента (макет resources/design_handoff_schedule_2b): слева крупное число и день недели, справа события дня.
+// Прошедшие дни бледнее, сегодняшний — на серой подложке. В текущем месяце дни раньше позавчерашнего
 // спрятаны под кнопку. key у ListView — месяц, так что в новом месяце они снова спрятаны.
 function ListView({ byDay, ym, todayNum, hasFilters, onReset }) {
   const startRef = useRef(null);
@@ -311,7 +308,6 @@ function ListView({ byDay, ym, todayNum, hasFilters, onReset }) {
 
       <div className="sched-feed" ref={feedRef}>
         {visibleDays.map(([day, items]) => {
-          const featured = items.filter((e) => e.main);
           const classes = ['sched-feed-day', day === todayNum && 'is-today', daysFromToday({ ...ym, day }) < 0 && 'is-past'].filter(Boolean).join(' ');
 
           return (
@@ -319,17 +315,18 @@ function ListView({ byDay, ym, todayNum, hasFilters, onReset }) {
               <div className="sched-feed-date">
                 <span className="sched-feed-num">{day}</span>
                 <span className="sched-feed-dow">
-                  {items[0].dowLabel}
-                  {day === todayNum && <EventChip tone="ink">Сегодня</EventChip>}
+                  <span className="sched-d">{items[0].dowLabel}</span>
+                  <span className="sched-m">{items[0].dowShort}</span>
+                  {day === todayNum && (
+                    <>
+                      <span className="sched-d sched-feed-today">Сегодня</span>
+                      <span className="sched-m sched-feed-today-dot" role="img" aria-label={t('Сегодня')} />
+                    </>
+                  )}
                 </span>
               </div>
               <div className="sched-feed-items">
-                {featured.length > 0 && (
-                  <div className="sched-feed-cards" style={{ '--cols': Math.min(featured.length, 3) }}>
-                    {featured.map((e) => <FeedCard key={e.id} event={e} />)}
-                  </div>
-                )}
-                {items.filter((e) => !e.main).map((e) => <FeedRow key={e.id} event={e} />)}
+                {items.map((e) => <FeedEvent key={e.id} event={e} />)}
               </div>
             </section>
           );
@@ -339,48 +336,21 @@ function ListView({ byDay, ym, todayNum, hasFilters, onReset }) {
   );
 }
 
-// Важное событие ленты — карточка цвета направления с водяным знаком.
-function FeedCard({ event: e }) {
+// Событие ленты: название, время, первый абзац описания и теги — эфир, направление, место.
+// На телефоне теги — под описанием, на десктопе — справа.
+function FeedEvent({ event: e }) {
   return (
-    <Link to={`/schedule/${e.id}`} className="sched-feed-card" style={themeVars(e)}>
-      <EventWatermark event={e} />
-      <div className="sched-feed-card-top">
-        {e.category && <EventChip>{categoryLabel(e.category)}</EventChip>}
-        {e.live && <LiveBadge />}
-      </div>
-      <div className="sched-feed-card-bottom">
-        <div className={`sched-feed-card-time${e.allDay ? ' is-allday' : ''}`}>{e.timeLabel ?? t('Весь день')}</div>
-        <div className="sched-feed-card-foot">
-          <div style={{ minWidth: 0 }}>
-            <div className="sched-feed-card-title">{e.title}</div>
-            <div className="sched-feed-card-sub">{[e.place, e.endLabel].filter(Boolean).join(' · ')}</div>
-          </div>
-          <span className="sched-feed-card-knob" aria-hidden="true">↗</span>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-// Обычное событие ленты — серая строка с квадратом времени цвета направления.
-// Направление в подписи — только на десктопе, на телефоне на него нет места.
-function FeedRow({ event: e }) {
-  const sub = [e.place, e.endLabel].filter(Boolean).join(' · ');
-
-  return (
-    <Link to={`/schedule/${e.id}`} className="sched-feed-row">
-      <span className={`sched-feed-time${e.allDay ? ' is-allday' : ''}`} style={themeVars(e)}>{e.timeLabel ?? t('Весь день')}</span>
-      <span className="sched-feed-body">
-        <span className="sched-feed-title-line">
-          <span className="sched-feed-title">{e.title}</span>
-          {e.live && <LiveDot />}
-        </span>
-        <span className="sched-feed-sub">
-          {sub}
-          {e.category && <span className="sched-d">{sub && ' · '}{categoryLabel(e.category)}</span>}
-        </span>
+    <Link to={`/schedule/${e.id}`} className="sched-feed-event">
+      <span className="sched-feed-main">
+        <span className="sched-feed-title">{e.title}</span>
+        <span className="sched-feed-time">{e.timeRange}</span>
+        {e.desc[0] && <span className="sched-feed-desc">{e.desc[0]}</span>}
       </span>
-      <span className="sched-feed-knob" aria-hidden="true">↗</span>
+      <span className="sched-feed-tags">
+        {e.live && <LiveTag />}
+        {e.category && <EventTag>{categoryLabel(e.category)}</EventTag>}
+        {e.place && <EventTag>{e.place}</EventTag>}
+      </span>
     </Link>
   );
 }

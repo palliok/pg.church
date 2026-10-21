@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Onest:wght@400;500;600;700&display=swap');
-/* Иконки водяных знаков расписания — только перечисленные в EVENT_ICONS (src/api/events.js), имена по алфавиту. */
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0&icon_names=celebration,church,groups,local_cafe,menu_book,music_note,toys,volunteer_activism,water_drop,wine_bar&display=block');
+/* Шрифты блоков расписания (макет resources/design_handoff_schedule_2b): остальной сайт на Archivo и Onest. */
+@import url('https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&family=JetBrains+Mono:wght@400&family=Prata&display=swap');
 
 :root {
   --c-bg: #ffffff;
@@ -26,6 +26,19 @@
 
   --f-head: 'Archivo', sans-serif;
   --f-body: 'Onest', sans-serif;
+
+  /* Расписание (макет design_handoff_schedule_2b): лента, блок и карусель на главной. */
+  --sch-ink: #231f20;
+  --sch-cyan: #02b7e3;
+  --sch-cyan-hover: #00ceff;
+  --sch-today: #e2e3da;
+  --sch-muted: #6b6b6b;
+  --sch-body: #4a4647;
+  --sch-line: rgba(35, 31, 32, 0.14);
+  --sch-stroke: rgba(35, 31, 32, 0.3);
+  --f-sch: 'Arimo', sans-serif;
+  --f-sch-num: 'Prata', serif;
+  --f-sch-mono: 'JetBrains Mono', monospace;
 
   --radius-lg: 24px;
   --radius-md: 18px;

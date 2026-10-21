@@ -147,10 +147,9 @@ const sermon = {
   durationLabel: 'Слушать 42 мин',
 };
 
-// Поля, которых бэкенд пока не отдаёт (описаны в README фронтенда, раздел «Моки»):
-// category — направление (цвет и фильтр расписания), icon — водяной знак на карточке события.
-// main — «важное» событие: в ленте расписания оно показывается крупной цветной карточкой.
-function event(id, { title, tag, category, icon = null, startsAt, minutes, place, desc, main = false, live: hasStream = false, withSermon = false, hymnNums = [] }) {
+// category — направление (тег в ленте и фильтр расписания); бэкенд его пока не отдаёт
+// (описано в README фронтенда, раздел «Моки»).
+function event(id, { title, tag, category, startsAt, minutes, place, desc, main = false, live: hasStream = false, withSermon = false, hymnNums = [] }) {
   const weekday = WEEKDAYS[startsAt.getDay()];
   const time = `${pad(startsAt.getHours())}:${pad(startsAt.getMinutes())}`;
   const hymns = songs.filter((song) => hymnNums.includes(song.num));
@@ -160,7 +159,6 @@ function event(id, { title, tag, category, icon = null, startsAt, minutes, place
     title,
     tag,
     category,
-    icon,
     main,
     live: hasStream,
     streamUrl: null,
@@ -184,13 +182,11 @@ function event(id, { title, tag, category, icon = null, startsAt, minutes, place
 
 // Регулярные встречи: [день недели (0 — воскресенье), часы, минуты, длительность в минутах, повтор, событие].
 // Повтор: 'week' — каждую неделю, 'twoWeeks' — через неделю, 'month' — в первый такой день месяца.
-// У «Малой группы» нет иконки — на карточке вместо неё число дня.
 const REGULAR = [
   [0, 11, 0, 120, 'week', {
     title: 'Богослужение',
     tag: 'Воскресенье',
     category: 'Богослужение',
-    icon: 'church',
     place: 'Главный зал',
     desc: [
       'Воскресное богослужение — время совместного поклонения, молитвы и слова. Приходите заранее, чтобы найти место и познакомиться с теми, кто рядом.',
@@ -203,7 +199,6 @@ const REGULAR = [
     title: 'Причастие',
     tag: 'Воскресенье',
     category: 'Таинство',
-    icon: 'wine_bar',
     place: 'Главный зал',
     desc: ['Вечеря Господня в первое воскресенье месяца — вспоминаем жертву Христа и благодарим Его вместе.'],
     main: true,
@@ -212,7 +207,6 @@ const REGULAR = [
     title: 'Обед общения',
     tag: 'Общение',
     category: 'Общение',
-    icon: 'local_cafe',
     place: 'Кафе церкви',
     desc: ['После богослужения остаёмся на простой обед — познакомиться и поговорить без спешки.'],
   }],
@@ -220,7 +214,6 @@ const REGULAR = [
     title: 'Хор',
     tag: 'Будни',
     category: 'Общение',
-    icon: 'music_note',
     place: 'Главный зал',
     desc: ['Репетиция церковного хора. Новым голосам рады — прослушивания нет.'],
   }],
@@ -228,7 +221,6 @@ const REGULAR = [
     title: 'Разбор Библии',
     tag: 'Будни',
     category: 'Общение',
-    icon: 'menu_book',
     place: 'Малый зал',
     desc: ['Читаем книгу Библии главу за главой, задаём вопросы и ищем ответы вместе.'],
   }],
@@ -236,7 +228,6 @@ const REGULAR = [
     title: 'Молитвенная встреча',
     tag: 'Будни',
     category: 'Молитва',
-    icon: 'volunteer_activism',
     place: 'Малый зал',
     desc: ['Собираемся вместе, чтобы молиться друг за друга, за город и за тех, кто ищет Бога.'],
   }],
@@ -251,7 +242,6 @@ const REGULAR = [
     title: 'Молодёжная встреча',
     tag: 'Молодёжь',
     category: 'Молодёжь',
-    icon: 'celebration',
     place: 'Молодёжный зал',
     desc: ['Игры, обсуждение и время в слове для тех, кому от 14 до 25.'],
     live: true,
@@ -260,7 +250,6 @@ const REGULAR = [
     title: 'Детский клуб',
     tag: 'Дети',
     category: 'Дети',
-    icon: 'toys',
     place: 'Детская комната',
     desc: ['Истории из Библии, поделки и игры для детей от 5 до 11 лет.'],
     main: true,
@@ -269,7 +258,6 @@ const REGULAR = [
     title: 'Крещение',
     tag: 'Суббота',
     category: 'Таинство',
-    icon: 'water_drop',
     place: 'Главный зал',
     desc: ['Водное крещение по вере. Если хотите креститься, напишите пастору — перед крещением проходят несколько встреч.'],
     main: true,

@@ -38,13 +38,9 @@ function dateLabels(raw) {
 // Направления расписания (фильтр и цвета на странице расписания). Ключ — значение поля category.
 export const EVENT_CATEGORIES = ['Богослужение', 'Таинство', 'Молодёжь', 'Молитва', 'Дети', 'Общение'];
 
-// Иконки водяного знака на карточках событий. Шрифт Material Symbols грузится только с ними
-// (src/styles/global.css), поэтому иконку не из списка не показываем — иначе вместо неё будет её имя.
-export const EVENT_ICONS = ['celebration', 'church', 'groups', 'local_cafe', 'menu_book', 'music_note', 'toys', 'volunteer_activism', 'water_drop', 'wine_bar'];
-
 const WEEKDAYS_SHORT = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
-// Поля category и icon пока есть только в моках (src/api/mocks.js). Бэкенд отдаёт лишь свободный тег из админки
+// Поле category пока есть только в моках (src/api/mocks.js). Бэкенд отдаёт лишь свободный тег из админки
 // («Воскресенье», «Будни», «Молодёжь»), поэтому направление угадываем по тегу и названию.
 const CATEGORY_HINTS = [
   ['Молодёжь', /молод/i],
@@ -64,35 +60,21 @@ function eventCategory(raw) {
   return CATEGORY_HINTS.find(([, pattern]) => pattern.test(text))?.[0] ?? (raw.main ? 'Богослужение' : null);
 }
 
-// Время события: «11:00–13:00», «19:00» без окончания или «Весь день».
+// Время события: «11:00 – 13:00», «19:00» без окончания или «Весь день».
 function timeRange(raw) {
   if (raw.allDay) return t('Весь день');
 
   const start = isoTime(raw.startsAt);
   const end = endTime(raw);
-  return end ? `${start}–${end}` : start;
+  return end ? `${start} – ${end}` : start;
 }
 
-// Время окончания, если событие заканчивается в тот же день: «13:00» для подписи «до 13:00».
+// Время окончания, если событие заканчивается в тот же день и не в момент начала.
 function endTime(raw) {
   if (raw.allDay || !raw.endsAt || raw.endsAt.slice(0, 10) !== raw.startsAt.slice(0, 10)) return null;
 
   const end = isoTime(raw.endsAt);
   return end !== isoTime(raw.startsAt) ? end : null;
-}
-
-// «до 21:00» на языке сайта: по-киргизски послелог после времени, словарём такое не перевести.
-function untilLabel(end) {
-  if (!end) return null;
-
-  switch (getLang()) {
-    case 'en':
-      return `until ${end}`;
-    case 'ky':
-      return `${end} чейин`;
-    default:
-      return `до ${end}`;
-  }
 }
 
 // Приводит событие из API к виду, который ждут страницы: тексты переводятся
@@ -112,9 +94,7 @@ function toEvent(raw) {
     when: [labels.dowLabel, raw.timeLabel, place].filter(Boolean).join(' · '),
     dowShort: t(WEEKDAYS_SHORT[raw.dow - 1]),
     timeRange: timeRange(raw),
-    endLabel: untilLabel(endTime(raw)),
     category: eventCategory(raw),
-    icon: EVENT_ICONS.includes(raw.icon) ? raw.icon : null,
   };
 
   if (raw.sermon) event.sermon = toSermon(raw.sermon);

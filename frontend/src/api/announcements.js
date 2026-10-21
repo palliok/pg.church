@@ -1,19 +1,9 @@
 import { useMemo } from 'react';
 import { getLang, t } from '../i18n.js';
-import { dayLabel, formatDate, isoDate } from './dates.js';
+import { dayLabel, formatDate, isoDate, monthLabel } from './dates.js';
 import { useApi } from './useApi.js';
 
-const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
 const WEEKDAYS = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
-
-// Месяц для вкладки под числом: «июня», «June». Для киргизского Intl в Chrome
-// не знает месяцев — берём из словаря.
-function monthLabel(date) {
-  const lang = getLang();
-  if (lang === 'ky') return t(MONTHS[date.month - 1]).toLowerCase();
-
-  return formatDate(date, lang, { day: 'numeric', month: 'long' }).replace(/\d+/, '').trim();
-}
 
 // День события для карточки: «28 июня, суббота», «June 28, Saturday».
 function eventLabel(date) {

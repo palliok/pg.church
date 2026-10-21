@@ -11,7 +11,7 @@ import { daysFromToday } from '../api/dates.js';
 import { useEvents } from '../api/events.js';
 import gospelTitle from '../assets/gospel-title.png';
 
-// Текущее время, обновляется раз в минуту: «через 3 часа» и прошедшие события на главной.
+// Текущее время, обновляется раз в минуту: «через 3 ч» и прошедшие события на главной.
 function useNow() {
   const [now, setNow] = useState(() => Date.now());
 
@@ -74,7 +74,8 @@ export default function Home() {
           )}
         </Link>
 
-        {/* Только после загрузки: иначе прокрутка с привязкой зацепится за «В календарь» и уедет в конец. */}
+        {/* Второстепенный блок: пока грузится и при ошибке не показываем. Без событий на неделе
+            остаётся карточка «В календарь». */}
         {!eventsLoading && !eventsError && <ScheduleCarousel events={week} now={now} />}
 
         <Announcements />

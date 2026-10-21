@@ -1,52 +1,16 @@
-/* Общие детали карточек расписания: водяной знак, плашка, бейдж «Эфир». Цвета — из themeVars(). */
-
-.ev-mark {
-  position: absolute;
-  right: var(--mark-right, -24px);
-  top: var(--mark-top, -28px);
-  line-height: 1;
-  color: currentColor;
-  transform: rotate(-12deg);
-  pointer-events: none;
-  user-select: none;
-}
-/* Два класса — чтобы перебить font-size из .material-symbols-rounded шрифта Google. */
-.ev-mark.ev-mark--icon { font-size: var(--mark-size, 160px); opacity: 0.12; font-variation-settings: 'FILL' 1, 'wght' 400, 'opsz' 48; }
-.ev-mark--day { font: 900 calc(var(--mark-size, 160px) * 0.85)/0.8 var(--f-head); letter-spacing: -0.07em; opacity: 0.13; font-variant-numeric: tabular-nums; }
-
-.ev-chip {
+/* Теги макета 2b: контурная пилюля капсом, «Эфир» — красная с белой точкой. */
+.ev-tag {
   display: inline-flex;
   align-items: center;
-  padding: 5px 10px;
-  border-radius: 8px;
-  background: var(--ev-btn-bg, var(--c-ink));
-  color: var(--ev-btn-fg, #fff);
-  font: 700 9px/1.2 var(--f-head);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.ev-chip--ink { background: var(--c-ink); color: #fff; }
-.ev-chip--white { background: #fff; color: var(--c-ink); }
-
-.ev-live {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
+  gap: 7px;
+  height: var(--tag-h, 26px);
+  padding: 0 var(--tag-px, 10px);
   border-radius: var(--radius-pill);
-  background: #fff;
-  color: var(--c-ink);
-  font: 700 9px/1.2 var(--f-head);
-  letter-spacing: 0.1em;
+  box-shadow: inset 0 0 0 1px var(--tag-line, var(--sch-stroke));
+  font: 400 var(--tag-fs, 11px) var(--f-sch-mono);
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   white-space: nowrap;
 }
-
-.ev-live-dot {
-  width: 6px;
-  height: 6px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--c-signal);
-}
+.ev-tag--live { box-shadow: none; background: var(--c-signal); color: #fff; }
+.ev-tag--live::before { content: ''; width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: #fff; }

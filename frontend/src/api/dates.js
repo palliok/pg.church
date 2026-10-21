@@ -18,6 +18,15 @@ export function dayLabel(date) {
     : formatDate(date, lang, { day: 'numeric', month: 'long' });
 }
 
+// Месяц под числом дня: «июня», «June», «июнь».
+// Для киргизского в Chrome нет данных Intl — месяц берём из словаря.
+export function monthLabel(date) {
+  const lang = getLang();
+  if (lang === 'ky') return t(MONTHS[date.month - 1]).toLowerCase();
+
+  return formatDate(date, lang, { day: 'numeric', month: 'long' }).replace(/\d+/, '').trim();
+}
+
 // Дата из строки ISO 8601 в том виде, как она записана: «2026-10-10T12:00:00+03:00» → 10 октября.
 export function isoDate(iso) {
   const [year, month, day] = iso.slice(0, 10).split('-').map(Number);
@@ -54,9 +63,9 @@ export function relativeDay(event) {
   return `${event.dowShort} ${event.day}`;
 }
 
-// Сколько осталось до начала: «через 40 мин», «через 3 часа» (short — «через 3 ч») или «идёт сейчас».
+// Сколько осталось до начала: «через 40 мин», «через 3 ч» или «идёт сейчас».
 // Считается только в пределах суток; для прошедших, дальних событий и событий на весь день — null.
-export function startsIn(event, { short = false, now = Date.now() } = {}) {
+export function startsIn(event, { now = Date.now() } = {}) {
   if (event.allDay) return null;
 
   const start = Date.parse(event.startsAt);
@@ -65,27 +74,18 @@ export function startsIn(event, { short = false, now = Date.now() } = {}) {
 
   const minutes = Math.ceil((start - now) / 60_000);
   if (minutes >= 24 * 60) return null;
-  if (minutes < 60) return inTime(minutes, 'min');
 
-  return inTime(Math.round(minutes / 60), short ? 'h' : 'hours');
+  return minutes < 60 ? inTime(minutes, 'min') : inTime(Math.round(minutes / 60), 'h');
 }
 
-// «через N …» на языке сайта: словарём такое не перевести — число стоит внутри фразы.
+// «через N мин/ч» на языке сайта: словарём такое не перевести — число стоит внутри фразы.
 function inTime(n, unit) {
   switch (getLang()) {
     case 'en':
-      return `in ${n} ${{ min: 'min', h: 'h', hours: n === 1 ? 'hour' : 'hours' }[unit]}`;
+      return `in ${n} ${unit}`;
     case 'ky':
       return `${n} ${unit === 'min' ? 'мүнөттөн' : 'сааттан'} кийин`;
     default:
-      return `через ${n} ${{ min: 'мин', h: 'ч', hours: hoursWord(n) }[unit]}`;
+      return `через ${n} ${unit === 'min' ? 'мин' : 'ч'}`;
   }
-}
-
-function hoursWord(n) {
-  const a = n % 10;
-  const b = n % 100;
-  if (a === 1 && b !== 11) return 'час';
-  if (a >= 2 && a <= 4 && (b < 10 || b >= 20)) return 'часа';
-  return 'часов';
 }
