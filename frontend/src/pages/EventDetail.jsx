@@ -1,19 +1,65 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { t } from '../i18n.js';
-import ArrowKnob from '../components/ArrowKnob.jsx';
 import CalendarOptions from '../components/CalendarOptions.jsx';
+import { EventTag, LiveTag } from '../components/EventVisuals.jsx';
+import LiveModal from '../components/LiveModal.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
-import { useEvent } from '../api/events.js';
+import LongArrow from '../components/LongArrow.jsx';
+import { categoryLabel, useEvent, useEvents } from '../api/events.js';
+import { useLive } from '../api/live.js';
+import './EventDetail.css';
+
+// Тип события задаёт цвет панели с датой и кнопки (макет design_handoff_overview, блоки 08–09, вариант 1A):
+// богослужение — тёплый серый, важное разовое событие — голубой, остальные встречи — чёрный.
+function eventKind(event) {
+  if (event.category === 'Богослужение') return 'service';
+  return event.main ? 'oneoff' : 'regular';
+}
+
+// Дата «2026-10-01» со сдвигом на days дней — границы запроса «Рядом по датам».
+function shiftDate({ year, month, day }, days) {
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+}
+
+// Три события, ближайшие по времени к этому (раньше и позже), по порядку дат.
+function useNearby(event) {
+  const { events } = useEvents({ from: shiftDate(event, -7), to: shiftDate(event, 21) });
+
+  return useMemo(() => {
+    const start = Date.parse(event.startsAt);
+
+    return events
+      .filter((e) => e.id !== event.id)
+      .sort((a, b) => Math.abs(Date.parse(a.startsAt) - start) - Math.abs(Date.parse(b.startsAt) - start))
+      .slice(0, 3)
+      .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));
+  }, [event, events]);
+}
+
+// Сообщение внизу экрана на пару секунд: «Ссылка скопирована».
+function useToast() {
+  const [toast, setToast] = useState('');
+  const timer = useRef(null);
+
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  const show = useCallback((text) => {
+    clearTimeout(timer.current);
+    setToast(text);
+    timer.current = setTimeout(() => setToast(''), 2000);
+  }, []);
+
+  return [toast, show];
+}
 
 export default function EventDetail() {
   const { id } = useParams();
   const { event: ev, loading, error, retry } = useEvent(id);
-  const [calendarOpen, setCalendarOpen] = useState(false);
 
   if (loading || error) {
     return (
-      <div className="page-enter container" style={{ padding: '40px 16px' }}>
+      <div className="page-enter container ev-page">
         <LoadStatus error={error} onRetry={retry} />
       </div>
     );
@@ -21,143 +67,229 @@ export default function EventDetail() {
 
   if (!ev) {
     return (
-      <div className="page-enter container" style={{ padding: '40px 16px' }}>
+      <div className="page-enter container ev-page">
         <p>Событие не найдено.</p>
         <Link to="/schedule">← К расписанию</Link>
       </div>
     );
   }
 
-  const preacher = ev.sermon;
-  const eventHymns = ev.hymns ?? [];
-
   return (
-    <div className="page-enter container" style={{ padding: '20px 16px 48px' }}>
-      <Link to="/schedule" className="pill-btn" style={{ padding: '0 20px 0 8px', height: 44, background: 'var(--c-panel)', color: '#231f20' }}>
-        <ArrowKnob size={30} bg="#fff" fg="#231f20" symbol="←" />
-        <span style={{ fontSize: 11.5 }}>Расписание</span>
-      </Link>
+    <div className="page-enter container ev-page">
+      <Link to="/schedule" className="ev-back">← Расписание</Link>
 
-      <div className="split-layout" style={{ marginTop: 16 }}>
-        <div>
-          <div
-            style={{
-              position: 'relative', borderRadius: 24, overflow: 'hidden', minHeight: 360,
-              backgroundColor: '#231f20',
-              backgroundImage: 'linear-gradient(to top, rgba(5,5,5,.92) 10%, rgba(5,5,5,.12) 62%, rgba(5,5,5,.45) 100%), repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 11px, transparent 11px 22px)',
-              color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: 32,
-            }}
-          >
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {ev.tag && (
-                <span style={{ background: 'rgba(255,255,255,.14)', border: '1px solid rgba(255,255,255,.24)', padding: '7px 13px', borderRadius: 8, fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase' }}>
-                  {ev.tag}
-                </span>
-              )}
-              {ev.main && (
-                <span style={{ background: 'var(--c-main)', color: '#231f20', padding: '7px 13px', borderRadius: 8, fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase' }}>
-                  Главное
-                </span>
-              )}
-              {ev.live && (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,.14)', border: '1px solid rgba(255,255,255,.24)', padding: '6px 13px', borderRadius: 8, fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase' }}>
-                  <span className="live-dot" />Трансляция
-                </span>
-              )}
-            </div>
-            <div className="h-display" style={{ fontSize: 'clamp(34px, 6vw, 56px)', marginTop: 18 }}>{ev.title}</div>
-            <div style={{ font: '600 15px var(--f-sans)', color: 'rgba(255,255,255,.72)', marginTop: 12 }}>{ev.when}</div>
+      <div className={`ev-layout is-${eventKind(ev)}`}>
+        <div className="ev-head">
+          <div className="ev-tags">
+            {ev.live && <LiveTag />}
+            {ev.category && <EventTag>{categoryLabel(ev.category)}</EventTag>}
           </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 22, maxWidth: 720 }}>
-            {ev.desc.map((p, i) => (
-              <p key={i} style={{ font: '500 16px/1.65 var(--f-sans)', color: '#3a3a3a', margin: 0 }}>{p}</p>
-            ))}
-          </div>
-
-          {preacher && (
-            <div style={{ marginTop: 28 }}>
-              <div className="eyebrow">Проповедь</div>
-              <Link
-                to={`/schedule/${ev.id}/sermon`}
-                style={{ display: 'block', borderRadius: 22, background: 'var(--c-panel)', padding: '24px 26px', color: '#231f20', marginTop: 12 }}
-              >
-                <div className="card-row">
-                  <span className="icon-circle" style={{ width: 48, height: 48, background: 'var(--c-second)', color: '#fff', fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 18 }}>
-                    {preacher.initial}
-                  </span>
-                  <span style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: 'block', fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 16 }}>{preacher.name}</span>
-                    <span style={{ display: 'block', font: '600 10.5px var(--f-sans)', letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--c-gray-text-soft)', marginTop: 4 }}>{preacher.role}</span>
-                  </span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 10.5, letterSpacing: '.08em', textTransform: 'uppercase' }}>
-                    Конспект <ArrowKnob size={34} />
-                  </span>
-                </div>
-                <div className="h-display" style={{ fontSize: 26, marginTop: 18, textTransform: 'none' }}>{preacher.topic}</div>
-                <div style={{ font: '700 13px var(--f-sans)', color: 'var(--c-gray-text)', marginTop: 8 }}>{preacher.ref}</div>
-              </Link>
-            </div>
-          )}
+          <h1 className="ev-title">{ev.title}</h1>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div style={{ borderRadius: 22, background: 'var(--c-panel)', padding: '22px 24px' }}>
-            <div className="eyebrow">Когда</div>
-            <div className="card-row" style={{ marginTop: 14 }}>
-              <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 52, height: 52, borderRadius: 14, background: '#231f20', color: '#fff', flex: '0 0 auto' }}>
-                <span style={{ fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 18, lineHeight: 1 }}>{ev.day}</span>
-                <span style={{ fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 8, letterSpacing: '.1em', opacity: 0.7, marginTop: 2 }}>{ev.mon}</span>
-              </span>
-              <span>
-                <span style={{ display: 'block', fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 19 }}>{ev.timeLabel ?? t('Весь день')}</span>
-                <span style={{ display: 'block', font: '600 12.5px var(--f-sans)', color: 'var(--c-gray-text)', marginTop: 4 }}>{ev.dowLabel}</span>
-              </span>
-            </div>
-            <div className="card-row" style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid var(--c-line-soft)' }}>
-              <span className="icon-circle" style={{ width: 52, height: 52, background: '#fff', flex: '0 0 auto' }}>
-                <span style={{ width: 15, height: 15, background: 'var(--c-signal)', borderRadius: '50% 50% 50% 0', transform: 'rotate(-45deg)' }} />
-              </span>
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <div className="eyebrow">Где</div>
-                <div style={{ font: '600 14.5px var(--f-sans)', marginTop: 5 }}>{[ev.place, ev.addr].filter(Boolean).join(' · ')}</div>
-              </span>
-              <ArrowKnob size={38} />
-            </div>
-            <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-              <button type="button" onClick={() => setCalendarOpen((open) => !open)} aria-expanded={calendarOpen} className="pill-btn" style={{ flex: 1, padding: '7px 7px 7px 20px', background: '#231f20', color: '#fff' }}>
-                <span style={{ flex: 1, fontSize: 12, textAlign: 'left' }}>В календарь</span>
-                <ArrowKnob size={36} bg="var(--c-main)" fg="#231f20" symbol={calendarOpen ? '−' : '＋'} />
-              </button>
-              <ArrowKnob as="a" href="#share" size={50} bg="#fff" fg="#231f20" />
-            </div>
-            {calendarOpen && (
-              <CalendarOptions
-                options={[
-                  { label: t('Google Календарь'), href: ev.calendar.google, external: true },
-                  { label: 'Outlook', href: ev.calendar.outlook, external: true },
-                  { label: t('Apple, Яндекс и другие'), hint: t('файл .ics'), href: ev.calendar.ics },
-                ]}
-              />
-            )}
-          </div>
+        <InfoPanel event={ev} />
 
-          {eventHymns.length > 0 && (
-            <div style={{ borderRadius: 22, background: 'var(--c-panel)', padding: '22px 24px' }}>
-              <div className="eyebrow">Гимны служения</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
-                {eventHymns.map((s) => (
-                  <Link key={s.id} to={`/songs/${s.id}`} className="card-row" style={{ padding: '8px 0', color: '#231f20' }}>
-                    <span style={{ fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 15, color: 'var(--c-gray-text-mute)' }}>{s.num}</span>
-                    <span style={{ flex: 1, fontFamily: 'var(--f-sans)', fontWeight: 600, fontSize: 15 }}>{s.title}</span>
-                    <span>↗</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
+        <div className="ev-body">
+          {ev.desc.length > 0 && <About paragraphs={ev.desc} />}
+          {ev.sermon && <Sermon eventId={ev.id} sermon={ev.sermon} />}
+          {ev.hymns?.length > 0 && <Hymns hymns={ev.hymns} />}
         </div>
+
+        <Nearby event={ev} />
       </div>
     </div>
+  );
+}
+
+// Панель с датой, временем, местом и кнопками; цвет — по типу события (класс is-… у .ev-layout).
+// На телефоне вместе с заголовком над ней это одна карточка-«билет».
+function InfoPanel({ event: ev }) {
+  const live = useLive();
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [liveOpen, setLiveOpen] = useState(false);
+  const closeLive = useCallback(() => setLiveOpen(false), []);
+  const [toast, showToast] = useToast();
+
+  const routeUrl = ev.addr ? `https://yandex.ru/maps/?text=${encodeURIComponent(ev.addr)}` : null;
+  // «Смотреть» — прямая ссылка события или, пока идёт эфир, выбор площадки, как в плашке «В эфире».
+  const canWatch = Boolean(ev.streamUrl) || Boolean(ev.live && live?.isLive && (live.links.length > 0 || live.signLink));
+
+  // Системное меню «Поделиться», а где его нет — ссылка в буфер обмена.
+  const share = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: ev.title, url: window.location.href });
+        return;
+      }
+      await navigator.clipboard.writeText(window.location.href);
+      showToast(t('Ссылка скопирована'));
+    } catch (shareError) {
+      // Пользователь закрыл меню «Поделиться» — это не ошибка.
+      if (shareError?.name !== 'AbortError') showToast(t('Не удалось скопировать ссылку'));
+    }
+  };
+
+  const calendarButton = (primary) => (
+    <button type="button" className={primary ? 'ev-btn is-primary' : 'ev-btn'} onClick={() => setCalendarOpen((open) => !open)} aria-expanded={calendarOpen}>
+      В календарь
+    </button>
+  );
+
+  return (
+    <div className="ev-panel">
+      <div className="ev-when">
+        <div className="ev-date">
+          <span className="ev-day">{ev.day}</span>
+          <span className="ev-date-side">
+            <span className="ev-mon">{ev.mon}</span>
+            <span className="ev-dow">{ev.dowLabel}</span>
+          </span>
+        </div>
+        <div className="ev-time">{ev.timeRange}</div>
+      </div>
+
+      {(ev.place || ev.addr) && (
+        <div className="ev-place">
+          <span className="ev-place-text">
+            {ev.place && <span className="ev-place-name">{ev.place}</span>}
+            {ev.addr && <span className="ev-place-addr">{ev.addr}</span>}
+          </span>
+          {routeUrl && <a href={routeUrl} target="_blank" rel="noreferrer" className="ev-round" title={t('Как добраться')} aria-label={t('Как добраться')}>↗</a>}
+        </div>
+      )}
+
+      <div className="ev-actions">
+        {canWatch ? (
+          ev.streamUrl
+            ? <a href={ev.streamUrl} target="_blank" rel="noreferrer" className="ev-btn is-primary">Смотреть</a>
+            : <button type="button" className="ev-btn is-primary" onClick={() => setLiveOpen(true)} aria-haspopup="dialog">Смотреть</button>
+        ) : calendarButton(true)}
+        <div className="ev-actions-row">
+          {canWatch
+            ? calendarButton(false)
+            : routeUrl && <a href={routeUrl} target="_blank" rel="noreferrer" className="ev-btn">Как добраться</a>}
+          <button type="button" className="ev-round ev-share" onClick={share} title={t('Поделиться')} aria-label={t('Поделиться')}>
+            <ShareIcon />
+          </button>
+        </div>
+      </div>
+
+      {calendarOpen && (
+        <CalendarOptions
+          options={[
+            { label: t('Google Календарь'), href: ev.calendar.google, external: true },
+            { label: 'Outlook', href: ev.calendar.outlook, external: true },
+            { label: t('Apple, Яндекс и другие'), hint: t('файл .ics'), href: ev.calendar.ics },
+          ]}
+        />
+      )}
+
+      {liveOpen && live && <LiveModal live={live} onClose={closeLive} />}
+      {toast && <div className="ev-toast" role="status">{toast}</div>}
+    </div>
+  );
+}
+
+// «О событии»: первый абзац крупно, остальные раскрываются кнопкой «Читать полностью».
+function About({ paragraphs }) {
+  const [open, setOpen] = useState(false);
+  const [lead, ...rest] = paragraphs;
+
+  return (
+    <section className="ev-section">
+      <span className="ev-label">О событии</span>
+      <p className="ev-lead">{lead}</p>
+      {open && rest.map((text, i) => <p key={i} className="ev-text">{text}</p>)}
+      {rest.length > 0 && (
+        <button type="button" className="ev-more" onClick={() => setOpen((value) => !value)} aria-expanded={open}>
+          {/* Через t(): React меняет текст в том же узле, а translatePage() такие правки не видит. */}
+          {open ? t('Свернуть ↑') : t('Читать полностью ↓')}
+        </button>
+      )}
+    </section>
+  );
+}
+
+// Проповедь — тёмная карточка: проповедник, место Писания, тема и переход к конспекту.
+function Sermon({ eventId, sermon }) {
+  return (
+    <section className="ev-section">
+      <span className="ev-label ev-desktop">Проповедь</span>
+      <Link to={`/schedule/${eventId}/sermon`} className="ev-sermon">
+        <span className="ev-sermon-who">
+          <span className="ev-sermon-initial">{sermon.initial}</span>
+          <span className="ev-sermon-name">
+            <span>{sermon.name}</span>
+            <span className="ev-sermon-meta">{[sermon.role, sermon.ref].filter(Boolean).join(' · ')}</span>
+          </span>
+        </span>
+        <span className="ev-sermon-mobile-meta">{[t('Проповедь'), sermon.ref].filter(Boolean).join(' · ')}</span>
+        <span className="ev-sermon-topic">«{sermon.topic}»</span>
+        <span className="ev-sermon-foot">
+          <span className="ev-sermon-mobile-name">{sermon.name}</span>
+          <span className="ev-sermon-btn">Конспект →</span>
+        </span>
+      </Link>
+    </section>
+  );
+}
+
+// Гимны служения — список с линиями, у каждого номер и название.
+function Hymns({ hymns }) {
+  return (
+    <section className="ev-section">
+      <div className="ev-section-head">
+        <span className="ev-label">Гимны служения</span>
+        <Link to="/songs" className="ev-link">Весь сборник →</Link>
+      </div>
+      <div className="ev-hymns">
+        {hymns.map((song) => (
+          <Link key={song.id} to={`/songs/${song.id}`} className="ev-hymn">
+            <span className="ev-hymn-num">
+              <span className="ev-hymn-word">Гимн</span>
+              <span>{song.num}</span>
+            </span>
+            <span className="ev-hymn-title">{song.title}</span>
+            <LongArrow width={28} stroke={2.6} />
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// «Рядом по датам» — ближайшие события строками с плашкой даты. Пока грузятся или их нет — блока нет.
+function Nearby({ event }) {
+  const events = useNearby(event);
+  if (events.length === 0) return null;
+
+  return (
+    <section className="ev-nearby">
+      <span className="ev-label">Рядом по датам</span>
+      <div className="ev-nearby-list">
+        {events.map((e) => (
+          <Link key={e.id} to={`/schedule/${e.id}`} className="ev-near">
+            <span className="ev-near-date">
+              <span className="ev-near-num">{e.day}</span>
+              <span className="ev-near-mon">{e.mon}</span>
+            </span>
+            <span className="ev-near-body">
+              <span className="ev-near-title">{e.title}</span>
+              <span className="ev-near-time">{e.timeLabel ?? t('Весь день')}</span>
+            </span>
+            <LongArrow width={28} stroke={2.6} />
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Значок «Поделиться» — форма ios_share из Material Symbols.
+function ShareIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M16 5l-1.42 1.42-1.59-1.59V16h-1.98V4.83L9.42 6.42 8 5l4-4 4 4zm4 5v11c0 1.1-.9 2-2 2H6c-1.11 0-2-.9-2-2V10c0-1.11.89-2 2-2h3v2H6v11h12V10h-3V8h3c1.1 0 2 .89 2 2z" fill="currentColor" />
+    </svg>
   );
 }

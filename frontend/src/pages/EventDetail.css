@@ -1,0 +1,239 @@
+/* Страница события (макет design_handoff_overview, блоки 08–09, вариант 1A). Сначала телефон, от 861px — десктоп. */
+
+/* С .container, иначе его padding: 0 32px перебивает верхний отступ. */
+.container.ev-page { padding: 14px 12px 28px; color: var(--c-ink); }
+
+/* Цвета панели по типу события: богослужение, разовое событие, регулярная встреча. */
+.ev-layout {
+  --ev-bg: var(--c-warm);
+  --ev-fg: var(--c-ink);
+  --ev-muted: var(--c-body);
+  --ev-line: var(--c-line);
+  --ev-cta-bg: var(--c-main);
+  --ev-cta-fg: var(--c-ink);
+}
+.ev-layout.is-oneoff { --ev-bg: var(--c-main); --ev-muted: #1f3a42; --ev-line: rgba(35, 31, 32, .2); --ev-cta-bg: var(--c-ink); --ev-cta-fg: #fff; }
+.ev-layout.is-regular { --ev-bg: var(--c-ink); --ev-fg: #fff; --ev-muted: rgba(255, 255, 255, .65); --ev-line: rgba(255, 255, 255, .16); }
+
+.ev-back { display: inline-block; padding: 6px 8px; font: 400 12px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-ink); }
+.ev-back:hover { color: var(--c-ink); text-decoration: underline; text-underline-offset: 3px; }
+
+.ev-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+
+/* ===== Заголовок и панель: на телефоне это одна карточка-«билет» цвета события ===== */
+.ev-head { display: flex; flex-direction: column; gap: 14px; padding: 20px 18px 0; border-radius: 28px 28px 0 0; background: var(--ev-bg); color: var(--ev-fg); }
+.ev-tags { --tag-h: 26px; --tag-px: 10px; --tag-fs: 10px; --tag-line: var(--ev-muted); display: flex; flex-wrap: wrap; gap: 6px; }
+.ev-tags:empty { display: none; }
+.ev-title { margin: 0; font: 700 46px/.9 var(--f-sans); letter-spacing: -.06em; text-wrap: balance; overflow-wrap: anywhere; }
+
+.ev-panel { position: relative; display: flex; flex-direction: column; gap: 22px; margin-top: -12px; padding: 22px 18px 18px; border-radius: 0 0 28px 28px; background: var(--ev-bg); color: var(--ev-fg); }
+
+/* Число слева, справа месяц с днём недели и под ними время. */
+.ev-when { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 14px; row-gap: 6px; align-items: end; }
+.ev-date { display: contents; }
+.ev-day { grid-row: 1 / 3; font: 400 80px/.9 var(--f-num); letter-spacing: -.06em; }
+.ev-date-side { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.ev-mon { font: 400 20px/1 var(--f-mono); letter-spacing: .02em; text-transform: uppercase; }
+.ev-dow { min-width: 0; font: 400 10px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ev-muted); }
+.ev-time { padding-bottom: 2px; font: 400 26px/1 var(--f-num); letter-spacing: -.04em; }
+
+.ev-place { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ev-place-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ev-place-name { font: 700 18px var(--f-sans); letter-spacing: -.04em; }
+.ev-place-addr { font: 400 14px var(--f-sans); color: var(--ev-muted); }
+
+.ev-round {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  color: var(--c-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.ev-round:hover { background: var(--c-main); color: var(--c-ink); }
+
+.ev-actions { display: flex; flex-direction: column; gap: 8px; }
+.ev-actions-row { display: flex; gap: 8px; }
+.ev-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  color: var(--c-ink);
+  font: 500 15px var(--f-sans);
+  letter-spacing: -.02em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .2s, opacity .2s;
+}
+.ev-btn:hover { background: var(--c-main); color: var(--c-ink); }
+.ev-btn.is-primary { flex: none; height: 52px; background: var(--ev-cta-bg); color: var(--ev-cta-fg); font-size: 17px; letter-spacing: -.03em; }
+.ev-btn.is-primary:hover { background: var(--ev-cta-bg); color: var(--ev-cta-fg); opacity: .88; }
+.ev-share { width: 46px; height: 46px; }
+
+/* ===== О событии, проповедь, гимны ===== */
+.ev-body { display: flex; flex-direction: column; gap: 20px; }
+.ev-section { display: flex; flex-direction: column; gap: 10px; }
+.ev-label { font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-gray-text); }
+.ev-section > .ev-label, .ev-section > .ev-lead, .ev-section > .ev-text, .ev-section > .ev-more { margin-inline: 8px; }
+.ev-section:first-child { padding-top: 14px; }
+.ev-lead { margin: 0; font: 400 18px/1.4 var(--f-sans); letter-spacing: -.02em; text-wrap: pretty; }
+.ev-text { margin: 0; font: 400 16px/1.5 var(--f-sans); color: var(--c-body); text-wrap: pretty; }
+.ev-more { align-self: flex-start; padding: 0; border: 0; background: none; cursor: pointer; font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-ink); }
+.ev-more:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.ev-desktop { display: none; }
+
+.ev-sermon { display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 26px; background: var(--c-ink); color: #fff; }
+.ev-sermon:hover { color: #fff; }
+.ev-sermon-who { display: none; }
+.ev-sermon-mobile-meta { font: 400 10px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; opacity: .6; }
+.ev-sermon-topic { font: 400 26px/1.1 var(--f-num); letter-spacing: -.03em; text-wrap: balance; }
+.ev-sermon-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ev-sermon-mobile-name { font: 700 15px var(--f-sans); }
+.ev-sermon-btn { flex: 0 0 auto; display: inline-flex; align-items: center; height: 34px; padding: 0 14px; border-radius: var(--radius-pill); background: #fff; color: var(--c-ink); font: 400 10px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; transition: background .2s; }
+.ev-sermon:hover .ev-sermon-btn { background: var(--c-main); }
+
+.ev-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 0 8px; }
+.ev-link { font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-ink); }
+.ev-link:hover { color: var(--c-ink); text-decoration: underline; text-underline-offset: 3px; }
+
+.ev-hymns { display: flex; flex-direction: column; margin: 0 4px; border-top: 1px solid var(--c-line); }
+.ev-hymn { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 14px 4px; border-bottom: 1px solid var(--c-line); color: var(--c-ink); transition: background .2s, border-radius .2s; }
+.ev-hymn:hover { border-radius: 20px; background: var(--c-main); color: var(--c-ink); }
+.ev-hymn-num { display: flex; align-items: baseline; gap: 8px; font: 400 22px/1 var(--f-num); letter-spacing: -.03em; }
+.ev-hymn-word { display: none; font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-gray-text); }
+.ev-hymn-title { font: 700 17px/1.1 var(--f-sans); letter-spacing: -.035em; }
+
+/* ===== Рядом по датам ===== */
+.ev-nearby { display: flex; flex-direction: column; gap: 2px; padding-top: 14px; }
+.ev-nearby > .ev-label { padding: 0 8px 4px; }
+.ev-nearby-list { display: flex; flex-direction: column; gap: 2px; }
+.ev-near { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 6px 12px 6px 6px; border-radius: 20px; color: var(--c-ink); transition: background .2s; }
+.ev-near:hover { background: var(--c-main); color: var(--c-ink); }
+.ev-near-date { width: 48px; height: 48px; border-radius: 14px; background: var(--c-page); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.ev-near-num { font: 400 21px/.9 var(--f-num); letter-spacing: -.04em; }
+.ev-near-mon { font: 400 8px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--c-gray-text); }
+.ev-near-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ev-near-title { font: 700 16px var(--f-sans); letter-spacing: -.03em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ev-near-time { font: 400 14px var(--f-num); }
+
+.ev-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--tabbar-h) + 28px);
+  z-index: 50;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  border-radius: var(--radius-pill);
+  background: var(--c-ink);
+  color: #fff;
+  font: 500 14px var(--f-sans);
+  white-space: nowrap;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+}
+
+/* ===== Десктоп: слева заголовок, описание, проповедь и гимны; справа панель и «Рядом по датам» ===== */
+@media (min-width: 861px) {
+  .container.ev-page { padding: 28px 32px 56px; }
+  .ev-back { padding: 6px 10px 4px; font-size: 13px; }
+
+  .ev-layout {
+    grid-template-columns: minmax(0, 1fr) 460px;
+    grid-template-areas:
+      'head panel'
+      'body panel'
+      'body nearby'
+      'body .';
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: 64px;
+    row-gap: 0;
+    align-items: start;
+    margin-top: 28px;
+    padding: 4px 6px 0;
+  }
+
+  .ev-head { grid-area: head; gap: 22px; padding: 6px 0 0; border-radius: 0; background: none; color: var(--c-ink); }
+  .ev-tags { --tag-h: 34px; --tag-px: 14px; --tag-fs: 13px; --tag-line: var(--c-stroke); gap: 8px; }
+  .ev-title { font-size: clamp(64px, 7.8vw, 112px); line-height: .88; letter-spacing: -.065em; }
+
+  .ev-panel { grid-area: panel; gap: 30px; margin-top: 0; padding: 42px 30px 24px; border-radius: 30px; }
+  .ev-when { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+  .ev-date { display: flex; align-items: flex-end; gap: 18px; }
+  .ev-day { font-size: 160px; letter-spacing: -.065em; }
+  .ev-date-side { flex-direction: column; align-items: flex-start; gap: 8px; padding-bottom: 6px; }
+  .ev-mon { font-size: 30px; }
+  .ev-dow { font-size: 12px; }
+  .ev-time { margin-top: 30px; padding: 0; font-size: 46px; }
+
+  .ev-place { align-items: flex-end; gap: 16px; padding-top: 20px; border-top: 1px solid var(--ev-line); }
+  .ev-place-text { gap: 5px; }
+  .ev-place-name { font-size: 24px; letter-spacing: -.045em; }
+  .ev-place-addr { font-size: 16px; }
+  .ev-round { width: 48px; height: 48px; font-size: 18px; }
+
+  .ev-actions { flex-direction: row; }
+  .ev-actions-row { display: contents; }
+  .ev-btn { height: 58px; font-size: 16px; }
+  .ev-btn.is-primary { flex: 1.4; height: 58px; font-size: 18px; }
+  .ev-share { flex: 0 0 58px; width: 58px; height: 58px; }
+
+  .ev-body { grid-area: body; gap: 44px; margin-top: 44px; }
+  .ev-section { gap: 14px; }
+  .ev-section > .ev-label, .ev-section > .ev-lead, .ev-section > .ev-text, .ev-section > .ev-more { margin-inline: 0; }
+  .ev-section:first-child { padding-top: 0; }
+  .ev-label { font-size: 12px; }
+  .ev-lead { max-width: 760px; font-size: 24px; line-height: 1.35; letter-spacing: -.03em; }
+  .ev-text { max-width: 760px; font-size: 18px; }
+  .ev-more { font-size: 13px; }
+  .ev-desktop { display: inline; }
+
+  .ev-sermon { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: end; padding: 28px 30px; border-radius: 30px; }
+  .ev-sermon-who { grid-column: 1; display: flex; align-items: center; gap: 12px; }
+  .ev-sermon-initial { flex: 0 0 auto; width: 44px; height: 44px; border-radius: var(--radius-pill); background: var(--c-main); color: var(--c-ink); display: flex; align-items: center; justify-content: center; font: 400 20px var(--f-num); }
+  .ev-sermon-name { display: flex; flex-direction: column; gap: 2px; font: 700 17px var(--f-sans); letter-spacing: -.03em; }
+  .ev-sermon-meta { font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; opacity: .6; }
+  .ev-sermon-mobile-meta, .ev-sermon-mobile-name { display: none; }
+  .ev-sermon-topic { grid-column: 1; font-size: 40px; line-height: 1.08; }
+  .ev-sermon-foot { grid-column: 2; grid-row: 1 / 3; align-self: end; }
+  .ev-sermon-btn { height: 42px; padding: 0 18px; font-size: 13px; }
+
+  .ev-section-head { padding: 0; }
+  .ev-link { font-size: 13px; }
+  .ev-hymns { margin: 0; }
+  .ev-hymn { grid-template-columns: 120px minmax(0, 1fr) auto; gap: 20px; padding: 18px 14px; }
+  .ev-hymn-num { font-size: 28px; }
+  .ev-hymn-word { display: inline; }
+  .ev-hymn-title { font-size: 24px; letter-spacing: -.045em; }
+
+  .ev-nearby { grid-area: nearby; gap: 6px; margin-top: 36px; padding-top: 0; }
+  .ev-nearby > .ev-label { padding: 0 14px; }
+  .ev-near { grid-template-columns: 56px minmax(0, 1fr) auto; gap: 14px; padding: 8px 12px 8px 8px; border-radius: 22px; }
+  .ev-near-date { width: 56px; height: 56px; border-radius: 16px; gap: 3px; }
+  .ev-near-num { font-size: 24px; }
+  .ev-near-mon { font-size: 9px; }
+  .ev-near-body { gap: 3px; }
+  .ev-near-title { font-size: 18px; letter-spacing: -.035em; }
+  .ev-near-time { font-size: 15px; }
+
+  .ev-toast { bottom: 28px; }
+}
+
+/* Узкий десктоп: панель уже, чтобы левой колонке хватило места. */
+@media (min-width: 861px) and (max-width: 1180px) {
+  .ev-layout { grid-template-columns: minmax(0, 1fr) 380px; column-gap: 40px; }
+  .ev-day { font-size: 120px; }
+  .ev-time { font-size: 38px; }
+}

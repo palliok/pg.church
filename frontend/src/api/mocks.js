@@ -163,7 +163,7 @@ function event(id, { title, tag, category, startsAt, minutes, place, desc, main 
     live: hasStream,
     streamUrl: null,
     startsAt: iso(startsAt),
-    endsAt: iso(new Date(startsAt.getTime() + minutes * 60_000)),
+    endsAt: minutes ? iso(new Date(startsAt.getTime() + minutes * 60_000)) : null,
     allDay: false,
     ...dateParts(startsAt),
     dow: startsAt.getDay() || 7,
@@ -181,9 +181,10 @@ function event(id, { title, tag, category, startsAt, minutes, place, desc, main 
 }
 
 // Регулярные встречи: [день недели (0 — воскресенье), часы, минуты, длительность в минутах, повтор, событие].
+// Длительность null — время окончания не указано (в админке оно необязательное): в ленте видно только начало.
 // Повтор: 'week' — каждую неделю, 'twoWeeks' — через неделю, 'month' — в первый такой день месяца.
 const REGULAR = [
-  [0, 11, 0, 120, 'week', {
+  [0, 11, 0, null, 'week', {
     title: 'Богослужение',
     tag: 'Воскресенье',
     category: 'Богослужение',
@@ -195,7 +196,7 @@ const REGULAR = [
     main: true,
     live: true,
   }],
-  [0, 13, 15, 45, 'month', {
+  [0, 13, 15, null, 'month', {
     title: 'Причастие',
     tag: 'Воскресенье',
     category: 'Таинство',
@@ -210,35 +211,35 @@ const REGULAR = [
     place: 'Кафе церкви',
     desc: ['После богослужения остаёмся на простой обед — познакомиться и поговорить без спешки.'],
   }],
-  [1, 19, 0, 120, 'week', {
+  [1, 19, 0, null, 'week', {
     title: 'Хор',
     tag: 'Будни',
     category: 'Общение',
     place: 'Главный зал',
     desc: ['Репетиция церковного хора. Новым голосам рады — прослушивания нет.'],
   }],
-  [2, 19, 0, 90, 'week', {
+  [2, 19, 0, null, 'week', {
     title: 'Разбор Библии',
     tag: 'Будни',
     category: 'Общение',
     place: 'Малый зал',
     desc: ['Читаем книгу Библии главу за главой, задаём вопросы и ищем ответы вместе.'],
   }],
-  [3, 19, 0, 90, 'week', {
+  [3, 19, 0, null, 'week', {
     title: 'Молитвенная встреча',
     tag: 'Будни',
     category: 'Молитва',
     place: 'Малый зал',
     desc: ['Собираемся вместе, чтобы молиться друг за друга, за город и за тех, кто ищет Бога.'],
   }],
-  [4, 19, 30, 90, 'week', {
+  [4, 19, 30, null, 'week', {
     title: 'Малая группа',
     tag: 'Общение',
     category: 'Общение',
     place: 'Каб. 2',
     desc: ['Несколько человек читают Библию, говорят о жизни и молятся друг за друга. Приходить можно без подготовки.'],
   }],
-  [5, 19, 30, 120, 'week', {
+  [5, 19, 30, null, 'week', {
     title: 'Молодёжная встреча',
     tag: 'Молодёжь',
     category: 'Молодёжь',
@@ -254,7 +255,7 @@ const REGULAR = [
     desc: ['Истории из Библии, поделки и игры для детей от 5 до 11 лет.'],
     main: true,
   }],
-  [6, 12, 0, 90, 'month', {
+  [6, 12, 0, null, 'month', {
     title: 'Крещение',
     tag: 'Суббота',
     category: 'Таинство',

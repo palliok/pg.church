@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useChurch } from '../api/church.js';
 import { churchToday, dayLabel, daysFromToday } from '../api/dates.js';
-import { EVENT_CATEGORIES, useEvents } from '../api/events.js';
+import { EVENT_CATEGORIES, categoryLabel, useEvents } from '../api/events.js';
 import CalendarOptions from '../components/CalendarOptions.jsx';
 import { EventTag, LiveTag } from '../components/EventVisuals.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
@@ -26,7 +26,6 @@ const LEGEND = [['#02407d', 'Богослужение'], ['#f9c9a5', 'Молод
 
 const categoryColor = (e) => CATEGORY_STYLE[e.category]?.color ?? '#a3a3a3';
 const eventTone = (e) => (e.main ? 'purple' : CATEGORY_STYLE[e.category]?.tone ?? 'dark');
-const categoryLabel = (category) => t(category === 'Общение' ? 'Малые группы' : category);
 const pad = (n) => String(n).padStart(2, '0');
 // Сколько прошедших дней лента текущего месяца показывает сразу, остальные — по кнопке.
 const PAST_DAYS_SHOWN = 2;
