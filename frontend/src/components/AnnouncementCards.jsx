@@ -1,4 +1,6 @@
 import { t } from '../i18n.js';
+import { PhoneIcon, PlaceIcon, ShareIcon } from './Icons.jsx';
+import LongArrow from './LongArrow.jsx';
 import './Announcements.css';
 
 // Рупор — водяной знак на чёрных карточках объявлений.
@@ -18,73 +20,99 @@ export function ImportantPill() {
   return <span className="ann-important">Важно</span>;
 }
 
-const FACT_ICONS = {
-  when: (
-    <>
-      <rect x="3" y="5" width="18" height="16" rx="3" />
-      <path d="M8 3v4M16 3v4M3 10h18" />
-    </>
-  ),
-  where: (
-    <>
-      <path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z" />
-      <circle cx="12" cy="9" r="2.5" />
-    </>
-  ),
-  link: <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />,
-};
-
-// Строка деталей с иконкой в кружке; ссылка открывается в новой вкладке.
-function Fact({ detail }) {
-  const content = (
-    <>
-      <span className="ann-fact-icon" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          {FACT_ICONS[detail.type]}
-        </svg>
+// Дата на чёрной карточке: подпись сверху («Вт», «До»), под ней число и месяц.
+function DatePart({ label, date }) {
+  return (
+    <span className="ann-date">
+      <span className="ann-date-label">{label}</span>
+      <span className="ann-date-day">
+        <span className="ann-date-num">{date.day}</span>
+        <span className="ann-date-mon">{date.mon}</span>
       </span>
-      <span className="ann-fact-text">{detail.text}</span>
-      {detail.type === 'link' && <span className="ann-fact-arrow" aria-hidden="true">↗</span>}
-    </>
+    </span>
   );
-
-  return detail.type === 'link'
-    ? <a className="ann-fact is-link" href={detail.url} target="_blank" rel="noopener noreferrer">{content}</a>
-    : <div className="ann-fact">{content}</div>;
 }
 
-// Открытое объявление — чёрная карточка: день события (если назначен) и пометки, заголовок, текст,
-// «когда», «где» и ссылки, кнопка звонка и «Поделиться». fromLink — пришли по ссылке ?a=.
-export function AnnouncementCard({ item, fromLink = false, onShare, className = '' }) {
+// Когда (макет design_handoff_overview, блок 12): срок «до 30 июн», один день или «14 июл → 20 июл · 7 дней»;
+// рядом белой пилюлей — время или пояснение («С 10:00», «После служений»), если withWhen.
+// Без даты и пояснения ничего не выводит.
+export function AnnouncementDates({ item, withWhen = false }) {
+  const when = withWhen ? item.details.find((detail) => detail.type === 'when') : null;
+  if (!item.deadline && !item.eventDate && !when) return null;
+
   return (
-    <article className={`ann-card ${item.contact ? '' : 'no-call'} ${className}`}>
-      <Megaphone />
-      <div className="ann-card-meta">
-        {item.eventDate && <span className="ann-card-date">{item.eventDate.label}</span>}
-        {item.important && <ImportantPill />}
-        {fromLink && <span className="ann-card-badge">по ссылке</span>}
-      </div>
-      <h2 className="ann-card-title">{item.title}</h2>
-      {item.body && <p className="ann-card-body">{item.body}</p>}
-      {item.details.length > 0 && (
-        <div className="ann-facts">
-          {item.details.map((detail, index) => <Fact key={index} detail={detail} />)}
+    <div className="ann-dates">
+      {item.deadline && <DatePart label={t('До')} date={item.deadline} />}
+      {item.eventDate && <DatePart label={item.eventDate.dow} date={item.eventDate} />}
+      {item.eventEnd && (
+        <>
+          <span className="ann-dates-arrow"><LongArrow width={44} stroke={2.2} /></span>
+          <DatePart label={item.eventEnd.dow} date={item.eventEnd} />
+        </>
+      )}
+      {item.days && <span className="ann-pill">{item.days}</span>}
+      {when && <span className="ann-pill">{when.text}</span>}
+    </div>
+  );
+}
+
+// Открытое объявление — чёрная карточка: «Важно», заголовок, текст, дата, место, ссылки,
+// телефон с именем и «Поделиться». fromLink — пришли по ссылке ?a=.
+export function AnnouncementCard({ item, fromLink = false, onShare, className = '' }) {
+  const where = item.details.find((detail) => detail.type === 'where');
+  const links = item.details.filter((detail) => detail.type === 'link');
+  const hasDates = Boolean(item.deadline || item.eventDate || item.details.some((detail) => detail.type === 'when'));
+
+  // Блоки карточки по порядку; последний встаёт в один ряд с «Поделиться».
+  const blocks = [
+    <div key="head" className="ann-card-head">
+      {(item.important || fromLink) && (
+        <div className="ann-card-marks">
+          {item.important && <ImportantPill />}
+          {fromLink && <span className="ann-card-badge">по ссылке</span>}
         </div>
       )}
-      {item.contact && (
-        <a className="ann-card-call" href={item.contact.tel} title={item.contact.name ?? undefined}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 5a2 2 0 0 1 2-2z" />
-          </svg>
-          {item.contact.phone}
-        </a>
-      )}
-      {/* «Поделиться» всегда в правом нижнем углу, на одной линии с последней строкой. */}
-      <button type="button" className="ann-card-share" aria-label={t('Поделиться')} onClick={() => onShare(item)}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />
-        </svg>
-      </button>
+      <h2 className="ann-card-title">{item.title}</h2>
+    </div>,
+    item.body && <p key="body" className="ann-card-body">{item.body}</p>,
+    hasDates && <AnnouncementDates key="dates" item={item} withWhen />,
+    where && (
+      <span key="where" className="ann-card-place">
+        <PlaceIcon size={15} />
+        <span>{where.text}</span>
+      </span>
+    ),
+    links.length > 0 && (
+      <div key="links" className="ann-card-links">
+        {links.map((link) => (
+          <a key={link.url + link.text} className="ann-card-link" href={link.url} target="_blank" rel="noopener noreferrer">
+            {link.text}
+            <LongArrow />
+          </a>
+        ))}
+      </div>
+    ),
+    item.contact && (
+      <a key="call" className="ann-card-call" href={item.contact.tel}>
+        <PhoneIcon />
+        <span className="ann-card-phone">{item.contact.phone}</span>
+        {item.contact.name && <span className="ann-card-name">{item.contact.name}</span>}
+      </a>
+    ),
+  ].filter(Boolean);
+  const last = blocks.pop();
+
+  return (
+    <article className={`ann-card ${className}`}>
+      <Megaphone />
+      {blocks}
+      {/* «Поделиться» — справа от последней строки и не делает её выше. */}
+      <div className="ann-card-last">
+        {last}
+        <button type="button" className="ann-card-share" aria-label={t('Поделиться')} onClick={() => onShare(item)}>
+          <ShareIcon size={18} />
+        </button>
+      </div>
     </article>
   );
 }

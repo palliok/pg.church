@@ -194,9 +194,10 @@ export const EN_EXTRA = {
   'Весь сборник →': 'Full songbook →',
   'Гимн': 'Hymn',
   'Рядом по датам': 'Nearby dates',
+  // Объявления по макету design_handoff_overview
+  'До': 'Until',
   // Главная по макету design_handoff_overview
   'Ближайшее': 'Coming up',
-  'Всё →': 'All →',
 };
 
 export const KY_EXTRA = {
@@ -336,7 +337,8 @@ export const KY_EXTRA = {
   'Весь сборник →': 'Толук жыйнак →',
   'Гимн': 'Гимн',
   'Рядом по датам': 'Жакынкы күндөр',
+  // Объявления по макету design_handoff_overview
+  'До': 'Чейин',
   // Главная по макету design_handoff_overview
   'Ближайшее': 'Жакынкы',
-  'Всё →': 'Баары →',
 };

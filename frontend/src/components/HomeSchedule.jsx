@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { getLang, t } from '../i18n.js';
 import { daysFromToday, startsIn } from '../api/dates.js';
-import { EventTag, LiveTag, PlaceIcon } from './EventVisuals.jsx';
+import { EventTag, LiveTag } from './EventVisuals.jsx';
+import { PlaceIcon } from './Icons.jsx';
 import LongArrow from './LongArrow.jsx';
 import './HomeSchedule.css';
 

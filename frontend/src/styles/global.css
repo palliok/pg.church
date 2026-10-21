@@ -206,6 +206,18 @@ input, textarea, select { font-family: inherit; }
   background: var(--c-panel);
 }
 
+/* Шапка телефона (MobileHeader, resources/Mobile Header.html): логотип и языки в одну строку. */
+.mobile-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 18px 14px; }
+.mobile-header-brand { min-width: 0; color: var(--c-ink); }
+.mobile-header-lang { flex: 0 0 auto; display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 99px; background: var(--c-panel); }
+.mobile-header-lang button { padding: 7px; border: 0; border-radius: 99px; background: transparent; color: var(--c-gray-text); font: 700 11px var(--f-sans); cursor: pointer; }
+.mobile-header-lang button.active { padding-inline: 9px; background: var(--c-ink); color: #fff; }
+/* Примерно с 370px шапка помещается в одну строку; уже — языки встают отдельной строкой над логотипом. */
+@media (max-width: 370px) {
+  .mobile-header { flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 8px; }
+  .mobile-header-lang { order: -1; align-self: flex-end; }
+}
+
 /* В одну строку шапка помещается примерно с 1130px (длиннее всего меню на киргизском).
    Уже — меню переносится на отдельную строку под логотипом: ::after разрывает строку. */
 @media (max-width: 1180px) {

@@ -25,6 +25,25 @@ function toEventDate(value) {
   return { day: date.day, month: monthLabel(date), label: eventLabel(date), ...shortDate(date) };
 }
 
+// «7 дней», «7 days», «7 күн» — длительность события с датами «с … по …».
+function daysLabel(n) {
+  switch (getLang()) {
+    case 'en':
+      return `${n} ${n === 1 ? 'day' : 'days'}`;
+    case 'ky':
+      return `${n} күн`;
+    default: {
+      const a = n % 10;
+      const b = n % 100;
+      const form = a === 1 && b !== 11 ? 0 : a >= 2 && a <= 4 && (b < 10 || b >= 20) ? 1 : 2;
+      return `${n} ${['день', 'дня', 'дней'][form]}`;
+    }
+  }
+}
+
+// Сколько дней занимает событие с from по to включительно (даты «YYYY-MM-DD»).
+const spanDays = (from, to) => Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000) + 1;
+
 const DETAIL_TYPES = ['when', 'where', 'link'];
 
 // Строки с иконками в карточке: «когда», «где» и ссылки. Ссылки — только http(s),
@@ -38,8 +57,11 @@ function toDetails(details) {
 
 // Даты, «Важно», детали и контакт пока есть только в моках (src/api/mocks.js):
 // бэкенд отдаёт { id, title, body } — тогда объявление показывается без даты и деталей.
-// Дату публикации на сайте не показываем, только день события, если он назначен.
+// Дату публикации на сайте не показываем, только день события, если он назначен:
+// eventDate — день или начало, eventDateEnd — конец, если событие на несколько дней, deadline — срок «до».
 function toAnnouncement(raw) {
+  const multiDay = Boolean(raw.eventDate && raw.eventDateEnd && raw.eventDateEnd > raw.eventDate);
+
   return {
     id: raw.id,
     publishedAt: raw.publishedAt ?? null,
@@ -47,6 +69,9 @@ function toAnnouncement(raw) {
     title: t(raw.title),
     body: raw.body ? t(raw.body) : null,
     eventDate: toEventDate(raw.eventDate),
+    eventEnd: multiDay ? toEventDate(raw.eventDateEnd) : null,
+    days: multiDay ? daysLabel(spanDays(raw.eventDate, raw.eventDateEnd)) : null,
+    deadline: raw.eventDate ? null : toEventDate(raw.deadline),
     details: toDetails(raw.details),
     contact: raw.contact ? { ...raw.contact, name: raw.contact.name ? t(raw.contact.name) : null } : null,
   };

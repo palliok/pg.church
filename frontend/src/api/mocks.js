@@ -316,12 +316,13 @@ function eventsBetween(params) {
 // Формат опережает бэкенд: publishedAt, eventDate, important, details и contact пока есть
 // только здесь, /api/v1/announcements отдаёт { id, title, body }.
 // publishedAt — когда опубликовано (для сортировки, на сайте не показывается);
-// eventDate — конкретный день события «YYYY-MM-DD» или null, если дня нет.
+// eventDate — конкретный день события «YYYY-MM-DD» или null, если дня нет; eventDateEnd — последний день,
+// если событие на несколько дней; deadline — срок «до» у объявления без дня события.
 // details — строки с иконками: { type: 'when' | 'where', text } и ссылки { type: 'link', text, url }.
 
 const isoDay = (date) => iso(date).slice(0, 10);
 
-function announcement(id, daysAgo, title, body, { important = false, eventIn = null, when = null, where = null, links = [], contact = null } = {}) {
+function announcement(id, daysAgo, title, body, { important = false, eventIn = null, eventDays = 1, deadlineIn = null, when = null, where = null, links = [], contact = null } = {}) {
   const tel = contact ? `tel:+${contact.phone.replace(/\D/g, '').replace(/^8(\d{10})$/, '7$1')}` : null;
 
   return {
@@ -331,6 +332,8 @@ function announcement(id, daysAgo, title, body, { important = false, eventIn = n
     important,
     publishedAt: iso(fromToday(-daysAgo)),
     eventDate: eventIn === null ? null : isoDay(fromToday(eventIn)),
+    eventDateEnd: eventIn === null || eventDays < 2 ? null : isoDay(fromToday(eventIn + eventDays - 1)),
+    deadline: deadlineIn === null ? null : isoDay(fromToday(deadlineIn)),
     details: [
       ...(when ? [{ type: 'when', text: when }] : []),
       ...(where ? [{ type: 'where', text: where }] : []),
@@ -343,26 +346,27 @@ function announcement(id, daysAgo, title, body, { important = false, eventIn = n
 // По дате, новые сверху — как будет отдавать бэкенд.
 const announcements = [
   announcement(1, 0, 'Сбор продуктов для нуждающихся', 'Приносите крупы, консервы и средства гигиены. Всё передадим семьям нашего района.', {
-    when: 'До конца месяца, после служений', where: 'Фойе, стол у входа', contact: { name: 'Ольга', phone: '+7 911 000-12-34' },
+    deadlineIn: 9, when: 'После служений', where: 'Фойе, стол у входа', contact: { name: 'Анна', phone: '+7 921 000-12-34' },
   }),
   announcement(2, 2, 'Запись в детский лагерь', 'Открыта запись на летнюю смену для детей 7–12 лет. Мест: 30.', {
     important: true,
-    when: '14–20 июля',
+    eventIn: 20,
+    eventDays: 7,
     where: 'База «Сосновый бор», Ленобласть',
     links: [['Анкета для записи', 'https://forms.yandex.ru/'], ['Что взять с собой', 'https://pg.church/']],
     contact: { name: 'Марина', phone: '8 911 000-45-67' },
   }),
-  announcement(3, 4, 'Нужны волонтёры на кухню', 'Ищем помощников для чаепития после воскресного служения.', {
-    when: 'По воскресеньям, 12:30', contact: { name: 'Олег', phone: '+7 931 000-78-90' },
+  announcement(3, 4, 'Нужны волонтёры на кухню', 'Ищем помощников готовить обеды после воскресного служения. Можно на одно воскресенье в месяц.', {
+    important: true, links: [['Написать в Telegram', 'https://t.me/']], contact: { name: 'Олег', phone: '+7 905 000-78-90' },
   }),
   announcement(4, 6, 'Изучение Библии для молодёжи', 'Каждую пятницу разбираем Евангелие от Марка. Приходите с друзьями.', {
     when: 'Пятница, 19:00', where: 'Малый зал', links: [['Чат молодёжи в Telegram', 'https://t.me/']],
   }),
   announcement(5, 9, 'Членское собрание после богослужения', 'В воскресенье после богослужения — членское собрание церкви в главном зале.\nПросим членов церкви остаться.', {
-    important: true, eventIn: (7 - new Date().getDay()) % 7 || 7, where: 'Главный зал',
+    important: true, eventIn: (7 - new Date().getDay()) % 7 || 7, when: 'После служения', where: 'Главный зал',
   }),
-  announcement(6, 14, 'Генеральная уборка зала', 'Приглашаем всех, кто может помочь подготовить зал к зиме.', {
-    eventIn: (6 - new Date().getDay() + 7) % 7 || 7, when: 'Суббота, 10:00', contact: { name: 'Олег', phone: '+7 931 000-78-90' },
+  announcement(6, 14, 'Генеральная уборка зала', 'Наводим порядок перед зимой: моем окна, разбираем склад, чистим стулья. Перчатки выдадим.', {
+    eventIn: (6 - new Date().getDay() + 7) % 7 || 7, when: 'С 10:00', where: 'Главный зал', links: [['Записаться', 'https://forms.yandex.ru/']],
   }),
 ];
 

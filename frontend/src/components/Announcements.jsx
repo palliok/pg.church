@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAnnouncements } from '../api/announcements.js';
-import { Megaphone } from './AnnouncementCards.jsx';
+import { AnnouncementDates, Megaphone } from './AnnouncementCards.jsx';
 import LongArrow from './LongArrow.jsx';
 import './Announcements.css';
 
@@ -21,7 +21,7 @@ export default function Announcements({ className = '' }) {
           {latest.important && <span className="ann-home-important">Важно</span>}
           <span className="ann-home-title">{latest.title}</span>
         </span>
-        {latest.eventDate && <AnnouncementDate date={latest.eventDate} />}
+        <AnnouncementDates item={latest} />
         <span className="ann-home-more">
           Подробнее
           <LongArrow />
@@ -39,15 +39,3 @@ export default function Announcements({ className = '' }) {
   );
 }
 
-// День события: день недели над числом, рядом месяц — «ВТ / 14 ИЮЛ».
-function AnnouncementDate({ date }) {
-  return (
-    <span className="ann-home-date">
-      <span className="ann-home-dow">{date.dow}</span>
-      <span className="ann-home-day">
-        <span className="ann-home-num">{date.day}</span>
-        <span className="ann-home-mon">{date.mon}</span>
-      </span>
-    </span>
-  );
-}

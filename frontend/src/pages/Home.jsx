@@ -1,9 +1,8 @@
-import { t, getLang, langPath } from '../i18n.js';
+import { t, getLang } from '../i18n.js';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Announcements from '../components/Announcements.jsx';
 import HomeSchedule, { ScheduleCarousel } from '../components/HomeSchedule.jsx';
-import ChurchBrand from '../components/ChurchBrand.jsx';
 import ContactsCard from '../components/ContactsCard.jsx';
 import { useChurch } from '../api/church.js';
 import { daysFromToday } from '../api/dates.js';
@@ -38,28 +37,6 @@ export default function Home() {
   return (
     <div className="home-wrap page-enter container" style={{ paddingLeft: 0, paddingRight: 0, maxWidth: 'var(--content-max)' }}>
       <div className="home-mobile">
-        <div className="home-mobile-header">
-          <ChurchBrand />
-
-          <div className="home-mobile-lang">
-            {['RU', 'EN', 'KY'].map((lng) => {
-              const code = lng.toLowerCase();
-              const active = getLang() === code;
-
-              return (
-                <button
-                  key={lng}
-                  type="button"
-                  className={active ? 'active' : ''}
-                  onClick={() => { window.location.href = langPath(code); }}
-                >
-                  {lng}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
         <Link to="/story/jesus" className="home-mobile-hero">
           <p className="home-mobile-hero-text">
             Всё началось задолго до сотворения мира. И с тех пор вся история связана с Ним.
@@ -76,15 +53,7 @@ export default function Home() {
 
         {/* Второстепенный блок: пока грузится и при ошибке не показываем. Без событий на неделе
             остаётся карточка «В календарь». */}
-        {!eventsLoading && !eventsError && (
-          <section className="home-mobile-near">
-            <div className="home-mobile-near-head">
-              <h2>Ближайшее</h2>
-              <Link to="/schedule">Всё →</Link>
-            </div>
-            <ScheduleCarousel events={week} now={now} />
-          </section>
-        )}
+        {!eventsLoading && !eventsError && <ScheduleCarousel events={week} now={now} />}
 
         <Announcements />
 

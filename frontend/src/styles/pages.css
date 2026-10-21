@@ -131,43 +131,6 @@
     padding: 0 14px;
   }
 
-  .home-mobile-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 18px 4px 14px;
-  }
-
-  .home-mobile-lang {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    background: var(--c-panel);
-    border-radius: 99px;
-    padding: 3px;
-  }
-
-  .home-mobile-lang button {
-    border: 0;
-    background: transparent;
-    color: var(--c-gray-text);
-    padding: 7px;
-    border-radius: 99px;
-    font-family: var(--f-sans);
-    font-weight: 700;
-    font-size: 11px;
-    cursor: pointer;
-  }
-
-  .home-mobile-lang button.active {
-    background: var(--c-ink);
-    color: #fff;
-    padding-left: 9px;
-    padding-right: 9px;
-  }
-
   .home-mobile-hero {
     position: relative;
     border-radius: 24px;
@@ -211,11 +174,10 @@
   }
 }
 
-/* Mobile home: tighter top spacing (equal gap above and below the logo row),
-   no extra empty space under the map */
+/* Мобильная главная: сразу под шапкой (MobileHeader), без пустого места под картой. */
 @media (max-width: 860px) {
   .home-wrap.page-enter.container {
-    padding: 10px 0 0 !important;
+    padding: 0 !important;
   }
 
 }
@@ -228,19 +190,16 @@
   }
 }
 
-/* Шапка из resources/Mobile Header.html помещается в одну строку примерно с 370px;
-   на экранах уже переключатель языков встаёт отдельной строкой над логотипом. */
 @media (max-width: 370px) {
-  .home-mobile-header { flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 8px; }
-  .home-mobile-lang { order: -1; align-self: flex-end; }
   .home-mobile-hero-title span { font-size: 50px; }
 }
 
 @media (max-width: 860px) {
   main { padding-bottom: 0 !important; }
 
+  /* Сверху шапка телефона (MobileHeader) — до заголовка страницы небольшой отступ. */
   .page-enter.container {
-    padding: 26px 18px 118px !important;
+    padding: 10px 18px 118px !important;
   }
 
   .page-enter.container > .h-display {

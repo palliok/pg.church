@@ -3,10 +3,11 @@ import { useSearchParams } from 'react-router-dom';
 import { useAnnouncements } from '../api/announcements.js';
 import { AnnouncementCard, ImportantPill } from '../components/AnnouncementCards.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
+import LongArrow from '../components/LongArrow.jsx';
 import { t } from '../i18n.js';
 
-// Вкладки колоды светлеют с удалением от открытой карточки.
-const SHADES = ['#e3e3e7', '#ebebee', '#f1f1f3', '#f5f5f7', '#f8f8f9'];
+// Вкладки колоды — тёплый серый, светлеет с удалением от открытой карточки.
+const SHADES = ['#e2e3da', '#eaebe4', '#f1f1ec', '#f5f5f1', '#f8f8f5'];
 
 // Вкладка колоды выше или ниже открытой карточки: чем дальше, тем светлее и уже.
 // Ближние к карточке лежат поверх дальних.
@@ -24,14 +25,14 @@ function tabStyle(index, activeIndex, count) {
   };
 }
 
-// Число и месяц дня события; у объявления без даты колонки нет.
+// Число и месяц события в один день; у объявления без даты, со сроком «до» или на несколько дней колонки нет.
 function DateBlock({ item, className }) {
-  if (!item.eventDate) return null;
+  if (!item.eventDate || item.eventEnd) return null;
 
   return (
     <span className={className}>
       <span className="ann-day">{item.eventDate.day}</span>
-      <span className="ann-month">{item.eventDate.month}</span>
+      <span className="ann-month">{item.eventDate.mon}</span>
     </span>
   );
 }
@@ -89,8 +90,8 @@ export default function Announcements() {
   };
 
   return (
-    <div className="page-enter container ann-page" style={{ padding: '26px 16px 48px' }}>
-      <h1 className="h-display" style={{ fontSize: 'clamp(34px, 6vw, 54px)' }}>Объявления</h1>
+    <div className="page-enter container ann-page">
+      <h1 className="ann-title">Объявления</h1>
 
       {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
 
@@ -118,7 +119,6 @@ export default function Announcements() {
               >
                 <DateBlock item={item} className="ann-tab-date" />
                 <span className="ann-tab-title">{item.title}</span>
-                {item.important && <ImportantPill />}
               </button>
             )))}
           </div>
@@ -139,7 +139,7 @@ export default function Announcements() {
                     <span>{item.title}</span>
                     {item.important && <ImportantPill />}
                   </span>
-                  <span className="ann-row-arrow" aria-hidden="true">→</span>
+                  <span className="ann-row-arrow"><LongArrow width={28} stroke={2.6} /></span>
                 </button>
               ))}
             </div>

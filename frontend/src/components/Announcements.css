@@ -1,9 +1,5 @@
-/* Цвета макета объявлений (resources/handoff_announcements_p5). */
-.ann-home, .ann-page {
-  --ann-important: #e5322d;
-  --ann-muted: #55555a;
-  --ann-hint: #8a8a90;
-}
+/* Объявления: блок на главной, страница, открытое объявление.
+   Макеты: resources/design_handoff_overview, блоки 02–03 и 10–12. */
 
 /* ===== Водяной знак и пометки ===== */
 .ann-megaphone {
@@ -17,13 +13,41 @@
 
 .ann-important {
   flex: 0 0 auto;
-  align-self: center;
-  border-radius: 99px;
-  padding: 3px 9px;
-  background: var(--ann-important);
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: var(--radius-pill);
+  background: var(--c-signal);
   color: #fff;
-  font: 700 11px var(--f-sans);
-  letter-spacing: .02em;
+  font: 400 10px var(--f-mono);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+/* ===== Даты: «до 30 июн», один день или «14 июл → 20 июл · 7 дней», рядом пилюля со временем ===== */
+.ann-dates { --d-num: 34px; --d-label: 9px; --d-mon: 10px; --d-gap: 12px; --d-arrow: 30px; --d-pill-h: 26px; --d-pill-fs: 10px; position: relative; display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--d-gap); }
+.ann-date { display: flex; flex-direction: column; gap: 6px; }
+.ann-date-label { font: 400 var(--d-label) var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: rgba(255, 255, 255, .55); }
+.ann-date-day { display: flex; align-items: baseline; gap: 6px; }
+.ann-date-num { font: 400 var(--d-num)/.85 var(--f-num); letter-spacing: -.05em; }
+.ann-date-mon { font: 400 var(--d-mon) var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
+.ann-dates-arrow { padding-bottom: calc(var(--d-num) * .2); color: rgba(255, 255, 255, .55); }
+.ann-dates-arrow svg { width: var(--d-arrow); height: auto; }
+.ann-pill {
+  display: inline-flex;
+  align-items: center;
+  height: var(--d-pill-h);
+  margin-bottom: 3px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  color: var(--c-ink);
+  font: 600 var(--d-pill-fs) var(--f-mono);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 /* ===== Блок на главной: карточка-стопка (макет design_handoff_overview, блоки 02 и 03) ===== */
@@ -43,7 +67,7 @@
 }
 .ann-home-card:hover { color: #fff; }
 .ann-home-card > :not(.ann-megaphone) { position: relative; }
-.ann-home-card .ann-megaphone { right: -55px; top: -6px; width: 210px; height: 210px; }
+.ann-home-card .ann-megaphone { right: calc(5% - 55px); top: -6px; width: 210px; height: 210px; }
 
 .ann-home-head { display: flex; flex-direction: column; gap: 10px; }
 
@@ -68,11 +92,8 @@
   text-wrap: balance;
 }
 
-.ann-home-date { display: flex; flex-direction: column; gap: 5px; }
-.ann-home-dow { font: 400 9px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: rgba(255, 255, 255, .55); }
-.ann-home-day { display: flex; align-items: baseline; gap: 5px; }
-.ann-home-num { font: 400 30px/.85 var(--f-num); letter-spacing: -.05em; }
-.ann-home-mon { font: 400 10px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
+/* Даты на карточке главной — помельче, чем в открытом объявлении. */
+.ann-home-card .ann-dates { --d-num: 30px; --d-label: 9px; --d-mon: 10px; --d-gap: 10px; --d-arrow: 24px; --d-pill-h: 24px; --d-pill-fs: 10px; }
 
 .ann-home-more {
   align-self: flex-start;
@@ -117,116 +138,100 @@
 .ann-home-all:hover { background: var(--c-main); box-shadow: none; }
 
 /* ===== Страница ===== */
-
+.container.ann-page { padding: 24px 18px 28px; color: var(--c-ink); }
+.ann-title { margin: 0; padding: 0 2px; font: 700 44px/.9 var(--f-sans); letter-spacing: -.06em; }
 
 .ann-empty { margin-top: 30px; padding: 56px 20px; border-radius: var(--radius-lg); background: var(--c-panel); text-align: center; }
 
 /* ===== Открытое объявление: чёрная карточка ===== */
 .ann-card {
-  --ann-pad-x: 22px;
-  --ann-pad-bottom: 22px;
-  --ann-share: 46px;
+  --ann-pad: 20px;
+  --ann-share: 40px;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: var(--ann-pad);
   border-radius: 26px;
   background: var(--c-ink);
   color: #fff;
-  padding: 24px var(--ann-pad-x) var(--ann-pad-bottom);
 }
-.ann-card > :not(.ann-megaphone, .ann-card-share) { position: relative; }
-/* Последний блок не заходит под кнопку «Поделиться» в правом нижнем углу. */
-.ann-card > :nth-last-child(2) { margin-right: calc(var(--ann-share) + 10px); }
-.ann-card.no-call { min-height: 0; }
-.ann-card.no-call > :nth-last-child(2) { min-height: var(--ann-share); }
-.ann-card .ann-megaphone { right: -34px; top: -24px; width: 200px; height: 200px; }
+.ann-card > :not(.ann-megaphone) { position: relative; }
 
-.ann-card-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.ann-card-date { font: 600 12px var(--f-sans); color: rgba(255, 255, 255, .7); }
-.ann-card .ann-important { padding: 4px 10px; }
-.ann-card-badge { border: 1px solid rgba(255, 255, 255, .45); border-radius: 99px; padding: 3px 9px; font: 600 11px var(--f-sans); }
+/* Последняя строка и «Поделиться» справа. Кнопка выровнена по нижнему краю строки, а отрицательное поле сверху
+   убирает её высоту из расчёта: строка не становится выше, кнопка выступает вверх. */
+.ann-card-last { display: flex; align-items: flex-end; gap: 10px; }
+.ann-card-last > :first-child { flex: 0 1 auto; min-width: 0; margin-right: auto; }
+.ann-card .ann-megaphone { right: -50px; top: -6px; width: 230px; height: 230px; }
 
-.ann-card-title {
-  max-width: 320px;
-  margin: 12px 0 0;
-  font-family: var(--f-sans);
-  font-weight: 700;
-  font-size: 30px;
-  line-height: .97;
-  letter-spacing: -.035em;
-  text-wrap: balance;
-}
+.ann-card-head { display: flex; flex-direction: column; gap: 10px; }
+.ann-card-marks { display: flex; flex-wrap: wrap; gap: 6px; }
+.ann-card-badge { display: inline-flex; align-items: center; height: 22px; padding: 0 9px; border-radius: var(--radius-pill); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .45); font: 400 10px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
+.ann-card-title { max-width: 260px; margin: 0; font: 700 24px/1.02 var(--f-sans); letter-spacing: -.045em; text-wrap: balance; }
+.ann-card-body { max-width: 460px; margin: 0; font: 400 14px/1.5 var(--f-sans); color: rgba(255, 255, 255, .72); white-space: pre-line; text-wrap: pretty; }
 
-.ann-card-body {
-  margin: 14px 0 0;
-  font: 400 15px/1.5 var(--f-sans);
-  color: rgba(255, 255, 255, .84);
-  white-space: pre-line;
-  text-wrap: pretty;
-}
+.ann-card-place { display: flex; align-items: center; gap: 6px; font: 400 10px var(--f-mono); letter-spacing: .02em; text-transform: uppercase; color: rgba(255, 255, 255, .8); }
 
-.ann-facts { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-.ann-fact { display: flex; align-items: center; gap: 12px; }
-
-.ann-fact-icon {
-  flex: 0 0 auto;
-  width: 32px;
-  height: 32px;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, .1);
-  display: flex;
+.ann-card-links { display: flex; flex-wrap: wrap; gap: 6px; }
+.ann-card-link {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px 0 14px;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3);
+  color: #fff;
+  font: 400 10px var(--f-mono);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background .2s, color .2s, box-shadow .2s;
 }
-
-.ann-fact-text { font: 600 14px/1.35 var(--f-sans); }
-
-.ann-fact.is-link { align-self: flex-start; color: #fff; }
-.ann-fact.is-link .ann-fact-text { text-decoration: underline; text-decoration-color: rgba(255, 255, 255, .35); text-underline-offset: 3px; transition: text-decoration-color .15s ease; }
-.ann-fact.is-link:hover { color: #fff; }
-.ann-fact.is-link:hover .ann-fact-text { text-decoration-color: #fff; }
-.ann-fact.is-link .ann-fact-icon { transition: background .15s ease; }
-.ann-fact.is-link:hover .ann-fact-icon { background: rgba(255, 255, 255, .2); }
-.ann-fact-arrow { margin-left: -4px; font-size: 13px; color: rgba(255, 255, 255, .6); }
+.ann-card-link:hover { background: var(--c-main); color: var(--c-ink); box-shadow: none; }
 
 .ann-card-call {
-  min-height: var(--ann-share);
-  margin-top: 22px;
-  display: flex;
+  align-self: flex-start;
+  max-width: 100%;
+  min-width: 0;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: 99px;
-  padding: 12px 16px;
-  background: #fff;
-  color: var(--c-ink);
-  font: 600 15px var(--f-sans);
-  white-space: nowrap;
+  gap: 10px;
+  height: 40px;
+  padding: 0 18px 0 14px;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3);
+  color: #fff;
+  transition: background .2s;
 }
-.ann-card-call:hover { color: var(--c-ink); }
-
+.ann-card-call:hover { background: rgba(255, 255, 255, .1); color: #fff; }
+.ann-card-call svg { color: rgba(255, 255, 255, .7); }
+.ann-card-phone { font: 700 15px var(--f-sans); letter-spacing: -.01em; white-space: nowrap; }
+.ann-card-name { font: 400 10px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: rgba(255, 255, 255, .55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ann-card-share {
-  position: absolute;
-  right: var(--ann-pad-x);
-  bottom: var(--ann-pad-bottom);
+  flex: 0 0 auto;
+  margin-top: calc(var(--ann-share) * -1);
   width: var(--ann-share);
   height: var(--ann-share);
-  border: 1.5px solid rgba(255, 255, 255, .4);
-  border-radius: 99px;
+  border: none;
+  border-radius: var(--radius-pill);
   background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: border-color .15s ease;
+  transition: background .2s;
 }
-.ann-card-share:hover { border-color: #fff; }
+.ann-card-share:hover { background: rgba(255, 255, 255, .1); }
 
-/* ===== Телефон: колода ===== */
-.ann-deck { display: flex; flex-direction: column; margin-top: 26px; }
+/* ===== Телефон: колода — вкладки над и под открытой карточкой ===== */
+.ann-deck { display: flex; flex-direction: column; margin-top: 24px; }
 .ann-split { display: none; }
 
-.ann-deck-card { position: relative; border-radius: 26px; box-shadow: 0 -6px 20px rgba(0, 0, 0, .10), 0 10px 24px rgba(0, 0, 0, .10); }
+.ann-deck-card { position: relative; border-radius: 28px; box-shadow: 0 -6px 20px rgba(0, 0, 0, .10), 0 10px 24px rgba(0, 0, 0, .10); }
 
 .ann-tab {
   position: relative;
@@ -241,26 +246,23 @@
   transition: margin .25s, background .25s, filter .15s;
 }
 .ann-tab:hover { filter: brightness(.97); }
-.ann-tab.is-above { padding: 14px 18px 30px; border-radius: 20px 20px 0 0; }
-.ann-tab.is-below { padding: 30px 18px 14px; border-radius: 0 0 20px 20px; }
+.ann-tab.is-above { padding: 14px 18px 30px; border-radius: 22px 22px 0 0; }
+.ann-tab.is-below { padding: 30px 18px 14px; border-radius: 0 0 22px 22px; }
 
-.ann-tab-date { flex: 0 0 52px; display: flex; flex-direction: column; }
-.ann-tab-date .ann-day { font-family: var(--f-sans); font-weight: 700; font-size: 22px; line-height: .9; letter-spacing: -.045em; }
-.ann-tab-date .ann-month { margin-top: 3px; font: 600 12px var(--f-sans); color: var(--ann-muted); }
+.ann-tab-date { flex: 0 0 auto; min-width: 52px; display: flex; align-items: baseline; gap: 5px; }
+.ann-tab-date .ann-day { font: 400 24px/1 var(--f-num); letter-spacing: -.04em; }
+.ann-tab-date .ann-month { font: 400 9px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-gray-text); }
 
 .ann-tab-title {
   flex: 1;
   min-width: 0;
-  font-family: var(--f-sans);
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 1.18;
+  font: 700 16px/1.15 var(--f-sans);
+  letter-spacing: -.03em;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-
 
 /* ===== Тост ===== */
 .ann-toast {
@@ -273,7 +275,7 @@
   padding: 12px 20px;
   background: var(--c-ink);
   color: #fff;
-  font: 600 14px var(--f-sans);
+  font: 500 14px var(--f-sans);
   white-space: nowrap;
   box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
   animation: ann-toast-in .2s ease;
@@ -284,11 +286,13 @@
   to { opacity: 1; transform: translateX(-50%); }
 }
 
-/* ===== Десктоп ===== */
+/* ===== Десктоп: список слева, открытое объявление справа ===== */
 @media (min-width: 861px) {
   .ann-home-layer { display: block; }
   .ann-home-foot { display: flex; }
 
+  .container.ann-page { padding: 40px 32px 64px; }
+  .ann-title { padding: 0; font-size: 72px; line-height: .88; letter-spacing: -.065em; }
 
   .ann-deck { display: none; }
   .ann-split {
@@ -299,29 +303,29 @@
     margin-top: 32px;
   }
 
-  .ann-list { display: flex; flex-direction: column; gap: 8px; }
+  .ann-list { display: flex; flex-direction: column; gap: 4px; }
 
   .ann-row {
     display: flex;
     align-items: center;
     gap: 14px;
+    min-height: 76px;
+    padding: 10px 14px 10px 10px;
     border: 0;
-    border-radius: 20px;
-    padding: 16px 16px 16px 20px;
-    background: var(--c-panel);
+    border-radius: 22px;
+    background: transparent;
     color: var(--c-ink);
     text-align: left;
     font: inherit;
     cursor: pointer;
-    transition: background .15s;
+    transition: background .2s;
   }
-  .ann-row:hover { background: var(--c-panel-hover); }
+  .ann-row:hover { background: var(--c-main); }
   .ann-row.is-active { background: var(--c-ink); color: #fff; cursor: default; }
 
-  .ann-row-date { flex: 0 0 46px; display: flex; flex-direction: column; align-items: flex-start; }
-  .ann-row-date .ann-day { font-family: var(--f-sans); font-weight: 700; font-size: 30px; line-height: .85; letter-spacing: -.05em; }
-  .ann-row-date .ann-month { margin-top: 4px; font: 600 14px var(--f-sans); color: var(--ann-muted); }
-  .ann-row.is-active .ann-month { color: rgba(255, 255, 255, .65); }
+  .ann-row-date { flex: 0 0 auto; width: 56px; height: 56px; border-radius: 16px; background: var(--c-page); color: var(--c-ink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+  .ann-row-date .ann-day { font: 400 26px/.9 var(--f-num); letter-spacing: -.04em; }
+  .ann-row-date .ann-month { font: 400 9px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--c-gray-text); }
 
   .ann-row-title {
     flex: 1;
@@ -329,44 +333,32 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    column-gap: 8px;
-    row-gap: 4px;
-    font-family: var(--f-sans);
-    font-weight: 700;
-    font-size: 17px;
-    line-height: 1.15;
-    letter-spacing: -.01em;
+    gap: 6px 10px;
+    padding-left: 10px;
+    font: 700 19px/1.15 var(--f-sans);
+    letter-spacing: -.035em;
   }
-
-  .ann-row-arrow {
-    flex: 0 0 auto;
-    width: 34px;
-    height: 34px;
-    border: 1.5px solid currentColor;
-    border-radius: 99px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-  }
+  .ann-row-title .ann-important { align-self: center; height: 24px; padding: 0 10px; }
+  .ann-row-arrow { flex: 0 0 auto; display: flex; padding-right: 4px; }
   .ann-row.is-active .ann-row-arrow { opacity: 0; }
 
   .ann-split-card { position: sticky; top: 24px; }
 
-  .ann-card.is-large { --ann-pad-x: 34px; --ann-pad-bottom: 30px; border-radius: 28px; padding-top: 34px; }
-  .ann-card.is-large .ann-megaphone { right: -40px; top: -30px; width: 300px; height: 300px; }
-  .ann-card.is-large .ann-card-date { font-size: 13px; }
-  .ann-card.is-large .ann-card-title { max-width: 440px; margin-top: 14px; font-size: 40px; line-height: .96; letter-spacing: -.04em; }
-  .ann-card.is-large .ann-card-body { max-width: 520px; margin-top: 18px; font-size: 16px; line-height: 1.55; color: rgba(255, 255, 255, .82); }
-  .ann-card.is-large .ann-facts { margin-top: 24px; }
-  .ann-card.is-large .ann-fact-icon { width: 36px; height: 36px; }
-  .ann-card.is-large .ann-fact-text { font-size: 15px; }
-  .ann-card.is-large .ann-card-call { max-width: 360px; margin-top: 26px; }
+  .ann-card.is-large { --ann-pad: 30px; --ann-share: 44px; gap: 22px; border-radius: 30px; }
+  .ann-card.is-large .ann-megaphone { right: -70px; top: -20px; width: 380px; height: 380px; }
+  .ann-card.is-large .ann-card-title { max-width: 420px; font-size: 30px; }
+  .ann-card.is-large .ann-card-body { font-size: 15px; }
+  .ann-card.is-large .ann-dates { --d-num: 44px; --d-label: 10px; --d-mon: 11px; --d-gap: 18px; --d-arrow: 44px; --d-pill-h: 30px; --d-pill-fs: 11px; }
+  .ann-card.is-large .ann-date-day { gap: 8px; }
+  .ann-card.is-large .ann-card-place { font-size: 11px; }
+  .ann-card.is-large .ann-card-link { height: 34px; font-size: 11px; }
+  .ann-card.is-large .ann-card-call { height: 44px; }
+  .ann-card.is-large .ann-card-phone { font-size: 16px; }
 
   .ann-toast { bottom: 28px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ann-tab, .ann-row { transition: none; }
+  .ann-tab, .ann-row, .ann-card-link, .ann-card-call { transition: none; }
   .ann-toast { animation: none; }
 }

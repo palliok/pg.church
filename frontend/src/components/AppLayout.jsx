@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 
 import LiveBanner from './LiveBanner.jsx';
 import Header from './Header.jsx';
+import MobileHeader from './MobileHeader.jsx';
 import TabBar from './TabBar.jsx';
 
 export default function AppLayout() {
@@ -27,6 +28,7 @@ export default function AppLayout() {
       <LiveBanner />
 
       <Header />
+      <MobileHeader />
 
       <main style={{ flex: 1 }}>
         <Outlet />
