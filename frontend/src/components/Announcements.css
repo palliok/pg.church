@@ -267,7 +267,7 @@
 .ann-toast {
   position: fixed;
   left: 50%;
-  bottom: calc(var(--tabbar-h) + 28px);
+  bottom: calc(var(--tabbar-h) + 28px + env(safe-area-inset-bottom));
   z-index: 50;
   transform: translateX(-50%);
   border-radius: 99px;

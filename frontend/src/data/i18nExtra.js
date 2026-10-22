@@ -198,6 +198,10 @@ export const EN_EXTRA = {
   'До': 'Until',
   // Главная по макету design_handoff_overview
   'Ближайшее': 'Coming up',
+  // Нижняя панель и меню на телефоне (design_handoff_tabbar_5a)
+  'Меню': 'Menu',
+  'Весть о спасении': 'The message of salvation',
+  'Пожертвования': 'Donations',
 };
 
 export const KY_EXTRA = {
@@ -341,4 +345,8 @@ export const KY_EXTRA = {
   'До': 'Чейин',
   // Главная по макету design_handoff_overview
   'Ближайшее': 'Жакынкы',
+  // Нижняя панель и меню на телефоне (design_handoff_tabbar_5a)
+  'Меню': 'Меню',
+  'Весть о спасении': 'Куткарылуу жөнүндө кабар',
+  'Пожертвования': 'Кайрымдуулуктар',
 };
