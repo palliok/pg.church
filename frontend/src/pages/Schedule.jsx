@@ -93,10 +93,10 @@ export default function Schedule() {
   const viewTabs = [['list', 'Лента', 'Списком'], ['month', 'Месяц', 'Календарь']];
 
   return (
-    <div className="page-enter container">
+    <div className="page-enter container page-bg" style={{ '--title-chars': t('Расписание').length }}>
       <div className="sched-head">
         <div className="sched-title-row">
-          <h1 className="page-title">Расписание</h1>
+          <h1 className="page-title page-title--bg">Расписание</h1>
           <button type="button" className="sched-m sched-filter-round" onClick={() => setSheetOpen(true)} aria-label="Фильтр">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4" /></svg>
             {filterCount > 0 && <span className="sched-badge">{filterCount}</span>}
@@ -141,8 +141,6 @@ export default function Schedule() {
             <button type="button" className="sched-m sched-reset" onClick={resetFilters}>Сбросить фильтры</button>
           </>
         )}
-        <span style={{ flex: 1 }} />
-        <Subscribe />
       </div>
 
       {panelOpen && (
@@ -167,7 +165,7 @@ export default function Schedule() {
       {(loading || error) ? (
         <div style={{ marginTop: 24 }}><LoadStatus error={error} onRetry={retry} /></div>
       ) : view === 'list' ? (
-        <ListView key={monthPrefix} byDay={byDay} ym={ym} todayNum={todayNum} hasFilters={filterCount > 0} onReset={resetFilters} />
+        <ListView key={monthPrefix} byDay={byDay} ym={ym} todayNum={todayNum} hasFilters={filterCount > 0} onReset={resetFilters} aside={<Subscribe />} />
       ) : (
         <MonthView ym={ym} byDay={byDay} selDay={selDay} todayNum={todayNum} onPick={setPickedDay} />
       )}
@@ -257,7 +255,8 @@ function MonthNav({ ym, onChange }) {
 // Лента (макет resources/design_handoff_schedule_2b): слева крупное число и день недели, справа события дня.
 // Прошедшие дни бледнее, сегодняшний — на серой подложке. В текущем месяце дни раньше позавчерашнего
 // спрятаны под кнопку. key у ListView — месяц, так что в новом месяце они снова спрятаны.
-function ListView({ byDay, ym, todayNum, hasFilters, onReset }) {
+// aside — «Подписаться», в одной строке с этой кнопкой.
+function ListView({ byDay, ym, todayNum, hasFilters, onReset, aside }) {
   const startRef = useRef(null);
   const feedRef = useRef(null);
   const [showPast, setShowPast] = useState(false);
@@ -281,29 +280,35 @@ function ListView({ byDay, ym, todayNum, hasFilters, onReset }) {
 
   if (byDay.size === 0) {
     return (
-      <div className="sched-empty">
-        <div className="sched-empty-title">Ничего не нашлось</div>
-        {hasFilters ? (
-          <>
-            <div className="sched-empty-text">В этом месяце по выбранным фильтрам собраний нет. Снимите часть условий или переключите месяц.</div>
-            <button type="button" className="sched-empty-btn" onClick={onReset}>Сбросить фильтры</button>
-          </>
-        ) : (
-          <div className="sched-empty-text">В этом месяце собраний нет.</div>
-        )}
+      <div className="sched-feed-wrap">
+        <div className="sched-feed-top">{aside}</div>
+        <div className="sched-empty">
+          <div className="sched-empty-title">Ничего не нашлось</div>
+          {hasFilters ? (
+            <>
+              <div className="sched-empty-text">В этом месяце по выбранным фильтрам собраний нет. Снимите часть условий или переключите месяц.</div>
+              <button type="button" className="sched-empty-btn" onClick={onReset}>Сбросить фильтры</button>
+            </>
+          ) : (
+            <div className="sched-empty-text">В этом месяце собраний нет.</div>
+          )}
+        </div>
       </div>
     );
   }
 
   return (
     <div className="sched-feed-wrap" ref={startRef}>
-      {hiddenCount > 0 && (
-        <button type="button" className="sched-feed-past" onClick={() => setShowPast((on) => !on)} aria-expanded={showPast}>
-          {/* Через t(): React меняет текст в том же узле, а translatePage() такие правки не видит. */}
-          <span>{showPast ? t('Скрыть прошедшие') : t('Показать прошедшие')}</span>
-          {!showPast && <span className="sched-feed-past-count">{hiddenCount} {eventsWord(hiddenCount)}</span>}
-        </button>
-      )}
+      <div className="sched-feed-top">
+        {hiddenCount > 0 && (
+          <button type="button" className="sched-feed-past" onClick={() => setShowPast((on) => !on)} aria-expanded={showPast}>
+            {/* Через t(): React меняет текст в том же узле, а translatePage() такие правки не видит. */}
+            <span>{showPast ? t('Скрыть прошедшие') : t('Показать прошедшие')}</span>
+            {!showPast && <span className="sched-feed-past-count">{hiddenCount} {eventsWord(hiddenCount)}</span>}
+          </button>
+        )}
+        {aside}
+      </div>
 
       <div className="sched-feed" ref={feedRef}>
         {visibleDays.map(([day, items]) => {

@@ -1,28 +1,10 @@
 /* Страница объявлений: на телефоне плитки и сторис (components/AnnouncementStories.css), на десктопе — список слева и карточка справа.
    Макет строк: resources/design_handoff_announcements_12a. Общие части карточки (даты, ссылки, телефон) — в components/Announcements.css. */
 
-/* ===== Большой заголовок на тёплой подложке =====
-   Кегль подбирается так, чтобы слово на любом языке заняло долю --ann-fit ширины страницы (--ann-chars — число букв):
-   на телефоне 80%, на десктопе половину. Подложка — только на десктопе, низ заголовка заходит на неё на --ann-overlap;
-   на телефоне плитки лежат прямо на странице. */
-.ann12-page {
-  container-type: inline-size;
-  --ann-pad: 4px;
-  --ann-fit: .8;
-  --ann-title: min(90px, calc((100cqi - 2 * var(--ann-pad)) * var(--ann-fit) / (var(--ann-chars, 10) * .58)));
-  --ann-overlap: calc(var(--ann-title) * .3);
-  color: var(--c-ink);
-}
-.page-title.ann12-title {
-  position: relative;
-  z-index: 1;
-  padding: 0 var(--ann-pad);
-  font-size: var(--ann-title);
-  line-height: .8;
-  letter-spacing: -.06em;
-  white-space: nowrap;
-}
-.ann12-panel { margin-top: 28px; }
+/* ===== Фоновый заголовок (.page-title--bg в global.css) и тёплая подложка =====
+   На телефоне плитки лежат прямо на странице, на десктопе — на подложке; и то и другое закрывает низ заголовка. */
+.ann12-page { color: var(--c-ink); }
+.ann12-panel { margin-top: 6px; }
 .ann12-panel .ann-empty { margin-top: 0; }
 
 /* ===== Свёрнутая строка — белая плашка ===== */
@@ -113,10 +95,10 @@
 .ann-split { display: none; }
 
 @media (min-width: 861px) {
-  .ann12-page { --ann-pad: 32px; --ann-fit: .5; }
+  .ann12-page { --ann-pad: 32px; }
   .ann12-panel {
-    margin-top: calc(-1 * var(--ann-overlap));
-    padding: calc(var(--ann-overlap) + 44px) var(--ann-pad) var(--ann-pad);
+    margin-top: 66px;
+    padding: var(--ann-pad);
     border-radius: 36px;
     background: #eaebe4; /* чуть светлее --c-warm */
   }

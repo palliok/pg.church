@@ -5,15 +5,21 @@
 @media (max-width: 860px) { .sched-d { display: none !important; } }
 @media (min-width: 861px) { .sched-m { display: none !important; } }
 
+/* Фильтры и переключатель «Лента / Месяц» пока скрыты: страница всегда показывает ленту. Код оставлен, чтобы вернуть.
+   Строка фильтров тоже скрыта: в ней остаются только фильтры, «Подписаться» — в строке с «Показать прошедшие». */
+.sched-filter-round, .sched-filter-btn, .sched-seg, .sched-toolbar { display: none !important; }
+
 /* ===== Шапка ===== */
-.sched-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+/* Заголовок фоновый (вне потока), в строке остаётся только кнопка фильтра справа. */
+.sched-title-row { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
 
 /* Отрицательные поля: кнопка выше заголовка, но не сдвигает его вниз — отступ сверху как у других страниц. */
 .sched-filter-round { position: relative; flex: 0 0 auto; width: 46px; height: 46px; margin: -4px 0; border: none; border-radius: 99px; background: var(--c-ink); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .sched-badge { position: absolute; top: 1px; right: 1px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: var(--c-main); color: var(--c-ink); font: 700 10px var(--f-sans); display: flex; align-items: center; justify-content: center; }
 .sched-badge--inline { position: static; min-width: 22px; height: 22px; padding: 0 6px; font-size: 11px; }
 
-.sched-controls { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+/* Отступ как у объявлений: выбор месяца закрывает низ фонового заголовка. */
+.sched-controls { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
 
 .sched-today { height: 46px; padding: 0 20px; border: none; border-radius: 99px; cursor: pointer; background: var(--c-panel); color: var(--c-ink); font: 700 11.5px var(--f-sans); letter-spacing: .05em; text-transform: uppercase; transition: background .2s, color .2s; }
 .sched-today.is-on { background: var(--c-ink); color: #fff; }
@@ -67,8 +73,16 @@
 /* Отступ при прокрутке к началу ленты — под липкой шапкой телефона (56px). */
 .sched-feed-wrap { margin-top: 16px; scroll-margin-top: 68px; color: var(--c-ink); }
 .sched-feed { display: flex; flex-direction: column; margin-top: 10px; }
-.sched-feed-past { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; height: 44px; padding: 0 18px; border: none; border-radius: var(--radius-pill); cursor: pointer; background: transparent; box-shadow: inset 0 0 0 1px var(--c-stroke); color: var(--c-ink); font: 400 12px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; transition: background .2s; }
+.sched-feed-past { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; height: 44px; padding: 0 18px; border: none; border-radius: var(--radius-pill); cursor: pointer; background: var(--c-bg); box-shadow: inset 0 0 0 1px var(--c-stroke); color: var(--c-ink); font: 400 12px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; transition: background .2s; }
 .sched-feed-past:hover { background: var(--c-main); }
+/* «Показать прошедшие» и «Подписаться» в одну строку; без прошедших — только «Подписаться» справа. */
+.sched-feed-top { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.sched-feed-top:empty { display: none; }
+.sched-feed-top .sched-feed-past { flex: 1 1 auto; width: auto; min-width: 0; white-space: nowrap; }
+.sched-feed-top .sched-feed-past > span:first-child { overflow: hidden; text-overflow: ellipsis; }
+.sched-feed-top .sched-subscribe-btn { height: 44px; }
+/* На телефоне обе кнопки в строку не помещаются со счётчиком — он виден только на десктопе. */
+@media (max-width: 860px) { .sched-feed-top .sched-feed-past-count { display: none; } }
 .sched-feed-past-count { color: var(--c-gray-text); }
 
 /* День: колонка даты и события */
@@ -176,7 +190,7 @@
 
   .sched-seg button { padding: 11px 20px; font-size: 11.5px; }
 
-  .sched-toolbar { margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(35,31,32,.12); }
+  .sched-toolbar { margin-top: 20px; }
   .sched-reset { padding: 10px 16px; }
   .sched-chip { padding: 11px 16px; background: #fff; }
   .sched-chips { gap: 9px; margin-top: 12px; }
@@ -189,6 +203,7 @@
   /* Лента: дата — колонкой 190px, события справа, теги — справа от текста */
   .sched-feed-wrap { margin-top: 20px; scroll-margin-top: 16px; }
   .sched-feed-past { height: 48px; padding: 0 22px; font-size: 13px; }
+  .sched-feed-top .sched-subscribe-btn { height: 48px; }
   .sched-feed-day { grid-template-columns: 190px minmax(0, 1fr); gap: 8px; padding: 12px 0; }
   .sched-feed-day.is-today { margin: 6px -24px; padding: 12px 24px; border-radius: 32px; }
   .sched-feed-date { gap: 10px; padding-top: 14px; }

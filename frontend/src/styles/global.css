@@ -224,6 +224,27 @@ input, textarea, select { font-family: inherit; }
   .page-title { font-size: 48px; letter-spacing: -.055em; }
 }
 
+/* Фоновый заголовок (resources/design_handoff_page_title) — «Расписание», «Сборник песен», «Объявления», «О церкви».
+   Крупное слово тёплого серого цвета лежит за строкой управления, нижнюю треть букв закрывает контент.
+   isolation: z-index: -1 уводит слово под контент страницы, но не под её фон. Кегль подбирается
+   по --title-chars (длина слова на текущем языке), чтобы слово целиком помещалось в ширину. */
+.page-bg { position: relative; isolation: isolate; }
+.page-title.page-title--bg {
+  position: absolute;
+  left: 10px;
+  top: -5px;
+  z-index: -1;
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: min(96px, calc((100vw - 28px) / (var(--title-chars, 10) * .62)));
+  line-height: .86;
+  letter-spacing: -.075em;
+  color: #e2dcd2;
+}
+@media (min-width: 861px) {
+  .page-title.page-title--bg { left: 12px; top: 0; font-size: min(128px, calc((100vw - 36px) / (var(--title-chars, 10) * .62))); }
+}
+
 /* В одну строку шапка помещается примерно с 1130px (длиннее всего меню на киргизском).
    Уже — меню переносится на отдельную строку под логотипом: ::after разрывает строку. */
 @media (max-width: 1180px) {

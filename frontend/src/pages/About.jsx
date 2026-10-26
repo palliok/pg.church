@@ -1,11 +1,12 @@
 import ContactsCard from '../components/ContactsCard.jsx';
+import { t } from '../i18n.js';
 
 export default function About() {
   return (
-    <div className="page-enter container">
-      <h1 className="page-title">О церкви</h1>
+    <div className="page-enter container page-bg" style={{ '--title-chars': t('О церкви').length }}>
+      <h1 className="page-title page-title--bg">О церкви</h1>
 
-      <div className="split-layout" style={{ marginTop: 26 }}>
+      <div className="split-layout about-body">
         <div>
           <div
             style={{

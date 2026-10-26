@@ -54,10 +54,10 @@ export default function Announcements() {
   const showStory = (index) => setParams({ a: String(items[index].id) }, { replace: true, state: location.state });
   const closeStory = () => (location.state?.story ? navigate(-1) : setParams({ a: '' }, { replace: true }));
 
-  // --ann-chars — длина заголовка на текущем языке: по ней кегль подбирается на всю ширину.
+  // --title-chars — длина заголовка на текущем языке: по ней подбирается кегль фонового заголовка.
   return (
-    <div className="page-enter container ann12-page" style={{ '--ann-chars': t('Объявления').length }}>
-      <h1 className="page-title ann12-title">Объявления</h1>
+    <div className="page-enter container page-bg ann12-page" style={{ '--title-chars': t('Объявления').length }}>
+      <h1 className="page-title page-title--bg">Объявления</h1>
 
       <div className="ann12-panel">
         {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
