@@ -15,7 +15,8 @@
   padding: 16px 18px;
   border: 0;
   border-radius: 26px;
-  background: var(--c-ink);
+  /* Непрочитанная — тёмно-серая, между --c-ink и --c-body */
+  background: #363233;
   color: #fff;
   text-align: left;
   font: inherit;
