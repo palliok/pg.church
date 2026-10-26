@@ -202,6 +202,9 @@ export const EN_EXTRA = {
   'Меню': 'Menu',
   'Весть о спасении': 'The message of salvation',
   'Пожертвования': 'Donations',
+  // Сторис объявлений на телефоне (design_handoff_stories_26c)
+  'Пауза': 'Paused',
+  'Продолжить': 'Resume',
 };
 
 export const KY_EXTRA = {
@@ -349,4 +352,7 @@ export const KY_EXTRA = {
   'Меню': 'Меню',
   'Весть о спасении': 'Куткарылуу жөнүндө кабар',
   'Пожертвования': 'Кайрымдуулуктар',
+  // Сторис объявлений на телефоне (design_handoff_stories_26c)
+  'Пауза': 'Тыныгуу',
+  'Продолжить': 'Улантуу',
 };

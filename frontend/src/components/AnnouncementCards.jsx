@@ -21,7 +21,7 @@ export function ImportantPill() {
 }
 
 // Дата на чёрной карточке: подпись сверху («Вт», «До»), под ней число и месяц.
-function DatePart({ label, date }) {
+export function DatePart({ label, date }) {
   return (
     <span className="ann-date">
       <span className="ann-date-label">{label}</span>

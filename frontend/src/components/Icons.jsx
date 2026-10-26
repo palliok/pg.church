@@ -28,3 +28,39 @@ export function ShareIcon({ size = 22 }) {
     </svg>
   );
 }
+
+// Плитка объявления — play_circle.
+export function PlayCircleIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Пауза — pause.
+export function PauseIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Продолжить — play_arrow.
+export function PlayIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <path d="M8 5v14l11-7z" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Закрыть — close.
+export function CloseIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor" />
+    </svg>
+  );
+}

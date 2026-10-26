@@ -138,8 +138,6 @@
 .ann-home-all:hover { background: var(--c-main); box-shadow: none; }
 
 /* ===== Страница ===== */
-.ann-page { color: var(--c-ink); }
-
 .ann-empty { margin-top: 30px; padding: 56px 20px; border-radius: var(--radius-lg); background: var(--c-panel); text-align: center; }
 
 /* ===== Открытое объявление: чёрная карточка ===== */
@@ -226,49 +224,12 @@
 }
 .ann-card-share:hover { background: rgba(255, 255, 255, .1); }
 
-/* ===== Телефон: колода — вкладки над и под открытой карточкой ===== */
-.ann-deck { display: flex; flex-direction: column; margin-top: 24px; }
-.ann-split { display: none; }
-
-.ann-deck-card { position: relative; border-radius: 28px; box-shadow: 0 -6px 20px rgba(0, 0, 0, .10), 0 10px 24px rgba(0, 0, 0, .10); }
-
-.ann-tab {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  border: 0;
-  color: var(--c-ink);
-  text-align: left;
-  font: inherit;
-  cursor: pointer;
-  transition: margin .25s, background .25s, filter .15s;
-}
-.ann-tab:hover { filter: brightness(.97); }
-.ann-tab.is-above { padding: 14px 18px 30px; border-radius: 22px 22px 0 0; }
-.ann-tab.is-below { padding: 30px 18px 14px; border-radius: 0 0 22px 22px; }
-
-.ann-tab-date { flex: 0 0 auto; min-width: 52px; display: flex; align-items: baseline; gap: 5px; }
-.ann-tab-date .ann-day { font: 400 24px/1 var(--f-num); letter-spacing: -.04em; }
-.ann-tab-date .ann-month { font: 400 9px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-gray-text); }
-
-.ann-tab-title {
-  flex: 1;
-  min-width: 0;
-  font: 700 16px/1.15 var(--f-sans);
-  letter-spacing: -.03em;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
 /* ===== Тост ===== */
 .ann-toast {
   position: fixed;
   left: 50%;
   bottom: calc(var(--tabbar-h) + 28px + env(safe-area-inset-bottom));
-  z-index: 50;
+  z-index: 210; /* поверх сторис */
   transform: translateX(-50%);
   border-radius: 99px;
   padding: 12px 20px;
@@ -285,61 +246,10 @@
   to { opacity: 1; transform: translateX(-50%); }
 }
 
-/* ===== Десктоп: список слева, открытое объявление справа ===== */
+/* ===== Десктоп ===== */
 @media (min-width: 861px) {
   .ann-home-layer { display: block; }
   .ann-home-foot { display: flex; }
-
-
-  .ann-deck { display: none; }
-  .ann-split {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
-    gap: 28px;
-    align-items: start;
-    margin-top: 32px;
-  }
-
-  .ann-list { display: flex; flex-direction: column; gap: 4px; }
-
-  .ann-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    min-height: 76px;
-    padding: 10px 14px 10px 10px;
-    border: 0;
-    border-radius: 22px;
-    background: transparent;
-    color: var(--c-ink);
-    text-align: left;
-    font: inherit;
-    cursor: pointer;
-    transition: background .2s;
-  }
-  .ann-row:hover { background: var(--c-main); }
-  .ann-row.is-active { background: var(--c-ink); color: #fff; cursor: default; }
-
-  .ann-row-date { flex: 0 0 auto; width: 56px; height: 56px; border-radius: 16px; background: var(--c-page); color: var(--c-ink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
-  .ann-row-date .ann-day { font: 400 26px/.9 var(--f-num); letter-spacing: -.04em; }
-  .ann-row-date .ann-month { font: 400 9px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--c-gray-text); }
-
-  .ann-row-title {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px 10px;
-    padding-left: 10px;
-    font: 700 19px/1.15 var(--f-sans);
-    letter-spacing: -.035em;
-  }
-  .ann-row-title .ann-important { align-self: center; height: 24px; padding: 0 10px; }
-  .ann-row-arrow { flex: 0 0 auto; display: flex; padding-right: 4px; }
-  .ann-row.is-active .ann-row-arrow { opacity: 0; }
-
-  .ann-split-card { position: sticky; top: 24px; }
 
   .ann-card.is-large { --ann-pad: 30px; --ann-share: 44px; gap: 22px; border-radius: 30px; }
   .ann-card.is-large .ann-megaphone { right: -70px; top: -20px; width: 380px; height: 380px; }
@@ -356,6 +266,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ann-tab, .ann-row, .ann-card-link, .ann-card-call { transition: none; }
+  .ann-card-link, .ann-card-call { transition: none; }
   .ann-toast { animation: none; }
 }
