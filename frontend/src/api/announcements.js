@@ -5,24 +5,28 @@ import { useApi } from './useApi.js';
 
 const WEEKDAYS = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 
-// День события для карточки: «28 июня, суббота», «June 28, Saturday».
-function eventLabel(date) {
+// Полный день недели на языке сайта: «суббота», «Saturday».
+function weekdayLabel(date) {
   const lang = getLang();
   const weekday = lang === 'ky'
     ? t(WEEKDAYS[new Date(Date.UTC(date.year, date.month - 1, date.day)).getUTCDay()])
     : formatDate(date, lang, { weekday: 'long' });
 
-  // По-английски день недели с заглавной: «June 28, Saturday».
-  return `${dayLabel(date)}, ${lang === 'en' ? weekday : weekday.toLowerCase()}`;
+  // По-английски день недели с заглавной: «Saturday».
+  return lang === 'en' ? weekday : weekday.toLowerCase();
 }
 
-// Конкретный день события { day, month, label, dow, mon } или null, если объявление без даты.
+// День события для карточки: «28 июня, суббота», «June 28, Saturday».
+const eventLabel = (date) => `${dayLabel(date)}, ${weekdayLabel(date)}`;
+
+// Конкретный день события { day, month, label, full, weekday, dow, mon } или null, если объявление без даты.
+// full — «1 ноября» для пилюли в списке, weekday — «суббота» под месяцем на плакате,
 // dow и mon — короткие подписи для плашки даты на главной.
 function toEventDate(value) {
   if (!value) return null;
   const date = isoDate(value);
 
-  return { day: date.day, month: monthLabel(date), label: eventLabel(date), ...shortDate(date) };
+  return { day: date.day, month: monthLabel(date), label: eventLabel(date), full: dayLabel(date), weekday: weekdayLabel(date), ...shortDate(date) };
 }
 
 // «7 дней», «7 days», «7 күн» — длительность события с датами «с … по …».
@@ -46,13 +50,13 @@ const spanDays = (from, to) => Math.round((Date.parse(to) - Date.parse(from)) / 
 
 const DETAIL_TYPES = ['when', 'where', 'link'];
 
-// Строки с иконками в карточке: «когда», «где» и ссылки. Ссылки — только http(s),
+// Строки с иконками в карточке: «когда», «где» и ссылки (primary — основное действие). Ссылки — только http(s),
 // чтобы из админки нельзя было подсунуть javascript: и подобное.
 function toDetails(details) {
   return (details ?? [])
     .filter((detail) => DETAIL_TYPES.includes(detail.type) && detail.text)
     .filter((detail) => detail.type !== 'link' || /^https?:\/\//i.test(detail.url ?? ''))
-    .map((detail) => ({ ...detail, text: t(detail.text) }));
+    .map((detail) => ({ ...detail, text: t(detail.text), primary: Boolean(detail.primary) }));
 }
 
 // Даты, «Важно», детали и контакт пока есть только в моках (src/api/mocks.js):

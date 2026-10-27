@@ -318,7 +318,8 @@ function eventsBetween(params) {
 // publishedAt — когда опубликовано (для сортировки, на сайте не показывается);
 // eventDate — конкретный день события «YYYY-MM-DD» или null, если дня нет; eventDateEnd — последний день,
 // если событие на несколько дней; deadline — срок «до» у объявления без дня события.
-// details — строки с иконками: { type: 'when' | 'where', text } и ссылки { type: 'link', text, url }.
+// details — строки с иконками: { type: 'when' | 'where', text } и ссылки { type: 'link', text, url, primary }.
+// primary — основное действие (регистрация, анкета): крупной кнопкой вместо телефона, телефон тогда помельче.
 
 const isoDay = (date) => iso(date).slice(0, 10);
 
@@ -337,7 +338,7 @@ function announcement(id, daysAgo, title, body, { important = false, eventIn = n
     details: [
       ...(when ? [{ type: 'when', text: when }] : []),
       ...(where ? [{ type: 'where', text: where }] : []),
-      ...links.map(([text, url]) => ({ type: 'link', text, url })),
+      ...links.map(([text, url, primary = false]) => ({ type: 'link', text, url, primary })),
     ],
     contact: contact ? { ...contact, tel } : null,
   };
@@ -353,7 +354,7 @@ const announcements = [
     eventIn: 20,
     eventDays: 7,
     where: 'База «Сосновый бор», Ленобласть',
-    links: [['Анкета для записи', 'https://forms.yandex.ru/'], ['Что взять с собой', 'https://pg.church/']],
+    links: [['Анкета для записи', 'https://forms.yandex.ru/', true], ['Что взять с собой', 'https://pg.church/']],
     contact: { name: 'Марина', phone: '8 911 000-45-67' },
   }),
   announcement(3, 4, 'Нужны волонтёры на кухню', 'Ищем помощников готовить обеды после воскресного служения. Можно на одно воскресенье в месяц.', {
@@ -381,7 +382,7 @@ const announcements = [
     important: true, eventIn: 5, when: 'С 12:00', where: 'Парк Сосновка', links: [['Записаться', 'https://forms.yandex.ru/']],
   }),
   announcement(11, 30, 'Женская конференция «Свет»', 'Два дня общения, поклонения и семинаров для сестёр. Регистрация обязательна.', {
-    eventIn: 26, eventDays: 2, where: 'Главный зал', links: [['Регистрация', 'https://forms.yandex.ru/']], contact: { name: 'Марина', phone: '8 911 000-45-67' },
+    eventIn: 26, eventDays: 2, where: 'Главный зал', links: [['Регистрация', 'https://forms.yandex.ru/', true]], contact: { name: 'Марина', phone: '8 911 000-45-67' },
   }),
 ];
 

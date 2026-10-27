@@ -231,18 +231,18 @@ input, textarea, select { font-family: inherit; }
 .page-bg { position: relative; isolation: isolate; }
 .page-title.page-title--bg {
   position: absolute;
-  left: 10px;
+  left: 18px;
   top: -5px;
   z-index: -1;
   pointer-events: none;
   white-space: nowrap;
-  font-size: min(96px, calc((100vw - 28px) / (var(--title-chars, 10) * .62)));
+  font-size: min(84px, calc((100vw - 36px) / (var(--title-chars, 10) * .62)));
   line-height: .86;
   letter-spacing: -.075em;
-  color: #e2dcd2;
+  color: var(--c-warm);
 }
 @media (min-width: 861px) {
-  .page-title.page-title--bg { left: 12px; top: 0; font-size: min(128px, calc((100vw - 36px) / (var(--title-chars, 10) * .62))); }
+  .page-title.page-title--bg { left: 56px; top: 0; font-size: min(112px, calc((100vw - 80px) / (var(--title-chars, 10) * .62))); }
 }
 
 /* В одну строку шапка помещается примерно с 1130px (длиннее всего меню на киргизском).

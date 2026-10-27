@@ -147,6 +147,10 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
   const where = item.details.find((detail) => detail.type === 'where');
   const when = item.details.find((detail) => detail.type === 'when');
   const links = item.details.filter((detail) => detail.type === 'link');
+  // Основное действие — крупной кнопкой внизу: ссылка с primary, иначе звонок.
+  // Если основная — ссылка, телефон становится обычной прозрачной плашкой в списке ссылок.
+  const main = links.find((link) => link.primary);
+  const other = links.filter((link) => link !== main);
   const hasDates = Boolean(item.deadline || item.eventDate);
   const hasPills = Boolean(item.days || when);
 
@@ -197,6 +201,8 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
           <h2 className="ann-story-title">{item.title}</h2>
         </div>
 
+        {item.body && <p className="ann-story-body">{item.body}</p>}
+
         {/* Даты и белые пилюли (длительность, время или уточнение) — одной строкой, пилюли по низу цифр */}
         {(hasDates || hasPills) && (
           <div className={`ann-dates ann-story-dates ${item.eventEnd ? 'is-range' : ''}`}>
@@ -216,7 +222,6 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
             )}
           </div>
         )}
-        {item.body && <p className="ann-story-body">{item.body}</p>}
 
         {where && (
           <span className="ann-story-place">
@@ -225,20 +230,32 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
           </span>
         )}
 
-        {links.length > 0 && (
+        {(other.length > 0 || (main && item.contact)) && (
           <div className="ann-story-links">
-            {links.map((link) => (
+            {other.map((link) => (
               <a key={link.url + link.text} className="ann-story-link" href={link.url} target="_blank" rel="noopener noreferrer">
                 {link.text}
                 <LongArrow />
               </a>
             ))}
+            {main && item.contact && (
+              <a className="ann-story-link" href={item.contact.tel}>
+                <PhoneIcon size={14} />
+                {item.contact.name ? `${item.contact.phone} · ${item.contact.name}` : item.contact.phone}
+              </a>
+            )}
           </div>
         )}
       </div>
 
       <div className="ann-story-foot">
-        {item.contact && (
+        {main && (
+          <a className="ann-story-call" href={main.url} target="_blank" rel="noopener noreferrer">
+            <span className="ann-story-call-text">{main.text}</span>
+            <LongArrow />
+          </a>
+        )}
+        {!main && item.contact && (
           <a className="ann-story-call" href={item.contact.tel}>
             <PhoneIcon size={20} />
             {/* Номер всегда целиком, длинное имя обрезается многоточием */}

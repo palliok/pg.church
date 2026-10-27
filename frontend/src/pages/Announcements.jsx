@@ -2,8 +2,7 @@ import { useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAnnouncements } from '../api/announcements.js';
-import { AnnouncementCard } from '../components/AnnouncementCards.jsx';
-import { AnnouncementRow } from '../components/AnnouncementRows.jsx';
+import { AnnouncementPlacard, AnnouncementPlate } from '../components/AnnouncementPlates.jsx';
 import AnnouncementStories, { AnnouncementTile } from '../components/AnnouncementStories.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
 import { t } from '../i18n.js';
@@ -26,8 +25,8 @@ function useIsPhone() {
 }
 
 // Страница объявлений. На телефоне — плитки, нажатая открывает полноэкранные сторис с этого объявления;
-// на десктопе — список строк слева, открытая карточка справа. Показанные помечаются прочитанными.
-// ?a=<id> — открытое объявление: на телефоне — открытые сторис, на десктопе — карточка справа
+// на десктопе — плашки слева, открытое объявление на светлом плакате справа. Показанные помечаются прочитанными.
+// ?a=<id> — открытое объявление: на телефоне — открытые сторис, на десктопе — плакат справа
 // (без ?a или с пустым ?a= там открыто первое).
 export default function Announcements() {
   const { items, loading, error, retry } = useAnnouncements();
@@ -77,11 +76,11 @@ export default function Announcements() {
               ))}
             </div>
 
-            {/* Десктоп: список слева, открытая карточка справа */}
-            <div className="ann-split">
-              <div className="ann12-list">
+            {/* Десктоп: плашки слева, светлый плакат справа */}
+            <div className="ann8-split">
+              <div className="ann8-list">
                 {items.map((item) => (
-                  <AnnouncementRow
+                  <AnnouncementPlate
                     key={item.id}
                     item={item}
                     read={isRead(item)}
@@ -90,8 +89,8 @@ export default function Announcements() {
                   />
                 ))}
               </div>
-              <div className="ann-split-card">
-                <AnnouncementCard item={active} onShare={share} className="is-large" />
+              <div className="ann8-split-card">
+                <AnnouncementPlacard item={active} onShare={share} />
               </div>
             </div>
           </>
