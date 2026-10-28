@@ -1,8 +1,7 @@
-import { t, getLang, langPath } from '../i18n.js';
+import { t } from '../i18n.js';
 import { NavLink, useNavigate } from 'react-router-dom';
 import ChurchBrand from './ChurchBrand.jsx';
-
-const CURRENT_LANG = getLang();
+import LangSwitch from './LangSwitch.jsx';
 
 const NAV_ITEMS = [
   { to: '/', label: t('Главная'), end: true },
@@ -58,29 +57,7 @@ export default function Header() {
       </nav>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-            background: 'var(--c-panel)',
-            borderRadius: 999,
-            padding: 3,
-          }}
-        >
-          {['RU', 'EN', 'KY'].map((lng) => {
-            const code = lng.toLowerCase();
-            const active = CURRENT_LANG === code;
-            return (
-              <button
-                key={lng}
-                type="button"
-                onClick={() => { window.location.href = langPath(code); }}
-                style={{ border: 'none', fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 11, color: active ? '#fff' : 'var(--c-gray-text)', background: active ? 'var(--c-ink)' : 'transparent', padding: '8px 12px', borderRadius: 999, cursor: 'pointer' }}
-              >{lng}</button>
-            );
-          })}
-        </div>
+        <LangSwitch />
         <NavLink to="/donate" className="pill-btn" style={{ background: 'var(--c-main)', color: 'var(--c-ink)', fontSize: 11.5, padding: '11px 20px' }}>
           Поддержать
         </NavLink>

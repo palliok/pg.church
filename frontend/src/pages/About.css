@@ -1,0 +1,535 @@
+/* Страница «О церкви». Шрифты сайта: Prata — крупные заголовки и номера (как даты в расписании),
+   JetBrains Mono — подписи, Arimo — текст. */
+.about { display: flex; flex-direction: column; gap: 14px; }
+
+.about-kicker { display: block; font: 400 11px var(--f-mono); letter-spacing: .12em; text-transform: uppercase; }
+
+/* ----- Вступление: главная фраза и три карточки-главы ----- */
+/* Карточки: история — тёплая бумага, призвание — тёмная, Благая весть — тёмно-синяя. Крупная цифра Prata — то, что ждёт в разделе. */
+/* Всё вступление — один лист-документ серого цвета сайта: двойная тонкая рамка (край листа и
+   внутренняя линия), строка-шапка моноширинным, внутри — фраза и карточки. */
+.about-intro {
+  padding: 10px;
+  border-radius: 30px;
+  background: var(--c-panel);
+  box-shadow: 0 0 0 1px rgba(35, 31, 32, .1), 0 1px 2px rgba(35, 31, 32, .05), 0 22px 44px -30px rgba(35, 31, 32, .35);
+}
+.about-intro-screen { overflow: hidden; border-radius: 22px; border: 1px solid rgba(35, 31, 32, .22); }
+.about-intro-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 22px 12px;
+  border-bottom: 1px solid rgba(35, 31, 32, .22);
+  font: 400 10px var(--f-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--c-gray-text);
+}
+.about-intro-body { display: flex; flex-direction: column; gap: 18px; padding: clamp(22px, 2.8vw, 36px); }
+/* Выключка по ширине: строки ровные и слева, и справа; переносы — чтобы не было больших пробелов.
+   На десктопе — колонка 15.75em по центру блока: ширина подобрана замером так, что фраза ложится
+   в четыре почти равные строки без единого переноса, и все строки ровные с обеих сторон. */
+.about-lead { margin: 0 0 10px; font: 400 clamp(24px, 2.4vw, 32px)/1.3 var(--f-num); letter-spacing: -.01em; color: var(--c-ink); text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+
+@media (min-width: 901px) {
+  .about-lead { width: 15.75em; max-width: 100%; margin-inline: auto; text-align-last: justify; hyphens: manual; -webkit-hyphens: manual; }
+}
+
+.about-lead .nowrap { white-space: nowrap; }
+
+.about-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.about-card {
+  --card-bg: var(--c-panel);
+  --card-ink: var(--c-ink);
+  --card-accent: var(--c-second);
+  --card-soft: rgba(35, 31, 32, .55);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 260px;
+  padding: clamp(20px, 2.2vw, 28px);
+  border-radius: 22px;
+  background: var(--card-bg);
+  color: var(--card-ink);
+  transition: transform .3s cubic-bezier(.2, .7, .2, 1), box-shadow .3s;
+}
+.about-card.is-history { --card-bg: #f1e7d3; --card-ink: #2b1d12; --card-accent: #8a3a1e; --card-soft: rgba(43, 29, 18, .6); }
+.about-card.is-calling { --card-bg: var(--c-ink); --card-ink: #f4f2ec; --card-accent: var(--c-main); --card-soft: rgba(244, 242, 236, .65); }
+.about-card.is-gospel { --card-bg: var(--c-second); --card-ink: #fff; --card-accent: var(--c-main); --card-soft: rgba(255, 255, 255, .7); }
+.about-card:hover { color: var(--card-ink); transform: translateY(-4px); box-shadow: 0 22px 40px -24px rgba(35, 31, 32, .55); }
+.about-card:focus-visible { outline: 2px solid var(--c-main); outline-offset: 3px; }
+
+.about-card-top { display: flex; align-items: center; justify-content: space-between; }
+.about-card-num { font: 400 11px var(--f-mono); letter-spacing: .12em; color: var(--card-soft); }
+.about-card-go { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 99px; background: var(--card-ink); color: var(--card-bg); font-size: 15px; transition: background .25s, color .25s; }
+.about-card:hover .about-card-go { background: var(--card-accent); color: var(--card-bg); }
+.about-card.is-history:hover .about-card-go { color: #f1e7d3; }
+.about-card-big { font: 400 clamp(72px, 7.4vw, 112px)/.85 var(--f-num); letter-spacing: -.05em; color: var(--card-accent); }
+.about-card-bottom { display: flex; flex-direction: column; gap: 6px; }
+.about-card-label { font: 700 24px/1 var(--f-sans); letter-spacing: -.04em; }
+.about-card-note { font: 400 11px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--card-soft); }
+
+/* ----- «Мостики» между разделами ----- */
+/* Линия сверху переходит в ромб, под ним фраза-связка (Prata) и стрелка к следующему разделу. */
+.about-bridge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 16px 10px;
+  color: var(--c-ink);
+  text-align: center;
+}
+.about-bridge-line { display: block; width: 1px; height: 26px; background: linear-gradient(transparent, var(--c-stroke)); }
+.about-bridge-mark { display: block; width: 8px; height: 8px; border: 1px solid var(--c-stroke); transform: rotate(45deg); transition: background .25s, border-color .25s; }
+.about-bridge-text { max-width: 38ch; font: 400 clamp(20px, 2vw, 26px)/1.25 var(--f-num); letter-spacing: -.01em; color: var(--c-body); text-wrap: balance; transition: color .25s; }
+.about-bridge-go { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 99px; background: var(--c-panel); font-size: 14px; transition: background .25s, transform .25s; }
+.about-bridge:hover { color: var(--c-ink); }
+.about-bridge:hover .about-bridge-text { color: var(--c-ink); }
+.about-bridge:hover .about-bridge-mark { background: var(--c-main); border-color: var(--c-main); }
+.about-bridge:hover .about-bridge-go { background: var(--c-main); transform: translateY(3px); }
+.about-bridge:focus-visible { outline: 2px solid var(--c-main); outline-offset: 2px; border-radius: 12px; }
+
+/* Разделы, к которым ведёт оглавление, не прячутся под шапкой. */
+#history, #calling, #gospel, #visit { scroll-margin-top: 24px; }
+
+/* ----- История церкви (ChurchHistory.jsx) ----- */
+/* Тёплая «бумага» и сепия — как старые фотографии и кадр с пергаментом в истории о Иисусе. */
+.hist {
+  --h-ink: #2b1d12;
+  --h-accent: #8a3a1e;
+  --h-line: rgba(43, 29, 18, .16);
+  padding: clamp(28px, 4vw, 56px);
+  border-radius: 30px;
+  background: #f1e7d3;
+  color: var(--h-ink);
+}
+.hist .about-kicker { color: var(--h-accent); font-size: 15px; letter-spacing: .14em; }
+.hist-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
+.hist-title { max-width: 18ch; min-height: 2.1em; margin: 18px 0 0; font: 400 clamp(32px, 3.4vw, 50px)/1.05 var(--f-num); letter-spacing: -.02em; text-wrap: balance; animation: hist-title-in .45s cubic-bezier(.2, .7, .2, 1); }
+@keyframes hist-title-in { from { opacity: 0; transform: translateY(10px); } }
+
+/* Линейка: общая черта, заполненная до выбранного года; у каждого года — засечка. */
+.hist-ruler {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 40px;
+  padding-top: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.hist-ruler::-webkit-scrollbar { display: none; }
+.hist-ruler::before, .hist-ruler::after { content: ""; position: absolute; top: 14px; left: 0; height: 1px; }
+.hist-ruler::before { right: 0; background: var(--h-line); }
+.hist-ruler::after { width: calc(var(--progress) * 100%); background: var(--h-accent); transition: width .5s cubic-bezier(.2, .8, .2, 1); }
+.hist-year {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 0 0 4px;
+  border: 0;
+  background: none;
+  color: rgba(43, 29, 18, .5);
+  cursor: pointer;
+  transition: color .25s;
+}
+.hist-year:last-child { align-items: flex-end; }
+.hist-year i { display: block; width: 9px; height: 9px; margin-top: -4px; border: 1px solid currentColor; border-radius: 99px; background: #f1e7d3; transition: background .25s, transform .25s; }
+.hist-year span { font: 400 22px/1 var(--f-num); letter-spacing: -.01em; }
+.hist-year:hover, .hist-year.is-past { color: var(--h-ink); }
+.hist-year.is-past i { background: var(--h-accent); border-color: var(--h-accent); }
+.hist-year.is-on { color: var(--h-accent); }
+.hist-year.is-on i { background: var(--h-accent); border-color: var(--h-accent); transform: scale(1.6); }
+.hist-year:focus-visible, .hist-deck-btn:focus-visible, .hist-cta:focus-visible { outline: 2px solid var(--h-accent); outline-offset: 3px; }
+
+/* Глава: крупный год слева, текст справа. */
+.hist-panel { margin-top: 40px; }
+.hist-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 24px 56px; align-items: start; }
+/* Дата — в блоке постоянной высоты: «1864» и «Сегодня» разного размера, а стрелки под ними стоят на месте. */
+.hist-big-box { display: flex; align-items: flex-end; height: clamp(77px, 9.6vw, 152px); }
+/* Левая колонка шириной ровно в четыре цифры года (в размер крупной даты): дата и стрелки
+   по её центру, поэтому стрелки стоят точно под серединой года и не двигаются при смене. */
+@media (min-width: 901px) {
+  .hist-side { display: flex; flex-direction: column; align-items: center; width: 2.02em; font-size: clamp(96px, 12vw, 190px); }
+  .hist-big-box { justify-content: center; }
+  .hist-side .hist-deck { font-size: 1rem; }
+}
+.hist-big, .hist-text { animation: hist-in .5s cubic-bezier(.2, .7, .2, 1); }
+@keyframes hist-in { from { opacity: 0; transform: translateX(16px); } }
+.hist-big { font: 400 clamp(96px, 12vw, 190px)/.8 var(--f-num); letter-spacing: -.05em; color: var(--h-accent); }
+.hist-big.is-word { font-size: clamp(64px, 7.4vw, 116px); }
+.hist-text p { max-width: 58ch; margin: 0 0 14px; font: 400 17px/1.65 var(--f-sans); color: rgba(43, 29, 18, .85); text-wrap: pretty; }
+.hist-cta { display: inline-flex; align-items: center; gap: 10px; margin-top: 10px; padding: 12px 20px; border-radius: 99px; background: var(--h-ink); color: #f1e7d3; font: 400 12px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; transition: background .2s; }
+.hist-cta:hover { background: var(--h-accent); color: #f1e7d3; }
+
+/* Пульт листания (десктоп): слева под датой. Кнопки статичные — без сдвигов при наведении
+   и нажатии, меняется только цвет; ширина кнопки фиксирована, чтобы подпись года не двигала их. */
+.hist-deck { display: flex; align-items: flex-start; gap: 18px; margin-top: 32px; }
+.hist-deck-btn { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 80px; padding: 0; border: 0; background: none; color: var(--h-ink); cursor: pointer; border-radius: 12px; }
+.hist-deck-knob {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 99px;
+  background: #f8f1e3;
+  box-shadow: inset 0 0 0 1px var(--h-line), 0 10px 24px -14px rgba(43, 29, 18, .45);
+  font: 400 24px/1 var(--f-sans);
+  transition: background .2s, color .2s, box-shadow .2s;
+}
+.hist-deck-knob > span { display: block; }
+.hist-deck-btn small { font: 400 15px var(--f-num); color: rgba(43, 29, 18, .55); transition: color .2s; }
+.hist-deck-btn:hover .hist-deck-knob { background: var(--h-accent); color: #f8f1e3; box-shadow: inset 0 0 0 1px var(--h-accent), 0 10px 24px -14px rgba(138, 58, 30, .6); }
+.hist-deck-btn:hover small { color: var(--h-accent); }
+.hist-deck-btn:active .hist-deck-knob { background: #6f2c15; }
+/* Кольцо отсчёта автопрокрутки вокруг «вперёд». */
+.hist-deck-ring { position: absolute; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px); transform: rotate(-90deg); pointer-events: none; }
+.hist-deck-ring circle { fill: none; stroke: var(--h-accent); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; animation: hist-ring 5s linear forwards; }
+@keyframes hist-ring { to { stroke-dashoffset: 0; } }
+
+/* ----- Призвание ----- */
+.about-calling {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: 24px 56px;
+  padding: clamp(28px, 4vw, 56px);
+  border-radius: 30px;
+  background: var(--c-page);
+}
+.about-calling-head { align-self: start; position: sticky; top: 40px; }
+.about-calling-head .about-kicker { color: var(--c-gray-text); }
+.about-motto {
+  margin: 22px 0 0;
+  font: 400 clamp(34px, 3.6vw, 54px)/1.05 var(--f-num);
+  letter-spacing: -.02em;
+  color: var(--c-ink);
+  text-wrap: balance;
+}
+.about-calling-intro { margin: 24px 0 0; font: 400 16px/1.5 var(--f-sans); color: var(--c-body); }
+
+.about-calling-body { position: relative; min-width: 0; }
+/* Линия прогресса слева от списка: заполняется синим по мере чтения. */
+.about-calling-list { position: relative; margin: 0; padding: 0 0 0 28px; list-style: none; border-top: 1px solid var(--c-line); }
+.about-calling-list::before, .about-calling-list::after { content: ""; position: absolute; left: 0; top: 0; width: 2px; border-radius: 2px; }
+.about-calling-list::before { bottom: 0; background: var(--c-line); }
+.about-calling-list::after { height: calc(var(--calling-p, 0) * 100%); background: var(--c-second); transition: height .15s linear; }
+/* Плашка для телефона — на десктопе её роль у счётчика слева. */
+.about-calling-sticky { display: none; }
+.about-calling-item {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  grid-template-areas: "num word" "num text";
+  gap: 6px 16px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--c-line);
+}
+.about-calling-num { grid-area: num; font: 400 44px/.9 var(--f-num); letter-spacing: -.04em; color: var(--c-num); }
+.about-calling-word { grid-area: word; align-self: end; font: 400 12px var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--c-second); }
+.about-calling-text { grid-area: text; margin: 0; max-width: 52ch; font: 400 17px/1.5 var(--f-sans); color: var(--c-ink); text-wrap: pretty; }
+
+/* Подсветка пункта, который читают: остальные приглушены, у текущего номер синий. */
+.about-calling-item { transition: opacity .35s; }
+.about-calling-item:not(.is-on) .about-calling-text { color: var(--c-gray-text); }
+.about-calling-item:not(.is-on) .about-calling-word { opacity: .55; }
+.about-calling-item.is-read .about-calling-num { color: var(--c-second); opacity: .45; }
+.about-calling-item.is-on .about-calling-num { color: var(--c-second); }
+/* Текущий пункт чуть выдвигается — взгляд держится на нём. */
+.about-calling-item > * { transition: transform .35s cubic-bezier(.2, .7, .2, 1), color .35s, opacity .35s; }
+.about-calling-item.is-on > * { transform: translateX(6px); }
+
+/* Индикатор в закреплённой колонке (только десктоп). */
+.about-calling-meter { display: flex; align-items: flex-end; gap: 28px; margin-top: 40px; }
+.about-calling-current { display: flex; align-items: baseline; gap: 8px; font: 400 96px/.8 var(--f-num); letter-spacing: -.05em; color: var(--c-second); }
+.about-calling-current > span { display: inline-block; animation: about-num .45s cubic-bezier(.2, .7, .2, 1); }
+.about-calling-current small { font: 400 12px var(--f-mono); letter-spacing: .1em; color: var(--c-gray-text); }
+@keyframes about-num { from { opacity: 0; transform: translateY(14px); } }
+.about-calling-rail { display: flex; flex-direction: column; gap: 2px; }
+.about-calling-rail button { display: flex; align-items: center; gap: 10px; min-height: 22px; padding: 0; border: 0; background: none; color: var(--c-gray-text); font: 400 10px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+.about-calling-rail i { display: block; width: 10px; height: 1px; background: currentColor; transition: width .3s; }
+.about-calling-rail span { opacity: 0; transition: opacity .25s; }
+.about-calling-rail button:hover span, .about-calling-rail button:focus-visible span, .about-calling-rail button.is-on span { opacity: 1; }
+.about-calling-rail button.is-on { color: var(--c-second); }
+.about-calling-rail button.is-on i { width: 26px; }
+.about-calling-rail button:focus-visible { outline: 2px solid var(--c-main); outline-offset: 2px; }
+
+/* ----- Справочник «Благая весть» (GospelGuide.jsx): электронная книга ----- */
+/* Плитка в стиле сайта (светлая, как «Призвание»), справа — ридер в тёмной рамке с экраном
+   «электронной бумаги». Текст на экране — книжный PT Serif, всё остальное — шрифты сайта. */
+.guide {
+  --e-paper: #f4f2ec;
+  --e-ink: #231f20;
+  --f-book: 'PT Serif', Georgia, serif;
+  display: grid;
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.5fr);
+  gap: 24px 56px;
+  padding: clamp(28px, 4vw, 56px);
+  border-radius: 30px;
+  background: var(--c-panel);
+  color: var(--c-ink);
+}
+.guide-side { align-self: start; position: sticky; top: 96px; }
+.guide-side .about-kicker { color: var(--c-gray-text); }
+.guide-title { margin: 18px 0 0; font: 400 clamp(36px, 3.6vw, 54px)/1 var(--f-num); letter-spacing: -.02em; color: var(--c-ink); }
+.guide-lead { max-width: 32ch; margin: 16px 0 0; font: 400 16px/1.5 var(--f-sans); color: var(--c-body); }
+
+/* Оглавление: римские номера на тонкой линии; прочитанные главы отмечены синим. */
+.guide-tabs { position: relative; display: flex; flex-direction: column; margin-top: 28px; }
+.guide-tabs::before { content: ""; position: absolute; top: 18px; bottom: 18px; left: 17px; border-left: 1px solid var(--c-line); }
+.guide-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 54px;
+  padding: 0 14px 0 0;
+  border: 0;
+  background: none;
+  color: var(--c-gray-text);
+  text-align: left;
+  cursor: pointer;
+  transition: color .2s;
+}
+.guide-tab-num {
+  flex: 0 0 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--c-stroke);
+  border-radius: 99px;
+  background: var(--c-panel);
+  font: 400 11px var(--f-mono);
+  letter-spacing: .04em;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.guide-tab-word { font: 400 24px/1.1 var(--f-num); letter-spacing: -.01em; }
+.guide-tab:hover { color: var(--c-ink); }
+.guide-tab.is-read .guide-tab-num { border-color: var(--c-second); color: var(--c-second); }
+.guide-tab.is-on { color: var(--c-ink); }
+.guide-tab.is-on .guide-tab-num { background: var(--c-ink); border-color: var(--c-ink); color: #fff; }
+.guide-tab:focus-visible { outline: 2px solid var(--c-main); outline-offset: 2px; }
+
+/* ----- Ридер ----- */
+.guide-reader {
+  min-width: 0;
+  padding: 14px;
+  border-radius: 30px;
+  background: var(--e-ink);
+  box-shadow: 0 24px 48px -24px rgba(35, 31, 32, .5);
+  scroll-margin-top: 90px;
+}
+.guide-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: clamp(520px, 72vh, 680px);
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--e-paper);
+}
+.guide-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 22px 12px;
+  border-bottom: 1px solid rgba(35, 31, 32, .08);
+  font: 400 10px var(--f-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--c-gray-text);
+}
+/* Текст главы листается внутри экрана; при смене главы экран «мигает», как e-ink. */
+.guide-page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: clamp(24px, 3vw, 40px) clamp(22px, 4vw, 56px) 32px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(35, 31, 32, .2) transparent;
+  animation: guide-eink .5s steps(1) , guide-in .35s .12s ease-out both;
+}
+@keyframes guide-eink { 0% { filter: invert(1) contrast(.6); } 30% { filter: none; } }
+@keyframes guide-in { from { opacity: 0; } }
+.guide-answer-title { margin: 0 0 22px; font: 400 clamp(34px, 3.4vw, 50px)/1.05 var(--f-num); letter-spacing: -.02em; color: var(--e-ink); }
+.guide-text { max-width: 62ch; }
+.guide-text > p { margin: 0; font: 400 18px/1.7 var(--f-book); color: var(--e-ink); text-align: justify; hyphens: auto; -webkit-hyphens: auto; text-indent: 1.5em; }
+.guide-text > p:first-child { text-indent: 0; }
+.guide-quote { margin: 22px 0; padding: 2px 0 2px 20px; border-left: 2px solid var(--c-main); }
+.guide-quote p { margin: 0; font: italic 400 clamp(20px, 1.8vw, 23px)/1.45 var(--f-book); color: var(--e-ink); }
+.guide-quote cite { display: block; margin-top: 8px; font: 400 10px var(--f-mono); font-style: normal; letter-spacing: .14em; text-transform: uppercase; color: var(--c-second); }
+.guide-quote + p { text-indent: 0; }
+
+/* Низ экрана: листание и индикатор глав. */
+.guide-controls { display: flex; align-items: center; gap: 16px; padding: 12px 14px; border-top: 1px solid rgba(35, 31, 32, .08); }
+.guide-progress { flex: 1; display: flex; gap: 4px; }
+.guide-progress i { flex: 1; height: 3px; border-radius: 3px; background: rgba(35, 31, 32, .12); transition: background .3s; }
+.guide-progress i.is-on { background: var(--c-main); }
+.guide-flip {
+  flex: 0 0 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 99px;
+  background: #fff;
+  color: var(--e-ink);
+  font: 400 16px var(--f-sans);
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(35, 31, 32, .1);
+  transition: background .2s, opacity .2s;
+}
+.guide-flip { position: relative; display: flex; align-items: center; justify-content: center; }
+.guide-flip:hover:not(:disabled) { background: var(--c-main); }
+/* Кольцо отсчёта автопрокрутки вокруг «вперёд» (как в истории). */
+.flip-ring { position: absolute; inset: -5px; width: calc(100% + 10px); height: calc(100% + 10px); transform: rotate(-90deg); pointer-events: none; }
+.flip-ring circle { fill: none; stroke: var(--c-main); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; animation: hist-ring 5s linear forwards; }
+.guide-flip:disabled { opacity: .35; cursor: default; }
+.guide-flip:focus-visible { outline: 2px solid var(--c-main); outline-offset: 2px; }
+
+/* ----- Во что мы верим + адрес ----- */
+.about-bottom { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: stretch; }
+/* Карточка адреса тянется на высоту соседнего блока: лишнюю высоту забирает карта. */
+.about-bottom .contacts-card { display: flex; flex-direction: column; }
+.about-bottom .contacts-card-inner { flex: 1; }
+.about-bottom .contacts-card-map { flex: 1 0 auto; }
+.about-faith {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  padding: clamp(24px, 3vw, 40px);
+  border-radius: 30px;
+  background: var(--c-second);
+  color: #fff;
+}
+.about-faith .about-kicker { color: rgba(255, 255, 255, .6); }
+.about-faith-words { margin: 0; font: 400 clamp(34px, 3.4vw, 50px)/1.05 var(--f-num); letter-spacing: -.02em; }
+.about-faith-text { margin: 0; max-width: 40ch; font: 400 16px/1.6 var(--f-sans); color: rgba(255, 255, 255, .75); }
+
+/* Обёртка ленты (годы истории, главы справочника). */
+.ribbon { position: relative; min-width: 0; }
+
+/* ----- Планшет и телефон: в одну колонку ----- */
+@media (max-width: 900px) {
+  /* minmax(0, …): иначе ленты тем и лет растягивают колонку шире экрана и текст уезжает вправо. */
+  .about-calling, .about-bottom, .guide { grid-template-columns: minmax(0, 1fr); }
+  .about-intro { padding: 6px; border-radius: 24px; }
+  .about-intro-screen { border-radius: 19px; }
+  .about-intro-status { padding: 12px 14px 10px; }
+  .about-intro-body { padding: 18px 10px 10px; }
+  /* Телефон: та же раскладка в четыре ровные строки, что на десктопе — шрифт подгоняется под
+     ширину блока (100cqi / 15.75em колонки), поэтому строки ломаются одинаково на любом экране. */
+  .about-intro-body { container-type: inline-size; }
+  .about-lead { width: 15.75em; max-width: 100%; margin-inline: auto; padding: 0; font-size: calc(100cqi / 15.9); text-align: justify; text-align-last: justify; hyphens: manual; -webkit-hyphens: manual; }
+  /* Телефон: карточки — строками, цифра слева. */
+  .about-cards { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .about-card { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; min-height: 0; padding: 16px 16px 16px 18px; border-radius: 18px; }
+  .about-card-top { display: contents; }
+  .about-card-num { display: none; }
+  .about-card-big { grid-column: 1; grid-row: 1; width: 96px; font-size: 46px; text-align: center; }
+  .about-card-bottom { grid-column: 2; grid-row: 1; }
+  .about-card-go { grid-column: 3; grid-row: 1; width: 34px; height: 34px; }
+  .about-card-label { font-size: 20px; }
+  .about-card:hover { transform: none; }
+  .about-bridge { padding: 2px 8px 8px; }
+  .about-bridge-line { height: 20px; }
+  .about-calling-head { position: static; }
+  .about-calling-meter { display: none; }
+  /* Телефон: плашка «04 / 07 · СЛУЖЕНИЕ» прилипает к верху экрана, пока читают список. */
+  .about-calling-sticky {
+    position: sticky;
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 -8px 14px;
+    padding: 12px 16px 14px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: rgba(244, 244, 241, .92);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 6px 20px -10px rgba(35, 31, 32, .25), inset 0 0 0 1px var(--c-line);
+  }
+  .about-calling-sticky-num { font: 400 11px var(--f-mono); letter-spacing: .08em; color: var(--c-gray-text); }
+  .about-calling-sticky-num b { display: inline-block; font: 400 26px/1 var(--f-num); letter-spacing: -.03em; color: var(--c-second); vertical-align: -4px; animation: about-num .4s cubic-bezier(.2, .7, .2, 1); }
+  .about-calling-sticky-word { font: 400 11px var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--c-second); animation: about-num .4s cubic-bezier(.2, .7, .2, 1); }
+  .about-calling-sticky i { position: absolute; left: 0; bottom: 0; height: 2px; width: calc(var(--calling-p, 0) * 100%); background: var(--c-second); transition: width .15s linear; }
+  .about-calling-list { padding-left: 18px; }
+  .about-calling-item.is-on > * { transform: translateX(4px); }
+  .hist-panel { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .hist-big-box { height: 72px; }
+  /* Линейка на телефоне — лента «таблеток» с годами, листается пальцем. */
+  /* Место под две строки заголовка — чтобы короткие и длинные названия глав не сдвигали блок. */
+  .hist-title { min-height: 2.1em; }
+  .hist-ruler { justify-content: flex-start; gap: 8px; margin: 0 -4px; padding: 4px; }
+  .hist-ruler::before, .hist-ruler::after { display: none; }
+  .hist-year, .hist-year:last-child { flex-direction: row; align-items: center; gap: 0; padding: 9px 16px; border: 1px solid var(--h-line); border-radius: 99px; }
+  .hist-year i { display: none; }
+  .hist-year span { font-size: 19px; }
+  .hist-year.is-past { color: rgba(43, 29, 18, .5); }
+  .hist-year.is-on { background: var(--h-accent); border-color: var(--h-accent); color: #f1e7d3; }
+  /* Черта между «таблетками»: пройденный путь до выбранного года — цветом акцента. */
+  .hist-ruler { gap: 0; }
+  .hist-year + .hist-year { margin-left: 26px; }
+  .hist-year + .hist-year::before { content: ""; position: absolute; top: 50%; right: calc(100% + 1px); width: 26px; height: 1px; background: var(--h-line); transition: background .3s; }
+  .hist-year.is-past + .hist-year::before { height: 2px; margin-top: -1px; background: var(--h-accent); }
+  .hist-panel { margin-top: 26px; }
+  /* Телефон: дата слева, кнопки ‹ › справа от неё в одну линию. */
+  .hist-side { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+  .hist-deck { margin-top: 0; gap: 12px; }
+  .hist-deck-btn { width: 60px; gap: 6px; }
+  .hist-deck-knob { width: 52px; height: 52px; }
+  .hist-deck-btn small { font-size: 13px; }
+  /* Ленты годов и глав: края затухают там, где за ними есть ещё пункты. */
+  .hist-ruler, .guide-tabs {
+    --fs: 0px;
+    --fe: 0px;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fs), #000 calc(100% - var(--fe)), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 var(--fs), #000 calc(100% - var(--fe)), transparent);
+  }
+  .hist-ruler[data-more-start], .guide-tabs[data-more-start] { --fs: 36px; }
+  .hist-ruler[data-more-end], .guide-tabs[data-more-end] { --fe: 56px; }
+  /* Отступ сверху — у обёртки ленты. */
+  .ribbon { margin-top: 22px; }
+  .guide-side { position: static; }
+  /* Темы — лента, которую листают пальцем. */
+  .guide-tabs { flex-direction: row; gap: 8px; margin: 0 -4px; padding: 4px; overflow-x: auto; scrollbar-width: none; }
+  .guide-tabs::-webkit-scrollbar { display: none; }
+  .guide-tabs::before { display: none; }
+  .guide-tab { flex: 0 0 auto; gap: 10px; min-height: 44px; padding: 4px 16px 4px 4px; border: 1px solid var(--c-line); border-radius: 99px; background: #fff; }
+  .guide-tab.is-on { border-color: var(--c-ink); }
+  .guide-tab-num { flex-basis: 34px; height: 34px; border: 0; }
+  .guide-tab-word { font-size: 19px; }
+}
+@media (max-width: 860px) {
+  .guide { border-radius: 24px; }
+  .about-calling, .about-faith { border-radius: 24px; }
+  .about-calling, .hist, .guide { padding: 26px 20px; }
+  .about-calling-item { grid-template-columns: 52px minmax(0, 1fr); gap: 4px 12px; padding: 18px 0; }
+  .about-calling-num { font-size: 34px; }
+  .about-calling-text { font-size: 16px; }
+  .hist { border-radius: 24px; }
+  .hist-text p { font-size: 16px; }
+  .hist-big { font-size: 88px; }
+  .hist-big.is-word { font-size: 58px; }
+  .about-motto { font-size: 34px; }
+  .guide-reader { margin: 0 -8px; padding: 8px; border-radius: 26px; }
+  .guide-screen { height: min(560px, 74svh); border-radius: 18px; }
+  .guide-status { padding: 12px 16px 10px; }
+  .guide-page { padding: 20px 18px 24px; }
+  .guide-text > p { font-size: 17px; line-height: 1.65; }
+}
+
+@media (prefers-reduced-motion: reduce) { .about-calling-current > span, .about-calling-sticky-num b, .about-calling-sticky-word { animation: none; } .about-calling-item > * { transition: none; transform: none !important; } .guide-page, .hist-big, .hist-text, .hist-title { animation: none; } .hist-deck-knob, .hist-deck-knob > span, .about-card { transition: none; } .guide-progress i, .hist-ruler::after { transition: none; } }

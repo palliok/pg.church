@@ -4,10 +4,12 @@ import { Link } from 'react-router-dom';
 import Announcements from '../components/Announcements.jsx';
 import HomeSchedule, { ScheduleCarousel } from '../components/HomeSchedule.jsx';
 import ContactsCard from '../components/ContactsCard.jsx';
+import LongArrow from '../components/LongArrow.jsx';
 import { useChurch } from '../api/church.js';
 import { daysFromToday } from '../api/dates.js';
 import { useEvents } from '../api/events.js';
 import gospelTitle from '../assets/gospel-title.png';
+import donateTitle from '../assets/donate-title.png';
 import './Home.css';
 
 // Текущее время, обновляется раз в минуту: «через 3 ч» и прошедшие события на главной.
@@ -91,19 +93,34 @@ export default function Home() {
 
         {/* Правая колонка: пожертвование и «Кто мы». */}
         <div className="home-right">
+        {/* Пожертвование: рука вдовы опускает две лепты в сокровищницу. Подпись и надпись сверху,
+            кнопка внизу; на десктопе кнопка под картинкой, как «Все объявления» в соседнем блоке. */}
+        <div className="home-donate-column">
         <Link to="/donate" className="home-donate">
-          <span className="home-label">Пожертвование</span>
-          <span className="home-donate-body">
-            <span className="home-donate-title">Поддержать служение</span>
-            <span className="home-pill is-dark is-small">
-              Пожертвовать
-              <span className="home-pill-knob">↗</span>
-            </span>
+          <span className="home-donate-head">
+            <span className="home-label">Пожертвование</span>
+            {titleImage ? (
+              <img className="home-donate-title-img" src={donateTitle} alt="Поддержать служение" />
+            ) : (
+              <span className="home-donate-title">Поддержать служение</span>
+            )}
+          </span>
+          <span className="home-pill is-dark is-small home-donate-pill">
+            Пожертвовать
+            <span className="home-pill-knob">↗</span>
           </span>
         </Link>
+        <div className="home-donate-foot">
+          <Link to="/donate" className="ann-home-all">
+            Пожертвовать
+            <LongArrow />
+          </Link>
+        </div>
+        </div>
 
         <Link to="/about" className="home-about">
           <span className="home-knob is-light home-about-knob">↗</span>
+          <span className="home-about-motto">«Прославлять Бога, живя по&nbsp;Его слову»</span>
           <span className="home-about-title">Кто мы</span>
           <p className="home-about-text">Наша история, во что мы верим и команда, которая ждёт именно тебя.</p>
           {duty?.shifts.length > 0 && (

@@ -1,15 +1,16 @@
-/* Логотип по макету design_handoff_overview, блок 01: Arimo 700 44 / 18, город — Mono капсом; на телефоне 32 / 13. */
+/* Логотип по макету design_handoff_overview, блок 01 (там 44 / 18, на телефоне 32 / 13), увеличен:
+   Arimo 700 50 / 20, город — Mono капсом; на телефоне 36 / 14,5. */
 .church-brand {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   min-width: 0;
   white-space: nowrap;
   color: var(--c-ink);
 }
 
 .church-brand-word {
-  font: 700 44px/.85 var(--f-sans);
+  font: 700 50px/.85 var(--f-sans);
   letter-spacing: -.07em;
 }
 
@@ -25,12 +26,12 @@
 }
 
 .church-brand-name {
-  font: 700 18px/1 var(--f-sans);
+  font: 700 20px/1 var(--f-sans);
   letter-spacing: -.04em;
 }
 
 .church-brand-city {
-  font: 400 10px/1 var(--f-mono);
+  font: 400 11px/1 var(--f-mono);
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--c-gray-text);
@@ -38,16 +39,16 @@
 
 @media (max-width: 860px) {
   .church-brand { gap: 10px; }
-  .church-brand-word { font-size: 32px; }
+  .church-brand-word { font-size: 36px; }
   .church-brand-side { gap: 3px; }
-  .church-brand-name { font-size: 13px; }
-  .church-brand-city { font-size: 8px; }
+  .church-brand-name { font-size: 14.5px; }
+  .church-brand-city { font-size: 9px; }
 }
 
-/* На узких телефонах рядом с логотипом стоит переключатель языков: при 32 / 13 он уже не помещается в строку. */
+/* На узких телефонах рядом с логотипом стоит свёрнутый переключатель языка: логотип чуть меньше, чтобы влезть в строку. */
 @media (max-width: 420px) {
   .church-brand { gap: 8px; }
-  .church-brand-word { font-size: 28px; }
-  .church-brand-name { font-size: 12px; }
-  .church-brand-city { font-size: 7.5px; }
+  .church-brand-word { font-size: 32px; }
+  .church-brand-name { font-size: 13px; }
+  .church-brand-city { font-size: 8px; }
 }

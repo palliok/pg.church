@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import Scene from '../components/Scene.jsx';
+import StoryFilm from '../components/StoryFilm.jsx';
 import { stories } from '../data/stories.js';
 
 const Arrow = () => (
@@ -12,6 +13,12 @@ const Arrow = () => (
 export default function Story() {
   const { slug } = useParams();
   const st = stories[slug];
+  // Истории с картинами — полноэкранным «фильмом», остальные — комиксом.
+  if (st?.film) return <StoryFilm key={slug} story={st} others={Object.entries(stories).filter(([k]) => k !== slug)} />;
+  return <StoryComic slug={slug} st={st} />;
+}
+
+function StoryComic({ slug, st }) {
   const box = useRef(null);
   const bar = useRef(null);
 

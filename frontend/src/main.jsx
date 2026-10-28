@@ -7,6 +7,7 @@ import { getLang, translatePage } from './i18n.js';
 import './styles/global.css';
 import './styles/pages.css';
 import './styles/story.css';
+import './styles/story-film.css';
 
 function Root() {
   useEffect(() => translatePage(), []);

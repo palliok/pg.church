@@ -203,10 +203,10 @@
 @media (max-width: 860px) {
   main { padding-bottom: 0 !important; }
 
-  /* Одинаковые на всех страницах, кроме главной: сверху 10px от шапки, по бокам как у главной (14px);
-     снизу место под нижнее меню. */
+  /* Одинаковые на всех страницах, кроме главной: сверху 10px от шапки, по бокам как у главной (14px).
+     Место под нижнее меню — у подвала (.site-footer), поэтому снизу только обычный отступ. */
   .page-enter.container:not(.home-wrap) {
-    padding: 10px 14px 118px !important;
+    padding: 10px 14px 24px !important;
   }
 
   .split-layout,
