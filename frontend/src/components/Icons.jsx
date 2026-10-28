@@ -64,3 +64,39 @@ export function CloseIcon({ size = 24 }) {
     </svg>
   );
 }
+
+// Объявление без даты — campaign.
+export function CampaignIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <path d="M18 11v2h4v-2h-4zm-2 6.61c.96.71 2.21 1.65 3.2 2.39.4-.53.8-1.07 1.2-1.6-.99-.74-2.24-1.68-3.2-2.4-.4.54-.8 1.08-1.2 1.61zM20.4 5.6c-.4-.53-.8-1.07-1.2-1.6-.99.74-2.24 1.68-3.2 2.4.4.53.8 1.07 1.2 1.6.96-.72 2.21-1.65 3.2-2.4zM4 9c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v4h2v-4h1l5 3V6L8 9H4zm11.5 3c0-1.33-.58-2.53-1.5-3.35v6.69c.92-.81 1.5-2.01 1.5-3.34z" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Событие в расписании — event.
+export function EventIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Время — schedule.
+export function ScheduleIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Прочитано — done_all.
+export function DoneAllIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <path d="M18 7l-1.41-1.41-6.34 6.34 1.41 1.41L18 7zm4.24-1.41L11.66 16.17 7.48 12l-1.41 1.41L11.66 19l12-12-1.42-1.41zM.41 13.41L6 19l1.41-1.41L1.83 12 .41 13.41z" fill="currentColor" />
+    </svg>
+  );
+}

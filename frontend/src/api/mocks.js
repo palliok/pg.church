@@ -318,11 +318,22 @@ function eventsBetween(params) {
 // publishedAt — когда опубликовано (для сортировки, на сайте не показывается);
 // eventDate — конкретный день события «YYYY-MM-DD» или null, если дня нет; eventDateEnd — последний день,
 // если событие на несколько дней; deadline — срок «до» у объявления без дня события.
-// details — строки с иконками: { type: 'when' | 'where', text } и ссылки { type: 'link', text, url }.
+// details — строки с иконками: { type: 'when' | 'where', text } и ссылки { type: 'link', text, url, primary }.
+// primary — основное действие (регистрация, анкета): на телефоне крупной кнопкой вместо телефона, на десктопе — белой пилюлей.
+// weekly — регулярное «каждую неделю»: { dow: 1–7 (пн–вс), time }; event — связанное событие из расписания
+// в том же виде, что в /events (здесь — ближайшее с таким названием).
 
 const isoDay = (date) => iso(date).slice(0, 10);
 
-function announcement(id, daysAgo, title, body, { important = false, eventIn = null, eventDays = 1, deadlineIn = null, when = null, where = null, links = [], contact = null } = {}) {
+// Ближайшее событие расписания с таким названием, начиная с сегодня.
+function nextEvent(title) {
+  const today = isoDay(fromToday(0, 0));
+  const found = events.find((item) => item.title === title && item.startsAt.slice(0, 10) >= today);
+
+  return found ? eventSummary(found) : null;
+}
+
+function announcement(id, daysAgo, title, body, { important = false, eventIn = null, eventDays = 1, deadlineIn = null, weekly = null, event = null, when = null, where = null, links = [], contact = null } = {}) {
   const tel = contact ? `tel:+${contact.phone.replace(/\D/g, '').replace(/^8(\d{10})$/, '7$1')}` : null;
 
   return {
@@ -334,10 +345,12 @@ function announcement(id, daysAgo, title, body, { important = false, eventIn = n
     eventDate: eventIn === null ? null : isoDay(fromToday(eventIn)),
     eventDateEnd: eventIn === null || eventDays < 2 ? null : isoDay(fromToday(eventIn + eventDays - 1)),
     deadline: deadlineIn === null ? null : isoDay(fromToday(deadlineIn)),
+    weekly,
+    event: event ? nextEvent(event) : null,
     details: [
       ...(when ? [{ type: 'when', text: when }] : []),
       ...(where ? [{ type: 'where', text: where }] : []),
-      ...links.map(([text, url]) => ({ type: 'link', text, url })),
+      ...links.map(([text, url, primary = false]) => ({ type: 'link', text, url, primary })),
     ],
     contact: contact ? { ...contact, tel } : null,
   };
@@ -353,17 +366,17 @@ const announcements = [
     eventIn: 20,
     eventDays: 7,
     where: 'База «Сосновый бор», Ленобласть',
-    links: [['Анкета для записи', 'https://forms.yandex.ru/'], ['Что взять с собой', 'https://pg.church/']],
+    links: [['Анкета для записи', 'https://forms.yandex.ru/', true], ['Что взять с собой', 'https://pg.church/']],
     contact: { name: 'Марина', phone: '8 911 000-45-67' },
   }),
   announcement(3, 4, 'Нужны волонтёры на кухню', 'Ищем помощников готовить обеды после воскресного служения. Можно на одно воскресенье в месяц.', {
     important: true, links: [['Написать в Telegram', 'https://t.me/']], contact: { name: 'Олег', phone: '+7 905 000-78-90' },
   }),
   announcement(4, 6, 'Изучение Библии для молодёжи', 'Каждую пятницу разбираем Евангелие от Марка. Приходите с друзьями.', {
-    when: 'Пятница, 19:00', where: 'Малый зал', links: [['Чат молодёжи в Telegram', 'https://t.me/']],
+    weekly: { dow: 5, time: '19:00' }, where: 'Малый зал', links: [['Чат молодёжи в Telegram', 'https://t.me/']],
   }),
   announcement(5, 9, 'Членское собрание после богослужения', 'В воскресенье после богослужения — членское собрание церкви в главном зале.\nПросим членов церкви остаться.', {
-    important: true, eventIn: (7 - new Date().getDay()) % 7 || 7, when: 'После служения', where: 'Главный зал',
+    important: true, event: 'Богослужение', when: 'После служения', where: 'Главный зал',
   }),
   announcement(6, 14, 'Генеральная уборка зала', 'Наводим порядок перед зимой: моем окна, разбираем склад, чистим стулья. Перчатки выдадим.', {
     eventIn: (6 - new Date().getDay() + 7) % 7 || 7, when: 'С 10:00', where: 'Главный зал', links: [['Записаться', 'https://forms.yandex.ru/']],
@@ -372,7 +385,7 @@ const announcements = [
     eventIn: 12, when: 'После служения', where: 'Малый зал', contact: { name: 'Пастор Алексей', phone: '+7 921 000-55-11' },
   }),
   announcement(8, 18, 'Молитвенное служение по средам', 'Собираемся вместе молиться о церкви, городе и друг о друге.', {
-    when: 'Среда, 19:30', where: 'Малый зал',
+    weekly: { dow: 3, time: '19:30' }, where: 'Малый зал',
   }),
   announcement(9, 20, 'Сбор тёплых вещей', 'Принимаем куртки, шапки и обувь в хорошем состоянии. Передадим в приют «Ночлежка».', {
     deadlineIn: 14, when: 'До и после служений', where: 'Фойе', contact: { name: 'Анна', phone: '+7 921 000-12-34' },
@@ -381,7 +394,7 @@ const announcements = [
     important: true, eventIn: 5, when: 'С 12:00', where: 'Парк Сосновка', links: [['Записаться', 'https://forms.yandex.ru/']],
   }),
   announcement(11, 30, 'Женская конференция «Свет»', 'Два дня общения, поклонения и семинаров для сестёр. Регистрация обязательна.', {
-    eventIn: 26, eventDays: 2, where: 'Главный зал', links: [['Регистрация', 'https://forms.yandex.ru/']], contact: { name: 'Марина', phone: '8 911 000-45-67' },
+    eventIn: 26, eventDays: 2, where: 'Главный зал', links: [['Регистрация', 'https://forms.yandex.ru/', true]], contact: { name: 'Марина', phone: '8 911 000-45-67' },
   }),
 ];
 

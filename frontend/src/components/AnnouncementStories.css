@@ -15,7 +15,8 @@
   padding: 16px 18px;
   border: 0;
   border-radius: 26px;
-  background: var(--c-ink);
+  /* Непрочитанная — тёмно-серая, между --c-ink и --c-body */
+  background: #363233;
   color: #fff;
   text-align: left;
   font: inherit;
@@ -157,6 +158,8 @@
 .ann-story-call:hover { background: var(--c-main-hover); color: var(--c-ink); }
 .ann-story-phone { flex: 0 0 auto; }
 .ann-story-call-name { min-width: 0; margin-left: -4px; overflow: hidden; text-overflow: ellipsis; }
+/* Основная ссылка вместо звонка (primary) — текст ссылки и стрелка. */
+.ann-story-call-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ann-story-share {
   flex: 0 0 54px;
   height: 54px;

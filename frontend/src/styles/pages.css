@@ -1,8 +1,12 @@
 /* ===== Отступы страниц ===== */
-/* Одинаковые на всех страницах, кроме главной: по бокам как у главной (18px), сверху 26px до заголовка. */
+/* Одинаковые на всех страницах, кроме главной: по бокам как у главной (18px), сверху 10px до заголовка. */
 @media (min-width: 861px) {
-  .page-enter.container:not(.home-wrap) { padding: 26px 18px 48px !important; }
+  .page-enter.container:not(.home-wrap) { padding: 10px 18px 48px !important; }
 }
+
+/* «О церкви»: контент закрывает нижнюю треть фонового заголовка (на телефоне слово крупнее, чем «Объявления»). */
+.about-body { margin-top: 16px; }
+@media (min-width: 861px) { .about-body { margin-top: 66px; } }
 
 /* ===== Главная ===== */
 /* Десктопная сетка главной — в pages/Home.css, здесь — мобильная версия. */
@@ -208,6 +212,9 @@
   .page-enter.container:not(.home-wrap) {
     padding: 10px 14px 24px !important;
   }
+
+  /* Над контентом — место под фоновый заголовок; слово не должно давать горизонтальную прокрутку. */
+  .page-enter.container.page-bg:not(.home-wrap) { padding-top: 25px !important; overflow-x: clip; }
 
   .split-layout,
   .songs-layout,

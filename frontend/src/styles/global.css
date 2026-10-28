@@ -209,43 +209,37 @@ input, textarea, select { font-family: inherit; }
 /* Шапка телефона (MobileHeader, resources/Mobile Header.html): логотип и языки в одну строку. */
 .mobile-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 18px 14px; }
 .mobile-header-brand { min-width: 0; color: var(--c-ink); }
-
-/* Переключатель языка (LangSwitch), прежний вид: серая «пилюля», текущий язык на чёрном.
-   Свёрнут — только текущий; по нажатию остальные выезжают влево поверх соседей (шапка не сдвигается). */
-.lang-switch { position: relative; flex: 0 0 auto; display: flex; padding: 3px; border-radius: 999px; background: var(--c-panel); transition: border-radius .2s; }
-.lang-switch button { border: 0; border-radius: 999px; background: transparent; color: var(--c-gray-text); font: 700 11px var(--f-sans); padding: 8px 12px; cursor: pointer; transition: color .15s; }
-.lang-switch button:hover { color: var(--c-ink); }
-.lang-switch button:focus-visible { outline: 2px solid var(--c-main); outline-offset: 1px; }
-.lang-switch .lang-switch-current { background: var(--c-ink); color: #fff; }
-/* Текущий язык на чёрном: при наведении текст остаётся светлым, только чуть голубеет. */
-.lang-switch .lang-switch-current:hover { color: var(--c-main); }
-.lang-switch-more {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 100%;
-  z-index: 5;
-  display: flex;
-  gap: 2px;
-  padding: 3px 0 3px 3px;
-  border-radius: 999px 0 0 999px;
-  background: var(--c-panel);
-  clip-path: inset(0 0 0 100%);
-  visibility: hidden;
-  transition: clip-path .25s ease, visibility 0s .25s;
+/* Примерно с 370px шапка помещается в одну строку; уже — языки встают отдельной строкой над логотипом. */
+@media (max-width: 370px) {
+  .mobile-header { flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 8px; }
+  .mobile-header .lang-switch { order: -1; align-self: flex-end; }
 }
-.lang-switch.is-open { border-radius: 0 999px 999px 0; }
-.lang-switch.is-open .lang-switch-more { clip-path: inset(0); visibility: visible; transition: clip-path .25s ease; }
-@media (max-width: 860px) {
-  .lang-switch button { padding: 7px; }
-  .lang-switch .lang-switch-current { padding-inline: 9px; }
-}
-@media (prefers-reduced-motion: reduce) { .lang-switch-more, .lang-switch.is-open .lang-switch-more { transition: none; } }
 
 /* Заголовок страницы («Расписание», «Объявления»…) — один стиль на всех страницах. */
 .page-title { margin: 0; color: var(--c-ink); font: 700 34px/.95 var(--f-sans); letter-spacing: -.05em; }
 @media (min-width: 861px) {
   .page-title { font-size: 48px; letter-spacing: -.055em; }
+}
+
+/* Фоновый заголовок (resources/design_handoff_page_title) — «Расписание», «Сборник песен», «Объявления», «О церкви».
+   Крупное слово тёплого серого цвета лежит за строкой управления, нижнюю треть букв закрывает контент.
+   isolation: z-index: -1 уводит слово под контент страницы, но не под её фон. Кегль подбирается
+   по --title-chars (длина слова на текущем языке), чтобы слово целиком помещалось в ширину. */
+.page-bg { position: relative; isolation: isolate; }
+.page-title.page-title--bg {
+  position: absolute;
+  left: 18px;
+  top: -5px;
+  z-index: -1;
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: min(84px, calc((100vw - 36px) / (var(--title-chars, 10) * .62)));
+  line-height: .86;
+  letter-spacing: -.075em;
+  color: var(--c-warm);
+}
+@media (min-width: 861px) {
+  .page-title.page-title--bg { left: 56px; top: 0; font-size: min(112px, calc((100vw - 80px) / (var(--title-chars, 10) * .62))); }
 }
 
 /* В одну строку шапка помещается примерно с 1130px (длиннее всего меню на киргизском).

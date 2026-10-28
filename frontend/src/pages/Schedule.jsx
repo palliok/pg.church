@@ -27,8 +27,8 @@ const LEGEND = [['#02407d', 'Богослужение'], ['#f9c9a5', 'Молод
 const categoryColor = (e) => CATEGORY_STYLE[e.category]?.color ?? '#a3a3a3';
 const eventTone = (e) => (e.main ? 'purple' : CATEGORY_STYLE[e.category]?.tone ?? 'dark');
 const pad = (n) => String(n).padStart(2, '0');
-// Сколько прошедших дней лента текущего месяца показывает сразу, остальные — по кнопке.
-const PAST_DAYS_SHOWN = 2;
+// Сколько прошедших дней с событиями лента текущего месяца показывает сразу, остальные — по кнопке.
+const PAST_DAYS_SHOWN = 1;
 const daysInMonth = ({ year, month }) => new Date(Date.UTC(year, month, 0)).getUTCDate();
 
 // «1 событие», «3 события», «7 событий»; в английском — event/events, в киргизском форма одна.
@@ -53,6 +53,8 @@ export default function Schedule() {
   const [online, setOnline] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [showPast, setShowPast] = useState(false);
+  const barRef = useRef(null);
 
   const dim = daysInMonth(ym);
   const monthPrefix = `${ym.year}-${pad(ym.month)}`;
@@ -73,12 +75,19 @@ export default function Schedule() {
   const todayNum = isCurrentMonth ? today.day : null;
   // Выбранный день календаря: сегодня, а в другом месяце — первый день с событиями.
   const selDay = pickedDay ?? todayNum ?? (byDay.keys().next().value ?? 1);
+  // В текущем месяце виден только последний прошедший день с событиями, раньше — под кнопкой «Показать прошедшие».
+  const pastDays = todayNum == null ? [] : [...byDay.keys()].filter((day) => day < todayNum);
+  const hiddenDays = pastDays.slice(0, Math.max(0, pastDays.length - PAST_DAYS_SHOWN));
+  const hiddenCount = hiddenDays.reduce((sum, day) => sum + byDay.get(day).length, 0);
+  const listReady = !loading && !error && view === 'list';
 
   const filterCount = cats.length + (online ? 1 : 0);
 
+  // В новом месяце прошедшие дни снова спрятаны.
   function goMonth(next) {
     setYm(next);
     setPickedDay(null);
+    setShowPast(false);
   }
 
   function toggleCat(category) {
@@ -93,16 +102,26 @@ export default function Schedule() {
   const viewTabs = [['list', 'Лента', 'Списком'], ['month', 'Месяц', 'Календарь']];
 
   return (
-    <div className="page-enter container">
+    <div className="page-enter container page-bg" style={{ '--title-chars': t('Расписание').length }}>
       <div className="sched-head">
         <div className="sched-title-row">
-          <h1 className="page-title">Расписание</h1>
+          <h1 className="page-title page-title--bg">Расписание</h1>
           <button type="button" className="sched-m sched-filter-round" onClick={() => setSheetOpen(true)} aria-label="Фильтр">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4" /></svg>
             {filterCount > 0 && <span className="sched-badge">{filterCount}</span>}
           </button>
         </div>
+      </div>
 
+      {/* Одна строка: «Показать прошедшие», выбор месяца и «Подписаться». На телефоне выбор месяца — отдельным рядом сверху. */}
+      <div className="sched-bar" ref={barRef}>
+        {listReady && hiddenCount > 0 && (
+          <button type="button" className="sched-feed-past" onClick={() => setShowPast((on) => !on)} aria-expanded={showPast}>
+            {/* Через t(): React меняет текст в том же узле, а translatePage() такие правки не видит. */}
+            <span>{showPast ? t('Скрыть прошедшие') : t('Показать прошедшие')}</span>
+            {!showPast && <span className="sched-feed-past-count">{hiddenCount} {eventsWord(hiddenCount)}</span>}
+          </button>
+        )}
         <div className="sched-controls">
           <button type="button" className={`sched-d sched-today${isCurrentMonth ? ' is-on' : ''}`} onClick={() => { goMonth({ year: today.year, month: today.month }); setPickedDay(today.day); }}>
             Сегодня
@@ -117,6 +136,7 @@ export default function Schedule() {
             ))}
           </div>
         </div>
+        <Subscribe />
       </div>
 
       <div className="sched-toolbar">
@@ -141,8 +161,6 @@ export default function Schedule() {
             <button type="button" className="sched-m sched-reset" onClick={resetFilters}>Сбросить фильтры</button>
           </>
         )}
-        <span style={{ flex: 1 }} />
-        <Subscribe />
       </div>
 
       {panelOpen && (
@@ -167,7 +185,7 @@ export default function Schedule() {
       {(loading || error) ? (
         <div style={{ marginTop: 24 }}><LoadStatus error={error} onRetry={retry} /></div>
       ) : view === 'list' ? (
-        <ListView key={monthPrefix} byDay={byDay} ym={ym} todayNum={todayNum} hasFilters={filterCount > 0} onReset={resetFilters} />
+        <ListView key={monthPrefix} byDay={byDay} ym={ym} todayNum={todayNum} hiddenDayCount={showPast ? 0 : hiddenDays.length} showPast={showPast} startRef={barRef} hasFilters={filterCount > 0} onReset={resetFilters} />
       ) : (
         <MonthView ym={ym} byDay={byDay} selDay={selDay} todayNum={todayNum} onPick={setPickedDay} />
       )}
@@ -255,24 +273,19 @@ function MonthNav({ ym, onChange }) {
 }
 
 // Лента (макет resources/design_handoff_schedule_2b): слева крупное число и день недели, справа события дня.
-// Прошедшие дни бледнее, сегодняшний — на серой подложке. В текущем месяце дни раньше позавчерашнего
-// спрятаны под кнопку. key у ListView — месяц, так что в новом месяце они снова спрятаны.
-function ListView({ byDay, ym, todayNum, hasFilters, onReset }) {
-  const startRef = useRef(null);
+// Прошедшие дни бледнее, сегодняшний — на серой подложке. Первые hiddenDayCount дней спрятаны под кнопку
+// «Показать прошедшие» — она в строке над лентой (startRef). key у ListView — месяц.
+function ListView({ byDay, ym, todayNum, hiddenDayCount, showPast, startRef, hasFilters, onReset }) {
   const feedRef = useRef(null);
-  const [showPast, setShowPast] = useState(false);
 
-  const days = [...byDay.entries()];
-  const hiddenDays = todayNum == null ? [] : days.filter(([day]) => day < todayNum - PAST_DAYS_SHOWN);
-  const hiddenCount = hiddenDays.reduce((sum, [, items]) => sum + items.length, 0);
-  const visibleDays = showPast ? days : days.slice(hiddenDays.length);
+  const visibleDays = [...byDay.entries()].slice(hiddenDayCount);
 
-  // В ленте текущего месяца сразу прокручиваем к её началу: над сегодняшним днём только кнопка
-  // «Показать прошедшие» и пара прошедших дней. Срабатывает, когда лента появляется (новый месяц,
+  // В ленте текущего месяца сразу прокручиваем к строке над ней: над сегодняшним днём только эта строка
+  // и последний прошедший день. Срабатывает, когда лента появляется (новый месяц,
   // возврат из «Месяц»), — от смены фильтров страница не прыгает.
   useEffect(() => {
     if (todayNum != null) startRef.current?.scrollIntoView({ block: 'start' });
-  }, [todayNum]);
+  }, [todayNum, startRef]);
 
   // Раскрытые прошедшие дни появляются выше — показываем их с начала месяца.
   useEffect(() => {
@@ -296,15 +309,7 @@ function ListView({ byDay, ym, todayNum, hasFilters, onReset }) {
   }
 
   return (
-    <div className="sched-feed-wrap" ref={startRef}>
-      {hiddenCount > 0 && (
-        <button type="button" className="sched-feed-past" onClick={() => setShowPast((on) => !on)} aria-expanded={showPast}>
-          {/* Через t(): React меняет текст в том же узле, а translatePage() такие правки не видит. */}
-          <span>{showPast ? t('Скрыть прошедшие') : t('Показать прошедшие')}</span>
-          {!showPast && <span className="sched-feed-past-count">{hiddenCount} {eventsWord(hiddenCount)}</span>}
-        </button>
-      )}
-
+    <div className="sched-feed-wrap">
       <div className="sched-feed" ref={feedRef}>
         {visibleDays.map(([day, items]) => {
           const classes = ['sched-feed-day', day === todayNum && 'is-today', daysFromToday({ ...ym, day }) < 0 && 'is-past'].filter(Boolean).join(' ');

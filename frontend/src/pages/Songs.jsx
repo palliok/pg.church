@@ -54,10 +54,10 @@ export default function Songs() {
   }
 
   return (
-    <div className="page-enter container">
+    <div className="page-enter container page-bg" style={{ '--title-chars': t('Сборник песен').length }}>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
         <div>
-          <h1 className="page-title">Сборник песен</h1>
+          <h1 className="page-title page-title--bg">Сборник песен</h1>
         </div>
         <button
           onClick={() => songs.length > 0 && navigate(`/songs/${songs[Math.floor(Math.random() * songs.length)].id}`)}

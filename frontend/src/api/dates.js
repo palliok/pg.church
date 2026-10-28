@@ -1,6 +1,8 @@
 import { getLang, t } from '../i18n.js';
 
 const WEEKDAYS_SHORT = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+// Сокращения месяцев: «нояб», «сент», а короткие названия — целиком. По-киргизски — из словаря.
+const MONTHS_SHORT = ['янв', 'февр', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сент', 'окт', 'нояб', 'дек'];
 const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
 
 // Форматирует календарную дату { year, month, day }. Дата уже дана по времени
@@ -28,7 +30,7 @@ export function monthLabel(date) {
   return formatDate(date, lang, { day: 'numeric', month: 'long' }).replace(/\d+/, '').trim();
 }
 
-// Короткие день недели и месяц для плашек дат: «Вт», «Июл» (капсом их делает CSS).
+// Короткие день недели и месяц для плашек дат: «Вт», «нояб» (капсом их делает CSS).
 // По-русски и по-киргизски — из словаря: в Chrome нет данных Intl для ky.
 export function shortDate(date) {
   const lang = getLang();
@@ -38,7 +40,7 @@ export function shortDate(date) {
 
   const weekday = new Date(Date.UTC(date.year, date.month - 1, date.day)).getUTCDay();
 
-  return { dow: t(WEEKDAYS_SHORT[weekday]), mon: t(MONTHS[date.month - 1]).slice(0, 3) };
+  return { dow: t(WEEKDAYS_SHORT[weekday]), mon: t(MONTHS_SHORT[date.month - 1]) };
 }
 
 // Дата из строки ISO 8601 в том виде, как она записана: «2026-10-10T12:00:00+03:00» → 10 октября.

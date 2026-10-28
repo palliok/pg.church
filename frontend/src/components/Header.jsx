@@ -1,7 +1,7 @@
 import { t } from '../i18n.js';
 import { NavLink, useNavigate } from 'react-router-dom';
 import ChurchBrand from './ChurchBrand.jsx';
-import LangSwitch from './LangSwitch.jsx';
+import LangSwitcher from './LangSwitcher.jsx';
 
 const NAV_ITEMS = [
   { to: '/', label: t('Главная'), end: true },
@@ -57,7 +57,7 @@ export default function Header() {
       </nav>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <LangSwitch />
+        <LangSwitcher />
         <NavLink to="/donate" className="pill-btn" style={{ background: 'var(--c-main)', color: 'var(--c-ink)', fontSize: 11.5, padding: '11px 20px' }}>
           Поддержать
         </NavLink>

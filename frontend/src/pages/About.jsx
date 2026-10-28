@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import ContactsCard from '../components/ContactsCard.jsx';
 import ChurchHistory from '../components/ChurchHistory.jsx';
 import GospelGuide from '../components/GospelGuide.jsx';
+import { t } from '../i18n.js';
 import './About.css';
 
 // Призвание члена церкви на Поклонной горе — текст церкви, порядок и ключевые слова как в оригинале.
@@ -79,9 +80,12 @@ export default function About() {
   };
 
   return (
-    <div className="page-enter container about">
+    <div className="page-enter container page-bg about" style={{ '--title-chars': t('О церкви').length }}>
+      {/* Крупный фоновый заголовок, как на других страницах (page-bg в global.css). */}
+      <h1 className="page-title page-title--bg">О церкви</h1>
+
       {/* Вступление: главная фраза и три карточки-главы в цветах своих разделов. */}
-      <section className="about-intro">
+      <section className="about-intro about-body">
         {/* Оформление как у документа: лист с двойной тонкой рамкой и строкой-шапкой. */}
         <div className="about-intro-screen">
         <div className="about-intro-status" aria-hidden="true">
