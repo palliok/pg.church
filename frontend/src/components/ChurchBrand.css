@@ -1,66 +1,53 @@
-/* Логотип по макету design_handoff_logo_6a. Все размеры строки завязаны на --brand-size (кегль слова «церковь»):
-   высота строки = 40/44, ширина линии = 64/44 от него. */
+/* Логотип по макету design_handoff_overview, блок 01: Arimo 700 44 / 18, город — Mono капсом; на телефоне 32 / 13. */
 .church-brand {
-  --brand-size: 44px;
   display: inline-flex;
-  align-items: stretch;
-  height: calc(var(--brand-size) * 40 / 44);
+  align-items: center;
+  gap: 14px;
   min-width: 0;
   white-space: nowrap;
   color: var(--c-ink);
 }
 
 .church-brand-word {
-  display: flex;
-  align-items: flex-end;
-  font: 700 var(--brand-size)/.85 var(--f-sans);
+  font: 700 44px/.85 var(--f-sans);
   letter-spacing: -.07em;
 }
 
-.church-brand-line {
-  flex: none;
-  width: calc(var(--brand-size) * 64 / 44);
-  height: 100%;
-  overflow: visible;
-}
-
-.church-brand-line path {
-  fill: none;
-  stroke: var(--c-main); /* #00b7e3 на светлом и тёмном */
-  stroke-width: 4.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.church-brand-dot {
+  color: var(--c-main);
 }
 
 .church-brand-side {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  /* Логотип стоит в <button>, у которого текст по центру: прижимаем подпись к линии. */
   align-items: flex-start;
-  gap: calc(var(--brand-size) * 4 / 44);
+  gap: 4px;
 }
 
 .church-brand-name {
-  font: 700 calc(var(--brand-size) * 18 / 44)/1 var(--f-sans);
+  font: 700 18px/1 var(--f-sans);
   letter-spacing: -.04em;
 }
 
 .church-brand-city {
-  font: 400 calc(var(--brand-size) * 10 / 44)/1 var(--f-mono);
+  font: 400 10px/1 var(--f-mono);
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--c-gray-text);
 }
 
-/* Тёмный фон: добавить класс .church-brand--dark на тёмных шапках/подвале. */
-.church-brand--dark { color: #fff; }
-.church-brand--dark .church-brand-city { color: rgba(255, 255, 255, .65); }
-
 @media (max-width: 860px) {
-  .church-brand { --brand-size: 32px; }
+  .church-brand { gap: 10px; }
+  .church-brand-word { font-size: 32px; }
+  .church-brand-side { gap: 3px; }
+  .church-brand-name { font-size: 13px; }
+  .church-brand-city { font-size: 8px; }
 }
 
+/* На узких телефонах рядом с логотипом стоит переключатель языков: при 32 / 13 он уже не помещается в строку. */
 @media (max-width: 420px) {
-  .church-brand { --brand-size: 28px; }
+  .church-brand { gap: 8px; }
+  .church-brand-word { font-size: 28px; }
+  .church-brand-name { font-size: 12px; }
+  .church-brand-city { font-size: 7.5px; }
 }
