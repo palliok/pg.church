@@ -81,8 +81,8 @@ function endTime(raw) {
 }
 
 // Приводит событие из API к виду, который ждут страницы: тексты переводятся
-// словарём, как раньше моки, подписи даты — на языке сайта.
-function toEvent(raw) {
+// словарём, как раньше моки, подписи даты — на языке сайта. Нужен и объявлениям со связанным событием.
+export function toEvent(raw) {
   const labels = dateLabels(raw);
   const place = t(raw.place);
   const event = {

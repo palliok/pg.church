@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { getLang, t } from '../i18n.js';
 import { dayLabel, formatDate, isoDate, monthLabel, shortDate } from './dates.js';
+import { toEvent } from './events.js';
 import { useApi } from './useApi.js';
 
 const WEEKDAYS = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
@@ -59,12 +60,34 @@ function toDetails(details) {
     .map((detail) => ({ ...detail, text: t(detail.text), primary: Boolean(detail.primary) }));
 }
 
+// Регулярное объявление «каждую неделю»: weekly = { dow: 1–7 (пн–вс, как у событий), time: «19:00» }.
+// dow — «Пт» для плитки, weekday — «пятница».
+function toRegular(weekly) {
+  if (!weekly) return null;
+  // 1 января 2024 — понедельник: от него берём любой день недели.
+  const date = { year: 2024, month: 1, day: weekly.dow };
+
+  return { dow: shortDate(date).dow, weekday: weekdayLabel(date), time: weekly.time };
+}
+
 // Даты, «Важно», детали и контакт пока есть только в моках (src/api/mocks.js):
 // бэкенд отдаёт { id, title, body } — тогда объявление показывается без даты и деталей.
 // Дату публикации на сайте не показываем, только день события, если он назначен:
-// eventDate — день или начало, eventDateEnd — конец, если событие на несколько дней, deadline — срок «до».
+// eventDate — день или начало, eventDateEnd — конец, если событие на несколько дней, deadline — срок «до»,
+// weekly — день недели и время регулярного, event — связанное событие из расписания (как в /events).
+// У объявления со связанным событием без своей даты днём события считается день из расписания.
 function toAnnouncement(raw) {
   const multiDay = Boolean(raw.eventDate && raw.eventDateEnd && raw.eventDateEnd > raw.eventDate);
+  // Месяц события — коротко, как у дат объявлений («нояб»), а не как в расписании.
+  const event = raw.event ? { ...toEvent(raw.event), mon: shortDate(isoDate(raw.event.startsAt)).mon } : null;
+  const eventDate = raw.eventDate ?? (raw.deadline ? null : raw.event?.startsAt);
+  const regular = eventDate || raw.deadline ? null : toRegular(raw.weekly);
+  const details = toDetails(raw.details);
+
+  // У регулярного без «когда» — день и время строкой, как их писали раньше: «Пятница, 19:00».
+  if (regular && !details.some((detail) => detail.type === 'when')) {
+    details.unshift({ type: 'when', text: `${regular.weekday[0].toUpperCase()}${regular.weekday.slice(1)}, ${regular.time}`, primary: false });
+  }
 
   return {
     id: raw.id,
@@ -72,11 +95,13 @@ function toAnnouncement(raw) {
     important: Boolean(raw.important),
     title: t(raw.title),
     body: raw.body ? t(raw.body) : null,
-    eventDate: toEventDate(raw.eventDate),
+    eventDate: toEventDate(eventDate),
     eventEnd: multiDay ? toEventDate(raw.eventDateEnd) : null,
     days: multiDay ? daysLabel(spanDays(raw.eventDate, raw.eventDateEnd)) : null,
-    deadline: raw.eventDate ? null : toEventDate(raw.deadline),
-    details: toDetails(raw.details),
+    deadline: eventDate ? null : toEventDate(raw.deadline),
+    regular,
+    event,
+    details,
     contact: raw.contact ? { ...raw.contact, name: raw.contact.name ? t(raw.contact.name) : null } : null,
   };
 }

@@ -1,0 +1,220 @@
+/* Объявления на десктопе: сторис со стопкой слева, список справа.
+   Макет: resources/design_handoff_announcements 2 (вариант 7a). «Важно» и рупор — общие классы из Announcements.css. */
+
+.ann7-board { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 28px; align-items: start; }
+
+/* Сторис остаётся на виду, пока листаешь длинный список. */
+.ann7-stage { position: sticky; top: 24px; display: flex; flex-direction: column; }
+
+/* ===== Сторис ===== */
+.ann7-story {
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 34px 32px;
+  border-radius: 30px;
+  /* Градиент — под будущее фото на фоне */
+  background-color: var(--c-ink);
+  background-image: linear-gradient(70deg, rgba(20, 18, 18, .95) 22%, rgba(20, 18, 18, .45) 64%, rgba(20, 18, 18, .25) 100%);
+  color: #fff;
+}
+.ann7-story > :not(.ann-megaphone, .ann7-tap) { position: relative; }
+.ann7-story .ann7-megaphone { right: -70px; top: -10px; width: 320px; height: 320px; opacity: .14; }
+
+/* Прогресс: пройденные залиты, текущий заливается за --ann7-ms, пока курсор над карточкой — замирает. */
+.ann7-segments { display: flex; gap: 6px; }
+.ann7-segment { flex: 1; height: 3px; border-radius: 99px; background: rgba(255, 255, 255, .28); overflow: hidden; }
+.ann7-segment-fill { display: block; height: 100%; background: #fff; }
+.ann7-segment-fill.is-done { width: 100%; }
+.ann7-segment-fill.is-current { width: 0; animation: ann7-fill var(--ann7-ms) linear forwards; }
+.ann7-story.is-paused .ann7-segment-fill.is-current { animation-play-state: paused; }
+
+.ann7-story-top { display: flex; align-items: center; gap: 8px; min-height: 40px; margin-top: 18px; }
+.ann7-story-top .ann-important { align-self: center; height: 26px; padding: 0 11px; }
+.ann7-share {
+  margin-left: auto;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.ann7-share:hover { background: var(--c-main); color: var(--c-ink); }
+
+.ann7-tap { position: absolute; top: 80px; height: 180px; padding: 0; border: 0; background: transparent; }
+.ann7-tap.is-prev { left: 0; width: 35%; cursor: w-resize; }
+.ann7-tap.is-next { right: 0; width: 50%; cursor: e-resize; }
+
+/* Низ: текст слева, дата или событие справа. */
+.ann7-story-main { margin-top: auto; padding-top: 32px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: end; }
+.ann7-story-text { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; min-width: 0; }
+/* Длинное слово рядом с карточкой события переносится по слогам, а не рвётся где попало. */
+.ann7-story-title { margin: 0; font: 700 60px/.95 var(--f-sans); letter-spacing: -.06em; text-wrap: balance; hyphens: auto; overflow-wrap: break-word; }
+.ann7-story-body { margin: 0; max-width: 460px; font: 400 17px/1.45 var(--f-sans); color: rgba(255, 255, 255, .75); white-space: pre-line; text-wrap: pretty; }
+.ann7-story-place { display: inline-flex; align-items: center; gap: 6px; font: 400 12px var(--f-mono); letter-spacing: .02em; text-transform: uppercase; }
+
+.ann7-story-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.ann7-story-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .35);
+  color: #fff;
+  font: 400 11px var(--f-mono);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background .2s, color .2s, box-shadow .2s;
+}
+.ann7-story-link span { font-size: 13px; }
+.ann7-story-link:hover { background: #fff; color: var(--c-ink); }
+/* Основная ссылка (primary) — белая, как контакт. */
+.ann7-story-link.is-main { background: #fff; box-shadow: none; color: var(--c-ink); }
+.ann7-story-link.is-main:hover { background: var(--c-main); }
+
+.ann7-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 6px 6px 22px;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  color: var(--c-ink);
+  transition: background .2s;
+}
+.ann7-contact:hover { background: var(--c-main); color: var(--c-ink); }
+.ann7-contact-text { font: 400 13px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.ann7-contact-call { width: 44px; height: 44px; border-radius: var(--radius-pill); background: var(--c-ink); color: #fff; display: flex; align-items: center; justify-content: center; }
+
+/* ===== Дата справа ===== */
+.ann7-story-side { display: flex; flex-direction: column; align-items: flex-end; padding-bottom: 4px; }
+.ann7-when { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+.ann7-when-note { font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: rgba(255, 255, 255, .55); white-space: nowrap; }
+.ann7-big-date { display: flex; align-items: baseline; gap: 8px; }
+.ann7-big-num { font: 400 96px/1 var(--f-num); letter-spacing: -.06em; }
+.ann7-big-mon { font: 400 12px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
+.ann7-when-time { font: 400 64px/1 var(--f-num); letter-spacing: -.05em; }
+.ann7-when-weekday { font: 400 12px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
+
+.ann7-range { display: flex; align-items: flex-end; gap: 14px; }
+.ann7-range-part { display: flex; flex-direction: column; gap: 12px; }
+.ann7-range-part .ann7-when-note { font-size: 10px; }
+.ann7-range .ann7-big-num { font-size: 72px; }
+.ann7-range-arrow { padding-bottom: 14px; color: rgba(255, 255, 255, .55); }
+.ann7-days {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 11px;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  color: var(--c-ink);
+  font: 600 11px var(--f-mono);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Связанное событие — белая карточка, ведёт на страницу события. */
+.ann7-event {
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 16px 14px;
+  border-radius: 24px;
+  background: #fff;
+  color: var(--c-ink);
+  transition: background .2s;
+}
+.ann7-event:hover { background: var(--c-main); color: var(--c-ink); }
+.ann7-event-head { display: flex; align-items: center; gap: 6px; font: 400 10px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-gray-text); }
+.ann7-event-body { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: center; }
+.ann7-event-tile { width: 72px; height: 72px; border-radius: 18px; background: #f4f4f1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+.ann7-event-dow { font: 400 8px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--c-gray-text); }
+.ann7-event-day { font: 400 26px/1 var(--f-num); letter-spacing: -.04em; }
+.ann7-event-mon { font: 400 9px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; }
+.ann7-event-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ann7-event-title { font: 700 19px/1.1 var(--f-sans); letter-spacing: -.04em; }
+.ann7-event-time { font: 400 18px/1 var(--f-num); }
+.ann7-event-place { display: flex; align-items: center; gap: 4px; font: 400 10px var(--f-mono); letter-spacing: .02em; text-transform: uppercase; }
+.ann7-event-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid rgba(35, 31, 32, .12); font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
+
+/* Стопка: краешки следующих карточек под сторис. */
+.ann7-layer { position: relative; margin-top: -2px; }
+.ann7-layer.is-first { z-index: 2; height: 16px; margin-inline: 22px; background: #4a4647; border-radius: 0 0 26px 26px; }
+.ann7-layer.is-second { z-index: 1; height: 14px; margin-inline: 44px; background: var(--c-num); border-radius: 0 0 24px 24px; }
+
+/* ===== Список ===== */
+/* Белый фон закрывает низ фонового заголовка страницы. */
+.ann7-list { display: flex; flex-direction: column; gap: 4px; padding-top: 4px; border-radius: 22px; background: var(--c-bg); }
+
+.ann7-row {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 8px 14px 8px 8px;
+  border: 0;
+  border-radius: 22px;
+  background: transparent;
+  color: var(--c-ink);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.ann7-row:hover,
+.ann7-row:focus-visible { outline: 0; background: var(--c-main); color: var(--c-ink); }
+.ann7-row.is-active { background: var(--c-ink); color: #fff; cursor: default; }
+
+.ann7-tile { position: relative; width: 76px; height: 76px; border-radius: 20px; background: #f4f4f1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+.ann7-row.is-active .ann7-tile { background: rgba(255, 255, 255, .12); }
+.ann7-tile-label { font: 400 8px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; opacity: .6; white-space: nowrap; }
+.ann7-tile-big { font: 400 22px/1 var(--f-num); letter-spacing: -.04em; white-space: nowrap; }
+.ann7-tile-bottom { font: 400 9px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.ann7-tile-dot { position: absolute; top: -3px; right: -3px; width: 14px; height: 14px; border-radius: 99px; background: var(--c-main); box-shadow: 0 0 0 3px #fff; }
+
+.ann7-row-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ann7-row.is-read .ann7-row-text { opacity: .5; }
+.ann7-row-chips { display: flex; align-items: center; gap: 6px; }
+.ann7-row-chips .ann-important { align-self: center; height: 20px; padding: 0 8px; font-size: 9px; }
+.ann7-row-event { display: inline-flex; align-items: center; gap: 3px; height: 20px; padding: 0 8px 0 6px; border-radius: var(--radius-pill); box-shadow: inset 0 0 0 1px currentColor; font: 400 9px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; opacity: .75; }
+.ann7-row-title { font: 700 20px/1.1 var(--f-sans); letter-spacing: -.04em; }
+.ann7-row-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font: 400 10px var(--f-mono); letter-spacing: .02em; text-transform: uppercase; opacity: .7; }
+.ann7-row-meta > span { display: inline-flex; align-items: center; gap: 4px; }
+/* Прочитанное — голубые галочки. */
+.ann7-row-done { color: var(--c-main); }
+
+/* ===== Узкий десктоп: список уже, дата или событие — под текстом ===== */
+@media (max-width: 1180px) {
+  .ann7-board { grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; }
+  .ann7-story { padding: 22px 28px 28px; }
+  .ann7-story-title { font-size: 44px; }
+  .ann7-story-main { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .ann7-story-side { align-items: flex-start; }
+  .ann7-when { align-items: flex-start; }
+  .ann7-event { width: 100%; max-width: 340px; }
+  .ann7-big-num { font-size: 72px; }
+}
+
+@keyframes ann7-fill {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ann7-row, .ann7-share, .ann7-story-link, .ann7-contact, .ann7-event { transition: none; }
+}
