@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { t } from '../i18n.js';
 import { ImportantPill, Megaphone } from './AnnouncementCards.jsx';
@@ -6,18 +6,6 @@ import { CampaignIcon, DoneAllIcon, EventIcon, PhoneIcon, PlaceIcon, ScheduleIco
 import LongArrow from './LongArrow.jsx';
 import './AnnouncementBoard.css';
 
-// Сколько показывается одно объявление в сторис; столько же длится заливка сегмента в CSS (--ann7-ms).
-const STORY_MS = 7000;
-// Сколько объявлений в сторис: все важные и последние из остальных, но не меньше двух последних.
-const STORY_COUNT = 5;
-
-// Набор сторис: важные (новые первыми), за ними последние опубликованные неважные. items уже по дате публикации.
-function storySet(items) {
-  const important = items.filter((item) => item.important);
-  const latest = items.filter((item) => !item.important).slice(0, Math.max(2, STORY_COUNT - important.length));
-
-  return [...important, ...latest];
-}
 
 // Как показывать дату: связанное событие важнее собственных дат объявления.
 function dateKind(item) {
@@ -223,31 +211,16 @@ function StoryWhen({ item }) {
   return null;
 }
 
-// Сторис-карточка: сегменты прогресса, «Важно» и «Поделиться», заголовок, текст, место, ссылки и контакт слева,
+// Карточка объявления: «Важно» и «Поделиться», заголовок, текст, место, ссылки и контакт слева,
 // дата или связанное событие справа. Ссылка с primary — белой пилюлей, как контакт, остальные — обводкой.
-function StoryCard({ item, segments, run, paused, onPrev, onNext, onShare, onHover }) {
+function StoryCard({ item, onPrev, onNext, onShare }) {
   const where = placeOf(item);
   const links = item.details.filter((entry) => entry.type === 'link');
   const main = links.find((link) => link.primary);
 
   return (
-    <div
-      className={`ann7-story ${paused ? 'is-paused' : ''}`}
-      style={{ '--ann7-ms': `${STORY_MS}ms` }}
-      onMouseEnter={() => onHover(true)}
-      onMouseLeave={() => onHover(false)}
-    >
+    <div className="ann7-story">
       <Megaphone className="ann7-megaphone" />
-
-      <div className="ann7-segments" aria-hidden="true">
-        {segments.map((state, i) => (
-          // eslint-disable-next-line react/no-array-index-key -- сегменты — позиции в наборе, а не объявления
-          <span key={i} className="ann7-segment">
-            {state === 'done' && <span className="ann7-segment-fill is-done" />}
-            {state === 'current' && <span key={run} className="ann7-segment-fill is-current" onAnimationEnd={onNext} />}
-          </span>
-        ))}
-      </div>
 
       <div className="ann7-story-top">
         {item.important && <ImportantPill />}
@@ -304,51 +277,33 @@ function StoryCard({ item, segments, run, paused, onPrev, onNext, onShare, onHov
   );
 }
 
-// Десктоп страницы объявлений (макет design_handoff_announcements 2, вариант 7a): слева сторис со стопкой подложек —
-// важные и последние объявления листаются сами по 7 секунд по кругу, справа список всех по дате публикации.
-// Строка списка открывает объявление в сторис: из набора — листание продолжается с него, не из набора —
-// оно «закреплено» (сегменты пустые, без таймера), а шаг вперёд или назад возвращает в набор.
-// Прочитанным объявление становится, только когда на него нажали в списке, а не когда сторис дошли до него сами.
-// initialId — объявление из ?a=, с которого начать; onRead(id) — отметить прочитанным.
-export default function AnnouncementBoard({ items, initialId, readIds, onRead, onShare }) {
-  const stories = storySet(items);
-  const [state, setState] = useState(() => {
-    const start = items.find((item) => String(item.id) === initialId) ?? stories[0];
-    return { id: start.id, pinned: !stories.includes(start) };
+// Десктоп страницы объявлений (макет design_handoff_announcements 2, вариант 7a): слева карточка открытого
+// объявления со стопкой подложек, справа список всех по дате публикации. Сами объявления не переключаются:
+// открывает строка списка, нажатие слева или справа на карточке листает список по кругу.
+// Показанное в карточке сразу становится прочитанным.
+// initialId — объявление из ?a=, с которого начать (без него — первое важное); onSeen(id) — показано.
+export default function AnnouncementBoard({ items, initialId, readIds, onSeen, onShare }) {
+  const [currentId, setCurrentId] = useState(() => {
+    const start = items.find((item) => String(item.id) === initialId) ?? items.find((item) => item.important) ?? items[0];
+    return start.id;
   });
-  // Счётчик показов: новый ключ перезапускает заливку сегмента, даже если объявление то же.
-  const [run, setRun] = useState(0);
-  const [hover, setHover] = useState(false);
 
-  const current = items.find((item) => item.id === state.id) ?? stories[0];
-  const position = state.pinned ? -1 : stories.indexOf(current);
+  const current = items.find((item) => item.id === currentId) ?? items[0];
+  const index = items.indexOf(current);
+  const step = (delta) => setCurrentId(items[(index + delta + items.length) % items.length].id);
 
-  const show = (item, pinned = false) => {
-    setState({ id: item.id, pinned });
-    setRun((value) => value + 1);
-  };
-
-  // Шаг по набору сторис по кругу; из закреплённого — к первому или последнему.
-  const step = (delta) => {
-    const count = stories.length;
-    const next = position < 0 ? (delta > 0 ? 0 : count - 1) : (position + delta + count) % count;
-    show(stories[next]);
-  };
-
-  const segments = stories.map((_, i) => (i < position ? 'done' : i === position ? 'current' : 'empty'));
+  useEffect(() => {
+    onSeen(String(current.id));
+  }, [current.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="ann7-board">
       <div className="ann7-stage">
         <StoryCard
           item={current}
-          segments={segments}
-          run={run}
-          paused={hover}
           onPrev={() => step(-1)}
           onNext={() => step(1)}
           onShare={onShare}
-          onHover={setHover}
         />
         <span className="ann7-layer is-first" aria-hidden="true" />
         <span className="ann7-layer is-second" aria-hidden="true" />
@@ -365,10 +320,7 @@ export default function AnnouncementBoard({ items, initialId, readIds, onRead, o
               active={active}
               read={!active && readIds.includes(id)}
               unread={!readIds.includes(id)}
-              onOpen={() => {
-                onRead(id);
-                if (!active) show(item, !stories.includes(item));
-              }}
+              onOpen={() => setCurrentId(item.id)}
             />
           );
         })}

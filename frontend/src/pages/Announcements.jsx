@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAnnouncements } from '../api/announcements.js';
@@ -26,8 +26,7 @@ function useIsPhone() {
 }
 
 // Страница объявлений. На телефоне — плитки, нажатая открывает полноэкранные сторис с этого объявления;
-// на десктопе — сторис слева и список справа (AnnouncementBoard). Прочитанным объявление становится, только если
-// на него нажали сами (плитка, строка списка) или пришли по ссылке на него, а не когда сторис дошли до него сами.
+// на десктопе — карточка слева и список справа (AnnouncementBoard). Показанные помечаются прочитанными.
 // ?a=<id> — открытое объявление: на телефоне — открытые сторис, на десктопе — с него начинаются сторис слева.
 export default function Announcements() {
   const { items, loading, error, retry } = useAnnouncements();
@@ -40,19 +39,11 @@ export default function Announcements() {
 
   const [linkedId] = useState(() => params.get('a'));
   const isRead = (item) => readIds.includes(String(item.id));
-
-  // Пришёл по ссылке на объявление (карточка на главной, «Поделиться») — его открыли сами.
-  useEffect(() => {
-    if (linkedId) markRead(linkedId);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const storyIndex = isPhone && params.get('a') ? items.findIndex((item) => String(item.id) === params.get('a')) : -1;
 
   // Открытие сторис — новая запись в истории: «Назад» на телефоне закрывает их, а не уводит со страницы.
   // Крестик тогда тоже возвращается назад; открытые по ссылке закрываются заменой адреса.
-  const openStory = (item) => {
-    markRead(String(item.id));
-    setParams({ a: String(item.id) }, { state: { story: true } });
-  };
+  const openStory = (item) => setParams({ a: String(item.id) }, { state: { story: true } });
   const showStory = (index) => setParams({ a: String(items[index].id) }, { replace: true, state: location.state });
   const closeStory = () => (location.state?.story ? navigate(-1) : setParams({ a: '' }, { replace: true }));
 
@@ -78,7 +69,7 @@ export default function Announcements() {
               ))}
             </div>
           ) : (
-            <AnnouncementBoard items={items} initialId={linkedId} readIds={readIds} onRead={markRead} onShare={share} />
+            <AnnouncementBoard items={items} initialId={linkedId} readIds={readIds} onSeen={markRead} onShare={share} />
           )
         )}
       </div>
@@ -89,6 +80,7 @@ export default function Announcements() {
           index={storyIndex}
           onIndex={showStory}
           onClose={closeStory}
+          onSeen={markRead}
           onShare={share}
         />
       )}

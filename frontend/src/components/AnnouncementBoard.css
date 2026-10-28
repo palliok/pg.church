@@ -24,15 +24,7 @@
 .ann7-story > :not(.ann-megaphone, .ann7-tap) { position: relative; }
 .ann7-story .ann7-megaphone { right: -70px; top: -10px; width: 320px; height: 320px; opacity: .14; }
 
-/* Прогресс: пройденные залиты, текущий заливается за --ann7-ms, пока курсор над карточкой — замирает. */
-.ann7-segments { display: flex; gap: 6px; }
-.ann7-segment { flex: 1; height: 3px; border-radius: 99px; background: rgba(255, 255, 255, .28); overflow: hidden; }
-.ann7-segment-fill { display: block; height: 100%; background: #fff; }
-.ann7-segment-fill.is-done { width: 100%; }
-.ann7-segment-fill.is-current { width: 0; animation: ann7-fill var(--ann7-ms) linear forwards; }
-.ann7-story.is-paused .ann7-segment-fill.is-current { animation-play-state: paused; }
-
-.ann7-story-top { display: flex; align-items: center; gap: 8px; min-height: 40px; margin-top: 18px; }
+.ann7-story-top { display: flex; align-items: center; gap: 8px; min-height: 40px; }
 .ann7-story-top .ann-important { align-self: center; height: 26px; padding: 0 11px; }
 .ann7-share {
   margin-left: auto;
@@ -50,7 +42,7 @@
 }
 .ann7-share:hover { background: var(--c-main); color: var(--c-ink); }
 
-.ann7-tap { position: absolute; top: 80px; height: 180px; padding: 0; border: 0; background: transparent; }
+.ann7-tap { position: absolute; top: 70px; height: 180px; padding: 0; border: 0; background: transparent; }
 .ann7-tap.is-prev { left: 0; width: 35%; cursor: w-resize; }
 .ann7-tap.is-next { right: 0; width: 50%; cursor: e-resize; }
 
@@ -208,11 +200,6 @@
   .ann7-when { align-items: flex-start; }
   .ann7-event { width: 100%; max-width: 340px; }
   .ann7-big-num { font-size: 72px; }
-}
-
-@keyframes ann7-fill {
-  from { width: 0; }
-  to { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {

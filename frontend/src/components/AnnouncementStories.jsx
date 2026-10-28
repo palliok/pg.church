@@ -55,8 +55,8 @@ export function AnnouncementTile({ item, read = false, onOpen }) {
 
 // Полноэкранные сторис с объявлениями: каждая идёт 7 секунд, потом следующая, после последней — закрываются.
 // Нажатие в левой трети — назад, правее — вперёд, свайп вбок листает, вниз — закрывает, удержание — пауза.
-// index — текущая, onIndex(i) — перейти.
-export default function AnnouncementStories({ items, index, onIndex, onClose, onShare }) {
+// index — текущая, onIndex(i) — перейти, onSeen(id) — показана (отметить прочитанной).
+export default function AnnouncementStories({ items, index, onIndex, onClose, onSeen, onShare }) {
   const [paused, setPaused] = useState(false);
   const [holding, setHolding] = useState(false);
   // Счётчик показов: новый ключ перезапускает заливку полоски, даже если сторис та же (назад с первой).
@@ -76,6 +76,10 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
     onIndex(Math.max(0, next));
     setRun((value) => value + 1);
   };
+
+  useEffect(() => {
+    onSeen(String(item.id));
+  }, [item.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Страница под сторис не прокручивается, фокус — на «Закрыть».
   useEffect(() => {
