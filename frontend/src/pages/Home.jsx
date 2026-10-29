@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import Announcements from '../components/Announcements.jsx';
 import HomeSchedule, { ScheduleCarousel } from '../components/HomeSchedule.jsx';
 import ContactsCard from '../components/ContactsCard.jsx';
-import LongArrow from '../components/LongArrow.jsx';
 import { useChurch } from '../api/church.js';
 import { daysFromToday } from '../api/dates.js';
 import { useEvents } from '../api/events.js';
@@ -93,8 +92,7 @@ export default function Home() {
 
         {/* Правая колонка: пожертвование и «Кто мы». */}
         <div className="home-right">
-        {/* Пожертвование: рука вдовы опускает две лепты в сокровищницу. Подпись и надпись сверху,
-            кнопка внизу; на десктопе кнопка под картинкой, как «Все объявления» в соседнем блоке. */}
+        {/* Пожертвование: рука вдовы опускает две лепты в сокровищницу. Подпись и надпись сверху, кнопка внизу. */}
         <div className="home-donate-column">
         <Link to="/donate" className="home-donate">
           <span className="home-donate-head">
@@ -110,12 +108,6 @@ export default function Home() {
             <span className="home-pill-knob">↗</span>
           </span>
         </Link>
-        <div className="home-donate-foot">
-          <Link to="/donate" className="ann-home-all">
-            Пожертвовать
-            <LongArrow />
-          </Link>
-        </div>
         </div>
 
         <Link to="/about" className="home-about">

@@ -113,11 +113,6 @@
 }
 .ann-home-card:hover .ann-home-more { background: var(--c-main); color: var(--c-ink); box-shadow: none; }
 
-/* Краешки следующих объявлений под карточкой; на телефоне по макету — только карточка. */
-.ann-home-layer { position: relative; display: none; margin-top: -2px; }
-.ann-home-layer.is-first { z-index: 2; height: 12px; margin-inline: 16px; background: var(--c-body); border-radius: 0 0 20px 20px; }
-.ann-home-layer.is-second { z-index: 1; height: 10px; margin-inline: 32px; background: var(--c-num); border-radius: 0 0 18px 18px; }
-
 /* На телефоне кнопки нет: на страницу ведут сама карточка и вкладка в нижнем меню. */
 .ann-home-foot { display: none; justify-content: flex-end; margin-top: 12px; }
 
@@ -164,7 +159,6 @@
 
 /* ===== Десктоп ===== */
 @media (min-width: 861px) {
-  .ann-home-layer { display: block; }
   .ann-home-foot { display: flex; }
 
   .ann-toast { bottom: 28px; }

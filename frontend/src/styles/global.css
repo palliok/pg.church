@@ -11,8 +11,8 @@
   --c-gray-text-soft: #8a8a8a;
   --c-gray-text-mute: #a3a3a3;
   --c-num: #87888a;
-  --c-panel: #f2f2f3;
-  --c-panel-hover: #eaeaec;
+  --c-panel: #f4f4f1; /* тёплый светло-серый, как подложка плиток дат (--c-page) */
+  --c-panel-hover: #ebebe6;
   --c-line: rgba(35, 31, 32, 0.14);
   --c-line-soft: rgba(35, 31, 32, 0.14);
   --c-page: #f4f4f1;

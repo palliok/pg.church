@@ -98,9 +98,8 @@
 /* Белая кнопка на тёмной картинке. */
 .home-donate-pill.is-dark { background: #fff; color: var(--c-ink); }
 .home-donate-pill.is-dark .home-pill-knob { background: var(--c-main); color: var(--c-ink); }
-/* Обёртка с кнопкой под картинкой нужна только на десктопе. */
+/* Обёртка нужна только на десктопе — место в сетке. */
 .home-donate-column { display: contents; }
-.home-donate-foot { display: none; }
 
 /* ===== Кто мы ===== */
 .home-about {
@@ -182,12 +181,9 @@
   /* Список расписания обрезается по высоте колонки и не растягивает сетку. */
   .home-schedule .home-sched-list { contain: size; }
 
-  /* «Поддержать» устроен как объявления рядом: картинка на высоту строки, под ней кнопка справа
-     (стиль — .ann-home-all из Announcements.css). Белая кнопка внутри картинки спрятана. */
+  /* «Поддержать» — картинка на высоту строки, кнопка внутри неё. */
   .home-donate-column { display: flex; flex-direction: column; min-width: 0; }
   .home-donate-column .home-donate { flex: 1; }
-  .home-donate-pill { display: none; }
-  .home-donate-foot { display: flex; justify-content: flex-end; margin-top: 12px; }
   /* Сверху место под кнопку ↗, чтобы заголовок на неё не наезжал. */
   .home-right .home-about { padding-top: 76px; }
 }
