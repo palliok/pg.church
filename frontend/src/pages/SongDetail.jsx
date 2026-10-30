@@ -1,52 +1,101 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useParams } from 'react-router-dom';
-import ArrowKnob from '../components/ArrowKnob.jsx';
+import { SettingsIcon, ShareIcon, TextDecreaseIcon, TextIncreaseIcon } from '../components/Icons.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
+import SongSettings from '../components/SongSettings.jsx';
 import SongText from '../components/SongText.jsx';
 import { useSong } from '../api/songs.js';
-import { songKey, transposeChord, transposeSections } from '../chords.js';
+import { songKey, transposeSections } from '../chords.js';
+import useWakeLock from '../hooks/useWakeLock.js';
+import { t } from '../i18n.js';
+import './SongDetail.css';
 
-const FONT_SIZES = [16, 19, 23];
-const FONT_LABELS = ['S', 'M', 'L'];
+const FONT_SIZES = [17, 19, 22, 26];
 
-// Включённые аккорды запоминаются в браузере: кто играет, тому они нужны в каждой песне.
+// Включённые аккорды и тёмная тема запоминаются в браузере: кто играет или читает в полутьме,
+// тому они нужны в каждой песне.
 const CHORDS_KEY = 'songs:chords';
+const THEME_KEY = 'songs:theme';
 
-function readChords() {
+// fallback — если в хранилище ничего нет: аккорды по умолчанию выключены, тема тёмная.
+function readFlag(key, on, fallback = false) {
   try {
-    return localStorage.getItem(CHORDS_KEY) === '1';
+    const value = localStorage.getItem(key);
+    return value === null ? fallback : value === on;
   } catch {
-    return false;
+    return fallback;
   }
 }
 
-function writeChords(on) {
+function writeFlag(key, value) {
   try {
-    localStorage.setItem(CHORDS_KEY, on ? '1' : '0');
+    localStorage.setItem(key, value);
   } catch {
     // Хранилище недоступно (приватный режим) — выбор действует до ухода со страницы.
   }
 }
 
-const panelBtn = (active) => ({ padding: '8px 14px', fontSize: 11, background: active ? '#231f20' : 'transparent', color: active ? '#fff' : '#231f20' });
+// «Поделиться» песней: системное меню, а где его нет — ссылка в буфер обмена.
+// toast — подпись для всплывашки, пустая строка — скрыта.
+function useShareSong() {
+  const [toast, setToast] = useState('');
+  const timer = useRef(null);
 
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  const showToast = (text) => {
+    clearTimeout(timer.current);
+    setToast(text);
+    timer.current = setTimeout(() => setToast(''), 2000);
+  };
+
+  const share = async (song) => {
+    const url = window.location.href;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `${song.num} · ${song.title}`, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      showToast(t('Ссылка скопирована'));
+    } catch (shareError) {
+      // Пользователь закрыл меню «Поделиться» — это не ошибка.
+      if (shareError?.name !== 'AbortError') showToast(t('Не удалось скопировать ссылку'));
+    }
+  };
+
+  return { share, toast };
+}
+
+// Страница песни (resources/design_handoff_songbook_mobile, экраны 03–05): карточка со светлой или тёмной темой,
+// размер текста в плашке, остальное — в шторке настроек. Тема меняет только карточку, шапка и меню остаются светлыми.
 export default function SongDetail() {
   const { id } = useParams();
   const { song, loading, error, retry } = useSong(id);
   const [fontStep, setFontStep] = useState(1);
-  const [chords, setChords] = useState(readChords);
+  const [chords, setChords] = useState(() => readFlag(CHORDS_KEY, '1'));
+  const [dark, setDark] = useState(() => readFlag(THEME_KEY, 'dark', true));
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const wake = useWakeLock();
+  const { share, toast } = useShareSong();
   // Сдвиг в полутонах; у другой песни он начинается заново.
   const [transpose, setTranspose] = useState({ id, steps: 0 });
   const steps = transpose.id === id ? transpose.steps : 0;
 
   const key = useMemo(() => (song ? songKey(song) : null), [song]);
   const sections = useMemo(() => (song && chords ? transposeSections(song.sections, steps, key) : song?.sections), [song, chords, steps, key]);
+  const closeSheet = useCallback(() => setSheetOpen(false), []);
 
-  const toggleChords = () => {
-    writeChords(!chords);
-    setChords(!chords);
+  const changeChords = (on) => {
+    writeFlag(CHORDS_KEY, on ? '1' : '0');
+    setChords(on);
   };
-  const shiftBy = (delta) => setTranspose((prev) => ({ id, steps: ((prev.id === id ? prev.steps : 0) + delta) % 12 }));
+  const changeTheme = (on) => {
+    writeFlag(THEME_KEY, on ? 'dark' : 'light');
+    setDark(on);
+  };
 
   if (loading || error) {
     return (
@@ -65,63 +114,62 @@ export default function SongDetail() {
     );
   }
 
+  const showChords = song.hasChords && chords;
+
   return (
-    <div className="page-enter container" style={{ padding: '20px 16px 64px', maxWidth: 760 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        <Link to="/songs" className="pill-btn" style={{ padding: '0 20px 0 8px', height: 44, background: 'var(--c-panel)', color: '#231f20' }}>
-          <ArrowKnob size={30} bg="#fff" fg="#231f20" symbol="←" />
-          <span style={{ fontSize: 11.5 }}>Сборник</span>
-        </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          {song.hasChords && (
-            <button
-              onClick={toggleChords}
-              aria-pressed={chords}
-              className="pill-btn"
-              style={{ padding: '0 18px', height: 44, fontSize: 11, background: chords ? '#231f20' : 'var(--c-panel)', color: chords ? '#fff' : '#231f20' }}
-            >
-              Аккорды
-            </button>
-          )}
-          {song.hasChords && chords && (
-            <div style={{ display: 'flex', gap: 3, padding: 4, borderRadius: 999, background: 'var(--c-panel)' }}>
-              <button onClick={() => shiftBy(-1)} aria-label="На полтона ниже" className="pill-btn" style={{ ...panelBtn(false), fontSize: 17, padding: '4px 13px' }}>−</button>
-              <button
-                onClick={() => setTranspose({ id, steps: 0 })}
-                disabled={!steps}
-                aria-label="Исходная тональность"
-                className="pill-btn"
-                style={{ ...panelBtn(steps !== 0), minWidth: 44, justifyContent: 'center', cursor: steps ? 'pointer' : 'default' }}
-              >
-                {key ? transposeChord(key, steps, key) : steps > 0 ? `+${steps}` : steps}
+    <div className="page-enter song-page">
+      <article className={`song-card${dark ? ' is-dark' : ''}${showChords ? ' has-chords' : ''}`}>
+        <div className="song-card-bar">
+          <Link to="/songs" className="song-card-back">← Сборник песен</Link>
+          <div className="song-card-tools">
+            <div className="song-card-chip">
+              <button type="button" onClick={() => setFontStep(fontStep - 1)} disabled={fontStep === 0} aria-label={t('Мельче')}>
+                <TextDecreaseIcon size={20} />
               </button>
-              <button onClick={() => shiftBy(1)} aria-label="На полтона выше" className="pill-btn" style={{ ...panelBtn(false), fontSize: 17, padding: '4px 13px' }}>+</button>
+              <button type="button" onClick={() => setFontStep(fontStep + 1)} disabled={fontStep === FONT_SIZES.length - 1} aria-label={t('Крупнее')}>
+                <TextIncreaseIcon size={22} />
+              </button>
+              <button
+                type="button"
+                className={`song-card-gear${showChords || steps ? ' is-active' : ''}`}
+                onClick={() => setSheetOpen(true)}
+                aria-label={t('Настройки')}
+              >
+                <SettingsIcon size={20} />
+              </button>
             </div>
-          )}
-          <div style={{ display: 'flex', gap: 3, padding: 4, borderRadius: 999, background: 'var(--c-panel)' }}>
-            {FONT_LABELS.map((label, i) => (
-              <button
-                key={label}
-                onClick={() => setFontStep(i)}
-                className="pill-btn"
-                style={panelBtn(fontStep === i)}
-              >
-                {label}
-              </button>
-            ))}
+            <button type="button" className="song-card-chip song-card-share" onClick={() => share(song)} aria-label={t('Поделиться')}>
+              <ShareIcon size={18} />
+            </button>
           </div>
         </div>
-      </div>
 
-      <div style={{ marginTop: 24, display: 'flex', alignItems: 'baseline', gap: 16 }}>
-        <span style={{ fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 44, color: 'var(--c-gray-text-mute)' }}>{song.num}</span>
-        <h1 className="h-display" style={{ fontSize: 'clamp(30px, 5vw, 44px)', textTransform: 'none' }}>{song.title}</h1>
-      </div>
-      <div style={{ font: '600 13px var(--f-sans)', color: 'var(--c-gray-text)', marginTop: 6 }}>{song.sub}</div>
+        <div className="song-card-head">
+          <span className="song-card-num">{song.num}</span>
+          <h1>{song.title}</h1>
+        </div>
 
-      <div style={{ marginTop: 30 }}>
-        <SongText sections={sections} chords={chords} fontSize={FONT_SIZES[fontStep]} />
-      </div>
+        <div className="song-card-text">
+          <SongText sections={sections} chords={showChords} fontSize={FONT_SIZES[fontStep]} gap={10} />
+        </div>
+      </article>
+
+      {sheetOpen && (
+        <SongSettings
+          dark={dark}
+          onDark={changeTheme}
+          hasChords={song.hasChords}
+          chords={chords}
+          onChords={changeChords}
+          songKey={key}
+          steps={steps}
+          onSteps={(next) => setTranspose({ id, steps: next })}
+          wake={wake}
+          onClose={closeSheet}
+        />
+      )}
+
+      {toast && createPortal(<div className="song-toast" role="status">{toast}</div>, document.body)}
     </div>
   );
 }

@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSong, useSongCategories, useSongs, useSongSearch } from '../api/songs.js';
 import LoadStatus from '../components/LoadStatus.jsx';
 import SongText from '../components/SongText.jsx';
+import { CloseIcon, SearchIcon } from '../components/Icons.jsx';
+import './Songs.css';
 
 const ALL = 'all';
 
@@ -19,27 +21,91 @@ function useDebounced(value, delay) {
   return debounced;
 }
 
+// Текст с подсвеченными вхождениями needle (без учёта регистра).
+function highlight(text, needle) {
+  if (!text || !needle) return text;
+
+  const lower = text.toLowerCase();
+  const query = needle.toLowerCase();
+  const parts = [];
+  let from = 0;
+
+  for (let at = lower.indexOf(query); at !== -1; at = lower.indexOf(query, from)) {
+    if (at > from) parts.push(text.slice(from, at));
+    parts.push(<mark key={at} className="sb-hl">{text.slice(at, at + query.length)}</mark>);
+    from = at + query.length;
+  }
+  if (from < text.length) parts.push(text.slice(from));
+
+  return parts;
+}
+
+// Буква для заголовка в режиме «А—Я»: первая буква названия, Ё — вместе с Е.
+function firstLetter(title) {
+  const letter = title.match(/[\p{L}\d]/u)?.[0]?.toUpperCase() ?? '#';
+  return letter === 'Ё' ? 'Е' : letter;
+}
+
+// Строка списка на телефоне: номер, название, строка текста и тональность; совпадения с поиском подсвечены.
+function SongRow({ song, line, term, isNum }) {
+  return (
+    <Link to={`/songs/${song.id}`} className="sb-row">
+      <span className="sb-num">{isNum ? highlight(String(song.num), term) : song.num}</span>
+      <span className="sb-text">
+        <span className="sb-title">{isNum ? song.title : highlight(song.title, term)}</span>
+        {line && <span className="sb-line">{isNum ? line : highlight(line, term)}</span>}
+      </span>
+      {song.key && <span className="sb-key">{song.key}</span>}
+    </Link>
+  );
+}
+
 export default function Songs() {
   const [q, setQ] = useState('');
   const [cat, setCat] = useState(ALL);
   const [favs, setFavs] = useState(() => new Set());
+
+  const [sort, setSort] = useState('num');
   const navigate = useNavigate();
 
   const { songs, loading, error, retry } = useSongs();
   const categories = useSongCategories();
   const term = q.trim();
-  const searchedTerm = useDebounced(term, 250);
+  // Одни цифры — это номер: ищем по его началу прямо в списке, без запроса.
+  const isNum = /^\d+$/.test(term);
+  const searchedTerm = useDebounced(isNum ? '' : term, 250);
   const found = useSongSearch(searchedTerm);
 
-  const filtered = useMemo(() => {
-    if (!term) return cat === ALL ? songs : songs.filter((s) => s.categoryId === cat);
+  // Строки с совпадением от сервера: по ним видно, почему песня нашлась.
+  const foundLines = useMemo(
+    () => new Map(found && searchedTerm === term ? found.map((s) => [s.id, s.line]) : []),
+    [found, searchedTerm, term],
+  );
 
-    // По названию и номеру ищем сразу в загруженном списке, по строке текста — на сервере.
-    const ids = new Set(found && searchedTerm === term ? found.map((s) => s.id) : []);
-    const matches = (s) => ids.has(s.id) || s.title.toLowerCase().includes(term.toLowerCase()) || String(s.num).startsWith(term);
+  const matched = useMemo(() => {
+    if (!term) return songs;
+    if (isNum) return songs.filter((s) => String(s.num).startsWith(term));
 
-    return songs.filter((s) => matches(s) && (cat === ALL || s.categoryId === cat));
-  }, [songs, found, searchedTerm, term, cat]);
+    // По названию ищем сразу в загруженном списке, по строке текста — на сервере.
+    return songs.filter((s) => foundLines.has(s.id) || s.title.toLowerCase().includes(term.toLowerCase()));
+  }, [songs, foundLines, term, isNum]);
+
+  const filtered = cat === ALL ? matched : matched.filter((s) => s.categoryId === cat);
+
+  // Список телефона: по номеру или по алфавиту с заголовками-буквами.
+  const rows = useMemo(() => {
+    if (sort === 'num') return matched.map((song) => ({ song }));
+
+    const result = [];
+    let letter = null;
+    [...matched].sort((a, b) => a.title.localeCompare(b.title, 'ru')).forEach((song) => {
+      const next = firstLetter(song.title);
+      if (next !== letter) result.push({ letter: (letter = next) });
+      result.push({ song });
+    });
+
+    return result;
+  }, [matched, sort]);
 
   const exact = songs.find((s) => String(s.num) === term);
   const preview = exact || filtered[0] || songs[0];
@@ -55,10 +121,49 @@ export default function Songs() {
 
   return (
     <div className="page-enter container page-bg" style={{ '--title-chars': t('Сборник песен').length }}>
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
-        <div>
-          <h1 className="page-title page-title--bg">Сборник песен</h1>
+      <h1 className="page-title page-title--bg">Сборник песен</h1>
+
+      {/* Телефон (resources/design_handoff_songbook_mobile): поиск закрепляется при прокрутке, рядом — сортировка. */}
+      <div className="mobile-only">
+        <div className="sb-bar">
+          <label className="sb-search">
+            <span className="sb-search-icon"><SearchIcon size={22} /></span>
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('Номер, название или строка')} />
+            {q && (
+              <button type="button" className="sb-clear" onClick={() => setQ('')} aria-label={t('Очистить')}>
+                <CloseIcon size={18} />
+              </button>
+            )}
+          </label>
+          <button
+            type="button"
+            className={`sb-sort${sort === 'alpha' ? ' is-alpha' : ''}`}
+            onClick={() => setSort(sort === 'num' ? 'alpha' : 'num')}
+            aria-label={t('Сортировка')}
+          >
+            {sort === 'num' ? '1—9' : t('А—Я')}
+          </button>
         </div>
+
+        <div className="sb-list">
+          {rows.map((row) => (row.letter ? (
+            <div key={`letter-${row.letter}`} className="sb-letter">
+              <span>{row.letter}</span>
+            </div>
+          ) : (
+            <SongRow key={row.song.id} song={row.song} line={foundLines.get(row.song.id) ?? row.song.line} term={term} isNum={isNum} />
+          )))}
+          {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
+          {!loading && !error && matched.length === 0 && (
+            <div className="sb-empty">
+              <span className="sb-empty-title">Ничего не нашлось</span>
+              <span>Попробуйте номер песни или слово из первой строки.</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="desktop-only" style={{ textAlign: 'right' }}>
         <button
           onClick={() => songs.length > 0 && navigate(`/songs/${songs[Math.floor(Math.random() * songs.length)].id}`)}
           className="pill-btn"
@@ -69,7 +174,7 @@ export default function Songs() {
         </button>
       </div>
 
-      <div className="songs-layout" style={{ marginTop: 24 }}>
+      <div className="songs-layout desktop-only" style={{ marginTop: 24 }}>
         <div style={{ borderRadius: 24, background: 'var(--c-panel)', padding: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '0 6px 0 16px', height: 52, borderRadius: 999, background: '#fff' }}>
             <span style={{ color: 'var(--c-gray-text-soft)', fontSize: 15 }}>⌕</span>

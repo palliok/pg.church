@@ -66,6 +66,18 @@ class SongApiTest extends TestCase
         $this->getJson('/api/v1/songs?q=нет такой песни')->assertJsonPath('data', []);
     }
 
+    public function test_index_shows_first_line_or_line_with_match(): void
+    {
+        $this->getJson('/api/v1/songs')
+            ->assertJsonPath('data.*.line', [null, 'Свят Господь Вседержитель,', 'Свет Твой сияет во мне,']);
+
+        // Строка с совпадением вместо первой; аккорды внутри слов не мешают.
+        $this->getJson('/api/v1/songs?q=ЗЕМЛЯ')->assertJsonPath('data.0.line', 'Вся земля полна славы Твоей.');
+        $this->getJson('/api/v1/songs?q=радость наполняет')->assertJsonPath('data.0.line', 'И радость наполняет дом.');
+        // Нашлась по названию — первая строка.
+        $this->getJson('/api/v1/songs?q=моя')->assertJsonPath('data.0.line', 'Свет Твой сияет во мне,');
+    }
+
     public function test_search_treats_like_wildcards_literally(): void
     {
         $this->getJson('/api/v1/songs?q='.urlencode('%'))->assertJsonPath('data.*.num', [60]);

@@ -87,7 +87,7 @@ docker compose exec app php artisan test
 | `GET /api/v1/events/{id}/sermon` | конспект проповеди |
 | `GET /api/v1/events.ics` | расписание календарём iCalendar — для подписки (`webcal://`) |
 | `GET /api/v1/events/{id}.ics` | одно событие файлом `.ics` |
-| `GET /api/v1/songs` | песни без текстов; параметры `q` (название, строка, номер), `category` |
+| `GET /api/v1/songs` | песни без текстов, но со строкой `line` — первой строкой песни, а при поиске строкой с совпадением; параметры `q` (название, строка, номер), `category` |
 | `GET /api/v1/songs/{id}` | песня с текстом и аккордами, разобранными на секции |
 | `GET /api/v1/song-categories` | разделы сборника |
 | `GET /api/v1/posts` | новости и блог; параметры `type` (`news`, `blog`), `per_page`, `page` |

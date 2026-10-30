@@ -29,6 +29,8 @@ class SongResource extends JsonResource
             'category' => $this->category?->name,
             'categoryId' => $this->song_category_id,
             'key' => $this->key,
+            // Строка текста для списка: с совпадением при поиске, иначе первая.
+            'line' => $this->whenHas('line'),
             // Текст отдаётся только там, где он выбран из базы (страница песни).
             $this->mergeWhen(array_key_exists('chordpro', $this->resource->getAttributes()), fn () => $this->text()),
         ];

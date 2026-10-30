@@ -100,3 +100,58 @@ export function DoneAllIcon({ size = 24 }) {
     </svg>
   );
 }
+
+// Поиск — search.
+export function SearchIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Текст мельче — text_decrease.
+export function TextDecreaseIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <path d="M.99 19h2.42l1.27-3.58h5.65L11.59 19h2.42L8.75 5h-2.5L.99 19zm4.42-5.61L7.44 7.6h.12l2.03 5.79H5.41zM23 11v2h-8v-2h8z" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Текст крупнее — text_increase.
+export function TextIncreaseIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <path d="M.99 19h2.42l1.27-3.58h5.65L11.59 19h2.42L8.75 5h-2.5L.99 19zm4.42-5.61L7.44 7.6h.12l2.03 5.79H5.41zM20 11h3v2h-3v3h-2v-3h-3v-2h3V8h2v3z" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Настройки — settings.
+export function SettingsIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Светлая тема — light_mode.
+export function LightModeIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <circle cx="12" cy="12" r="4.5" fill="currentColor" />
+      <path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.58 4.58l2.12 2.12M17.3 17.3l2.12 2.12M4.58 19.42l2.12-2.12M17.3 6.7l2.12-2.12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// Тёмная тема — dark_mode.
+export function DarkModeIcon({ size = 24 }) {
+  return (
+    <svg {...svgProps(size)}>
+      <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z" fill="currentColor" />
+    </svg>
+  );
+}

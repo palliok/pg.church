@@ -107,21 +107,26 @@ function chordLine(line) {
   return parts;
 }
 
+const PLAIN_LINES = LYRICS.flatMap(([, , lines]) => lines.map((line) => line.replace(/\[[^\]]+\]/g, '')));
+
 const SECTIONS = LYRICS.map(([type, label, lines]) => ({ type, label, lines: lines.map(chordLine) }));
 
 const songs = SONG_TITLES.map((title, index) => {
   const category = CATEGORIES[index % 3];
 
-  return { id: index + 1, num: 60 + index * 7, title, sub: null, category: category.name, categoryId: category.id, key: 'E' };
+  return { id: index + 1, num: 60 + index * 7, title, sub: null, category: category.name, categoryId: category.id, key: 'E', line: PLAIN_LINES[0] };
 });
 
 const songWithText = (song) => ({ ...song, hasChords: true, sections: SECTIONS });
 
+// Как на бэке: строка с совпадением вместо первой.
 function searchSongs(term) {
   const query = term.trim().toLowerCase();
-  const inLyrics = LYRICS.some(([, , lines]) => lines.some((line) => line.replace(/\[[^\]]+\]/g, '').toLowerCase().includes(query)));
+  const line = PLAIN_LINES.find((text) => text.toLowerCase().includes(query));
 
-  return songs.filter((song) => inLyrics || song.title.toLowerCase().includes(query) || String(song.num) === query);
+  return songs
+    .filter((song) => line || song.title.toLowerCase().includes(query) || String(song.num).startsWith(query))
+    .map((song) => ({ ...song, line: line ?? song.line }));
 }
 
 // ===== События =====

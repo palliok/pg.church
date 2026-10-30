@@ -26,6 +26,7 @@ class SongController extends Controller
 
         $songs = Song::query()
             ->withoutLyrics()
+            ->withLine($term)
             ->with('category')
             ->when($term !== '', fn ($query) => $query->search($term))
             ->when($filters['category'] ?? null, fn ($query, $category) => $query->where('song_category_id', $category))

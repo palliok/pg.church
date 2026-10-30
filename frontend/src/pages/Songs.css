@@ -1,0 +1,29 @@
+/* Сборник на телефоне (resources/design_handoff_songbook_mobile, экраны 01–02). Десктоп — inline-стили в Songs.jsx. */
+
+/* Поиск закреплён при прокрутке; белый фон на всю ширину экрана — поверх отступов контейнера. */
+.sb-bar { position: sticky; top: 0; z-index: 2; display: flex; gap: 8px; margin: 0 -14px; padding: 6px 14px 12px; background: #fff; }
+.sb-search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 6px 0 16px; border-radius: 99px; background: #f2f2f3; color: var(--c-ink); }
+.sb-search-icon { color: var(--c-gray-text); }
+.sb-search input { flex: 1; min-width: 0; height: 100%; border: none; outline: none; background: none; font: 16px var(--f-sans); color: var(--c-ink); }
+.sb-search input::placeholder { color: var(--c-gray-text-soft); }
+.sb-clear { flex: none; width: 40px; height: 40px; border: none; border-radius: 99px; background: #fff; color: var(--c-ink); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.sb-sort { flex: none; min-width: 64px; height: 52px; padding: 0 14px; border: none; border-radius: 99px; background: #f2f2f3; color: var(--c-ink); cursor: pointer; font: 12px var(--f-mono); letter-spacing: .04em; }
+.sb-sort.is-alpha { background: var(--c-ink); color: #fff; }
+
+/* Заголовок-буква в режиме «А—Я» закрепляется под поиском (52px поля + 18px отступов). */
+.sb-letter { position: sticky; top: 70px; z-index: 1; display: flex; align-items: center; gap: 12px; padding: 16px 4px 8px; background: #fff; }
+.sb-letter span { font: 26px/1 var(--f-num); color: var(--c-main); }
+.sb-letter::after { content: ''; flex: 1; height: 1px; background: rgba(35, 31, 32, .12); }
+
+.sb-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px 4px; border-bottom: 1px solid rgba(35, 31, 32, .1); color: var(--c-ink); -webkit-tap-highlight-color: transparent; }
+.sb-row:active { background: #f2f2f3; }
+.sb-num { font: 24px/1 var(--f-num); letter-spacing: -.03em; }
+.sb-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.sb-title { font: 700 17px/1.1 var(--f-sans); letter-spacing: -.04em; }
+.sb-line { font: 13px/1.35 var(--f-sans); color: var(--c-gray-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-key { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 26px; padding: 0 9px; border-radius: 99px; box-shadow: inset 0 0 0 1px rgba(35, 31, 32, .2); font: 11px var(--f-mono); letter-spacing: .04em; color: var(--c-body); }
+
+.sb-hl { border-radius: 4px; background: var(--c-main); color: inherit; }
+
+.sb-empty { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; padding: 22px 20px; border-radius: 28px; background: var(--c-warm); font: 15px/1.45 var(--f-sans); color: var(--c-body); }
+.sb-empty-title { font: 700 24px/1 var(--f-sans); letter-spacing: -.05em; color: var(--c-ink); }

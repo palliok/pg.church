@@ -217,7 +217,6 @@
   .page-enter.container.page-bg:not(.home-wrap) { padding-top: 25px !important; overflow-x: clip; }
 
   .split-layout,
-  .songs-layout,
   .donate-layout {
     grid-template-columns: 1fr !important;
     gap: 14px !important;
@@ -239,15 +238,6 @@
 
   .home-mobile + .home-grid {
     display: none !important;
-  }
-
-  .songs-layout {
-    margin-top: 18px !important;
-  }
-
-  .songs-layout > div:first-child {
-    padding: 16px !important;
-    border-radius: 22px !important;
   }
 
   .donate-layout > div {

@@ -42,7 +42,7 @@ export default function SongText({ sections, chords = false, fontSize = 16, gap 
   return (
     <div className="song-text" style={{ fontSize, '--song-gap': `${gap}px` }}>
       {sections.map((section, i) => (
-        <section key={i}>
+        <section key={i} className={section.type ? `song-section-${section.type}` : undefined}>
           {section.label && <p className="song-label">{section.label}</p>}
           {section.lines.length > 0 && (
             <div className="song-lines">

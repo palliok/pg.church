@@ -63,6 +63,28 @@ class Song extends Model
     }
 
     /**
+     * Строка текста для списка (`line`): первая, где встречается term, иначе первая строка песни.
+     * По ней в сборнике видно, почему песня нашлась.
+     *
+     * @param  Builder<Song>  $query
+     */
+    public function scopeWithLine(Builder $query, string $term = ''): void
+    {
+        $first = "split_part(lyrics, E'\\n', 1)";
+
+        if ($term === '') {
+            $query->selectRaw("$first as line");
+
+            return;
+        }
+
+        $query->selectRaw(
+            "coalesce((select l from regexp_split_to_table(lyrics, E'\\n') with ordinality as t(l, n) where l ilike ? order by n limit 1), $first) as line",
+            ['%'.Text::escapeLike($term).'%'],
+        );
+    }
+
+    /**
      * «214 · Свят, свят, свят» — подпись в выпадающих списках админки.
      */
     protected function displayName(): Attribute

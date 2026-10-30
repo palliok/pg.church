@@ -1,0 +1,52 @@
+/* Шторка настроек песни (resources/design_handoff_songbook_mobile, экран 04). Выше нижнего меню (.tabbar, z-index 61). */
+.ss { position: fixed; inset: 0; z-index: 90; }
+.ss-overlay { position: absolute; inset: 0; background: rgba(35, 31, 32, .4); animation: ss-fade .2s ease; }
+.ss-sheet {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: calc(8px + env(safe-area-inset-bottom));
+  max-height: calc(100% - 16px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 12px 20px 20px;
+  border-radius: 36px;
+  background: #fff;
+  color: var(--c-ink);
+  font-family: var(--f-sans);
+  animation: ss-up .28s cubic-bezier(.2, .8, .2, 1);
+}
+/* На десктопе — той же ширины, что на телефоне, по центру. */
+@media (min-width: 861px) {
+  .ss-sheet { left: 50%; right: auto; width: 420px; bottom: 24px; transform: translateX(-50%); animation: none; }
+}
+
+.ss-handle { align-self: center; width: 40px; height: 5px; border-radius: 99px; background: rgba(35, 31, 32, .2); }
+.ss-title { font: 700 28px/1 var(--f-sans); letter-spacing: -.055em; }
+.ss-mono { font: 12px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
+.ss-muted { color: var(--c-gray-text); }
+
+.ss-seg { display: flex; gap: 4px; padding: 4px; border-radius: 99px; background: var(--c-panel); }
+.ss-seg button { flex: 1; height: 48px; border: none; border-radius: 99px; background: transparent; color: var(--c-ink); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font: 15px var(--f-sans); letter-spacing: -.02em; }
+.ss-seg button.is-on { background: var(--c-ink); color: #fff; }
+
+.ss-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; height: 60px; padding: 0 8px 0 20px; border: none; border-radius: 99px; background: var(--c-panel); color: var(--c-ink); cursor: pointer; text-align: left; font: 16px var(--f-sans); letter-spacing: -.02em; }
+.ss-switch { flex: none; width: 56px; height: 36px; padding: 3px; border-radius: 99px; background: rgba(35, 31, 32, .2); display: flex; transition: background .2s; }
+.ss-switch span { width: 30px; height: 30px; border-radius: 99px; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .2); transition: transform .2s; }
+.ss-switch.is-on { background: var(--c-main); }
+.ss-switch.is-on span { transform: translateX(20px); }
+
+.ss-key { display: flex; flex-direction: column; gap: 10px; }
+.ss-key-head { display: flex; justify-content: space-between; align-items: baseline; }
+.ss-scale { display: flex; align-items: center; height: 56px; padding: 0 6px; border-radius: 99px; background: var(--c-panel); }
+.ss-scale button { flex: 1; min-width: 0; height: 44px; padding: 0; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.ss-tick { width: 2px; height: 12px; border-radius: 2px; background: rgba(35, 31, 32, .35); }
+.ss-tick.is-origin { height: 22px; background: var(--c-main); }
+.ss-current { flex: none; min-width: 40px; height: 40px; padding: 0 6px; border-radius: 99px; background: var(--c-ink); color: #fff; display: flex; align-items: center; justify-content: center; font: 16px var(--f-num); }
+
+.ss-done { flex: none; height: 60px; border: none; border-radius: 99px; background: var(--c-ink); color: #fff; cursor: pointer; font: 700 12px var(--f-sans); letter-spacing: .06em; text-transform: uppercase; }
+
+@keyframes ss-fade { from { opacity: 0; } }
+@keyframes ss-up { from { transform: translateY(40px); opacity: 0; } }
