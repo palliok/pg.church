@@ -1,13 +1,11 @@
 import { t } from '../i18n.js';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useSong, useSongCategories, useSongs, useSongSearch } from '../api/songs.js';
+import { Link } from 'react-router-dom';
+import { useSong, useSongs, useSongSearch } from '../api/songs.js';
 import LoadStatus from '../components/LoadStatus.jsx';
-import SongText from '../components/SongText.jsx';
+import SongCard from '../components/SongCard.jsx';
 import { CloseIcon, SearchIcon } from '../components/Icons.jsx';
 import './Songs.css';
-
-const ALL = 'all';
 
 // Значение, которое не менялось delay миллисекунд: чтобы не слать запрос на каждую букву.
 function useDebounced(value, delay) {
@@ -46,10 +44,19 @@ function firstLetter(title) {
   return letter === 'Ё' ? 'Е' : letter;
 }
 
-// Строка списка на телефоне: номер, название, строка текста и тональность; совпадения с поиском подсвечены.
-function SongRow({ song, line, term, isNum }) {
+// На десктопе рядом со списком карточка песни: клик по строке открывает песню в ней, а не на отдельной странице.
+const DESKTOP = '(min-width: 861px)';
+
+// Строка списка: номер, название, строка текста и тональность; совпадения с поиском подсвечены.
+function SongRow({ song, line, term, isNum, active, onPick }) {
+  const pick = (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || !window.matchMedia(DESKTOP).matches) return;
+    e.preventDefault();
+    onPick(song.id);
+  };
+
   return (
-    <Link to={`/songs/${song.id}`} className="sb-row">
+    <Link to={`/songs/${song.id}`} className={`sb-row${active ? ' is-active' : ''}`} onClick={pick} aria-current={active || undefined}>
       <span className="sb-num">{isNum ? highlight(String(song.num), term) : song.num}</span>
       <span className="sb-text">
         <span className="sb-title">{isNum ? song.title : highlight(song.title, term)}</span>
@@ -62,14 +69,11 @@ function SongRow({ song, line, term, isNum }) {
 
 export default function Songs() {
   const [q, setQ] = useState('');
-  const [cat, setCat] = useState(ALL);
-  const [favs, setFavs] = useState(() => new Set());
-
   const [sort, setSort] = useState('num');
-  const navigate = useNavigate();
+  // Песня, выбранная в списке для карточки на десктопе; новый поиск выбор сбрасывает.
+  const [picked, setPicked] = useState(null);
 
   const { songs, loading, error, retry } = useSongs();
-  const categories = useSongCategories();
   const term = q.trim();
   // Одни цифры — это номер: ищем по его началу прямо в списке, без запроса.
   const isNum = /^\d+$/.test(term);
@@ -90,9 +94,7 @@ export default function Songs() {
     return songs.filter((s) => foundLines.has(s.id) || s.title.toLowerCase().includes(term.toLowerCase()));
   }, [songs, foundLines, term, isNum]);
 
-  const filtered = cat === ALL ? matched : matched.filter((s) => s.categoryId === cat);
-
-  // Список телефона: по номеру или по алфавиту с заголовками-буквами.
+  // Список: по номеру или по алфавиту с заголовками-буквами.
   const rows = useMemo(() => {
     if (sort === 'num') return matched.map((song) => ({ song }));
 
@@ -108,157 +110,67 @@ export default function Songs() {
   }, [matched, sort]);
 
   const exact = songs.find((s) => String(s.num) === term);
-  const preview = exact || filtered[0] || songs[0];
+  const preview = matched.find((s) => s.id === picked) || exact || matched[0] || songs[0];
   const { song: previewSong } = useSong(preview?.id ?? null);
 
-  function toggleFav(id) {
-    setFavs((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  }
+  // Пока грузится следующая песня, карточка показывает предыдущую, а не пропадает.
+  const [shown, setShown] = useState(null);
+  if (previewSong && previewSong !== shown) setShown(previewSong);
+
+  const search = (value) => {
+    setQ(value);
+    setPicked(null);
+  };
 
   return (
     <div className="page-enter container page-bg" style={{ '--title-chars': t('Сборник песен').length }}>
       <h1 className="page-title page-title--bg">Сборник песен</h1>
 
-      {/* Телефон (resources/design_handoff_songbook_mobile): поиск закрепляется при прокрутке, рядом — сортировка. */}
-      <div className="mobile-only">
-        <div className="sb-bar">
-          <label className="sb-search">
-            <span className="sb-search-icon"><SearchIcon size={22} /></span>
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('Номер, название или строка')} />
-            {q && (
-              <button type="button" className="sb-clear" onClick={() => setQ('')} aria-label={t('Очистить')}>
-                <CloseIcon size={18} />
-              </button>
-            )}
-          </label>
-          <button
-            type="button"
-            className={`sb-sort${sort === 'alpha' ? ' is-alpha' : ''}`}
-            onClick={() => setSort(sort === 'num' ? 'alpha' : 'num')}
-            aria-label={t('Сортировка')}
-          >
-            {sort === 'num' ? '1—9' : t('А—Я')}
-          </button>
-        </div>
-
-        <div className="sb-list">
-          {rows.map((row) => (row.letter ? (
-            <div key={`letter-${row.letter}`} className="sb-letter">
-              <span>{row.letter}</span>
-            </div>
-          ) : (
-            <SongRow key={row.song.id} song={row.song} line={foundLines.get(row.song.id) ?? row.song.line} term={term} isNum={isNum} />
-          )))}
-          {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
-          {!loading && !error && matched.length === 0 && (
-            <div className="sb-empty">
-              <span className="sb-empty-title">Ничего не нашлось</span>
-              <span>Попробуйте номер песни или слово из первой строки.</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="desktop-only" style={{ textAlign: 'right' }}>
-        <button
-          onClick={() => songs.length > 0 && navigate(`/songs/${songs[Math.floor(Math.random() * songs.length)].id}`)}
-          className="pill-btn"
-          style={{ padding: '0 8px 0 20px', height: 46, background: 'var(--c-panel)', color: '#231f20' }}
-        >
-          <span style={{ fontSize: 11.5 }}>Случайная</span>
-          <span className="icon-circle" style={{ width: 32, height: 32, background: '#fff', fontSize: 15 }}>⤮</span>
-        </button>
-      </div>
-
-      <div className="songs-layout desktop-only" style={{ marginTop: 24 }}>
-        <div style={{ borderRadius: 24, background: 'var(--c-panel)', padding: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '0 6px 0 16px', height: 52, borderRadius: 999, background: '#fff' }}>
-            <span style={{ color: 'var(--c-gray-text-soft)', fontSize: 15 }}>⌕</span>
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder={t('Название, номер или строка')}
-              style={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'none', font: '500 14.5px var(--f-sans)', color: '#231f20' }}
-            />
-            {q && (
-              <button onClick={() => setQ('')} aria-label={t('Очистить')} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--c-gray-text-mute)' }}>✕</button>
-            )}
-          </div>
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginTop: 14 }}>
-            {[{ id: ALL, name: t('Все') }, ...categories].map((c) => (
-              <button
-                key={c.id}
-                onClick={() => setCat(c.id)}
-                className="pill-btn"
-                style={{ padding: '9px 15px', fontSize: 11, background: cat === c.id ? '#231f20' : '#fff', color: cat === c.id ? '#fff' : '#231f20' }}
-              >
-                {c.name}
-              </button>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 18 }}>
-            <span className="eyebrow" style={{ fontSize: 9.5 }}>Список</span>
-            <span style={{ font: '600 11.5px var(--f-sans)', color: 'var(--c-gray-text-soft)' }}>{filtered.length} {t('песен')}</span>
-          </div>
-
-          <div className="hide-scrollbar" style={{ maxHeight: 520, overflowY: 'auto', marginTop: 4, paddingRight: 4 }}>
-            {filtered.map((s) => (
-              <div key={s.id} className="card-row" style={{ padding: '10px 8px', borderRadius: 14 }}>
-                <Link to={`/songs/${s.id}`} style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 12, color: 'inherit' }}>
-                  <span style={{ flex: '0 0 30px', fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 15, color: 'var(--c-gray-text-mute)' }}>{s.num}</span>
-                  <span style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: 'block', fontFamily: 'var(--f-sans)', fontWeight: 600, fontSize: 17, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.title}</span>
-                    <span style={{ display: 'block', font: '500 12px var(--f-sans)', color: 'var(--c-gray-text)', marginTop: 2 }}>{s.sub}</span>
-                  </span>
-                </Link>
-                <button
-                  onClick={() => toggleFav(s.id)}
-                  aria-label={t('В избранное')}
-                  style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: favs.has(s.id) ? 'var(--c-second)' : 'var(--c-gray-text-mute)' }}
-                >
-                  {favs.has(s.id) ? '★' : '☆'}
+      <div className="songs-layout">
+        {/* Поиск и список — один и тот же блок для телефона и десктопа (resources/design_handoff_songbook_mobile):
+            поиск закрепляется при прокрутке, рядом — сортировка. На десктопе справа — превью песни. */}
+        <div>
+          <div className="sb-bar">
+            <label className="sb-search">
+              <span className="sb-search-icon"><SearchIcon size={22} /></span>
+              <input value={q} onChange={(e) => search(e.target.value)} placeholder={t('Номер, название или строка')} />
+              {q && (
+                <button type="button" className="sb-clear" onClick={() => search('')} aria-label={t('Очистить')}>
+                  <CloseIcon size={18} />
                 </button>
+              )}
+            </label>
+            <button
+              type="button"
+              className={`sb-sort${sort === 'alpha' ? ' is-alpha' : ''}`}
+              onClick={() => setSort(sort === 'num' ? 'alpha' : 'num')}
+              aria-label={t('Сортировка')}
+            >
+              {sort === 'num' ? '1—9' : t('А—Я')}
+            </button>
+          </div>
+
+          <div className="sb-list">
+            {rows.map((row) => (row.letter ? (
+              <div key={`letter-${row.letter}`} className="sb-letter">
+                <span>{row.letter}</span>
               </div>
-            ))}
+            ) : (
+              <SongRow key={row.song.id} song={row.song} line={foundLines.get(row.song.id) ?? row.song.line} term={term} isNum={isNum}
+                active={row.song.id === preview?.id} onPick={setPicked} />
+            )))}
             {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
-            {!loading && !error && filtered.length === 0 && (
-              <div style={{ padding: '34px 18px', borderRadius: 18, background: '#fff', textAlign: 'center', marginTop: 10 }}>
-                <div className="h-display" style={{ fontSize: 16 }}>Ничего не нашлось</div>
-                <div style={{ font: '500 12.5px/1.5 var(--f-sans)', color: 'var(--c-gray-text-soft)', marginTop: 6 }}>
-                  Попробуйте номер песни или слово из первой строки.
-                </div>
+            {!loading && !error && matched.length === 0 && (
+              <div className="sb-empty">
+                <span className="sb-empty-title">Ничего не нашлось</span>
+                <span>Попробуйте номер песни или слово из первой строки.</span>
               </div>
             )}
           </div>
         </div>
 
-        <div className="desktop-only">
-          {preview && (
-            <div style={{ borderRadius: 24, overflow: 'hidden', background: '#fff', boxShadow: '0 0 0 1px rgba(35,31,32,.08)' }}>
-              <div
-                style={{
-                  position: 'relative', minHeight: 200, backgroundColor: '#231f20',
-                  backgroundImage: 'linear-gradient(to top, rgba(5,5,5,.92) 10%, rgba(5,5,5,.2) 70%), repeating-linear-gradient(135deg, rgba(255,255,255,.04) 0 11px, transparent 11px 22px)',
-                  color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '28px 30px',
-                }}
-              >
-                <div className="eyebrow" style={{ color: 'rgba(255,255,255,.5)' }}>№ {preview.num} · {preview.category}</div>
-                <div className="h-display" style={{ fontSize: 40, marginTop: 10 }}>{preview.title}</div>
-              </div>
-              <div style={{ padding: 28 }}>
-                {previewSong && <SongText sections={previewSong.sections} gap={14} />}
-                <Link to={`/songs/${preview.id}`} className="pill-btn" style={{ marginTop: 10, padding: '11px 20px', background: '#231f20', color: '#fff', fontSize: 11.5 }}>
-                  Открыть песню ↗
-                </Link>
-              </div>
-            </div>
-          )}
+        <div className="desktop-only sb-preview">
+          {shown && <SongCard song={shown} nav={<Link to={`/songs/${shown.id}`} className="song-card-back">Открыть песню ↗</Link>} />}
         </div>
       </div>
     </div>

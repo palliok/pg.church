@@ -70,15 +70,6 @@ export function daysFromToday({ year, month, day }) {
   return Math.round((Date.UTC(year, month - 1, day) - Date.UTC(today.year, today.month - 1, today.day)) / 86_400_000);
 }
 
-// День события относительно сегодня: «Сегодня», «Завтра» или «Сб 27».
-export function relativeDay(event) {
-  const days = daysFromToday(event);
-  if (days === 0) return t('Сегодня');
-  if (days === 1) return t('Завтра');
-
-  return `${event.dowShort} ${event.day}`;
-}
-
 // Сколько осталось до начала: «через 40 мин», «через 3 ч» или «идёт сейчас».
 // Считается только в пределах суток; для прошедших, дальних событий и событий на весь день — null.
 export function startsIn(event, { now = Date.now() } = {}) {

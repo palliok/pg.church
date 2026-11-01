@@ -19,7 +19,7 @@
 }
 
 .live-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; padding-top: 8px; }
-.live-modal-badge { display: flex; align-items: center; gap: 9px; font: 700 10px var(--f-sans); letter-spacing: .14em; text-transform: uppercase; }
+.live-modal-badge { display: flex; align-items: center; gap: 9px; font: 700 11px var(--f-sans); letter-spacing: .14em; text-transform: uppercase; }
 .live-modal-close { flex: 0 0 auto; width: 44px; height: 44px; border: none; border-radius: 99px; background: rgba(255,255,255,.12); color: #fff; cursor: pointer; font-size: 15px; transition: background .15s; }
 .live-modal-close:hover { background: rgba(255,255,255,.2); }
 
@@ -30,14 +30,14 @@
 .live-modal-grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
 .live-tile { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 6px 14px; border-radius: 22px; background: rgba(255,255,255,.08); color: #fff; transition: background .15s; }
 .live-tile:hover { background: rgba(255,255,255,.16); }
-.live-tile-name { font: 700 12.5px var(--f-sans); text-align: center; overflow-wrap: anywhere; }
+.live-tile-name { font: 700 13px var(--f-sans); text-align: center; overflow-wrap: anywhere; }
 
 /* Широкая строка: единственная площадка и трансляция с сурдопереводом. */
 .live-row { display: flex; align-items: center; gap: 14px; width: 100%; margin-top: 16px; padding: 10px; border-radius: 22px; background: rgba(255,255,255,.08); color: #fff; transition: background .15s, border-color .15s; }
 .live-row:hover { background: rgba(255,255,255,.16); }
 .live-row-text { flex: 1; min-width: 0; }
 .live-row-name { display: block; font: 700 16px var(--f-sans); }
-.live-row-note { display: block; margin-top: 3px; font: 500 11.5px var(--f-sans); color: rgba(255,255,255,.6); }
+.live-row-note { display: block; margin-top: 3px; font: 500 12px var(--f-sans); color: rgba(255,255,255,.6); }
 .live-row-go { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 99px; background: var(--c-main); color: var(--c-ink); display: flex; align-items: center; justify-content: center; font-size: 15px; }
 
 .live-row--sign { margin-top: 10px; background: none; border: 1.5px solid rgba(255,255,255,.3); }
@@ -46,7 +46,7 @@
 .live-row--sign .live-row-note { margin-top: 2px; }
 .live-row--sign .live-row-go { background: #fff; }
 
-.live-modal-section { display: flex; align-items: center; gap: 10px; margin-top: 18px; font: 700 10px var(--f-sans); letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+.live-modal-section { display: flex; align-items: center; gap: 10px; margin-top: 18px; font: 700 11px var(--f-sans); letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.55); }
 .live-modal-section::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.14); }
 
 .live-modal-handle { width: 44px; height: 4px; border-radius: 99px; background: rgba(255,255,255,.2); margin: 14px auto 0; }
@@ -71,7 +71,7 @@
 
   .live-row { gap: 16px; margin-top: 22px; padding: 12px; border-radius: 24px; }
   .live-row-name { font-size: 17px; }
-  .live-row-note { font-size: 12.5px; }
+  .live-row-note { font-size: 13px; }
   .live-row-go { width: 44px; height: 44px; }
   .live-row--sign { margin-top: 12px; }
   .live-row--sign .live-row-name { font-size: 16px; }

@@ -8,7 +8,6 @@ import { useChurch } from '../api/church.js';
 import { daysFromToday } from '../api/dates.js';
 import { useEvents } from '../api/events.js';
 import gospelTitle from '../assets/gospel-title.png';
-import donateTitle from '../assets/donate-title.png';
 import './Home.css';
 
 // Текущее время, обновляется раз в минуту: «через 3 ч» и прошедшие события на главной.
@@ -90,24 +89,17 @@ export default function Home() {
         <HomeSchedule className="home-schedule" events={upcoming} loading={eventsLoading} error={eventsError} now={now} />
         </div>
 
-        {/* Правая колонка: пожертвование и «Кто мы». */}
+        {/* Правая колонка: блог и «Кто мы». */}
         <div className="home-right">
-        {/* Пожертвование: рука вдовы опускает две лепты в сокровищницу. Подпись и надпись сверху, кнопка внизу. */}
-        <div className="home-donate-column">
-        <Link to="/donate" className="home-donate">
-          <span className="home-donate-head">
-            <span className="home-label">Пожертвование</span>
-            {titleImage ? (
-              <img className="home-donate-title-img" src={donateTitle} alt="Поддержать служение" />
-            ) : (
-              <span className="home-donate-title">Поддержать служение</span>
-            )}
+        {/* Блог ещё не готов: плитка-заглушка без ссылки. Пожертвовать можно через «Поддержать» в шапке. */}
+        <div className="home-blog-column">
+        <div className="home-blog" aria-disabled="true">
+          <span className="home-blog-head">
+            <span className="home-blog-soon">В разработке</span>
+            <span className="home-blog-title">Блог</span>
           </span>
-          <span className="home-pill is-dark is-small home-donate-pill">
-            Пожертвовать
-            <span className="home-pill-knob">↗</span>
-          </span>
-        </Link>
+          <span className="home-blog-line">Скоро здесь появятся первые записи</span>
+        </div>
         </div>
 
         <Link to="/about" className="home-about">

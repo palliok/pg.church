@@ -102,7 +102,7 @@
 
 .ann7-range { display: flex; align-items: flex-end; gap: 14px; }
 .ann7-range-part { display: flex; flex-direction: column; gap: 12px; }
-.ann7-range-part .ann7-when-note { font-size: 10px; }
+.ann7-range-part .ann7-when-note { font-size: 11px; }
 .ann7-range .ann7-big-num { font-size: 72px; }
 .ann7-range-arrow { padding-bottom: 14px; color: rgba(255, 255, 255, .55); }
 .ann7-days {
@@ -132,16 +132,16 @@
   transition: background .2s;
 }
 .ann7-event:hover { background: var(--c-main); color: var(--c-ink); }
-.ann7-event-head { display: flex; align-items: center; gap: 6px; font: 400 10px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-gray-text); }
+.ann7-event-head { display: flex; align-items: center; gap: 6px; font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-gray-text); }
 .ann7-event-body { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: center; }
 .ann7-event-tile { width: 72px; height: 72px; border-radius: 18px; background: #f4f4f1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
-.ann7-event-dow { font: 400 8px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--c-gray-text); }
+.ann7-event-dow { font: 400 11px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--c-gray-text); }
 .ann7-event-day { font: 400 26px/1 var(--f-num); letter-spacing: -.04em; }
-.ann7-event-mon { font: 400 9px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; }
+.ann7-event-mon { font: 400 11px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; }
 .ann7-event-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .ann7-event-title { font: 700 19px/1.1 var(--f-sans); letter-spacing: -.04em; }
 .ann7-event-time { font: 400 18px/1 var(--f-num); }
-.ann7-event-place { display: flex; align-items: center; gap: 4px; font: 400 10px var(--f-mono); letter-spacing: .02em; text-transform: uppercase; }
+.ann7-event-place { display: flex; align-items: center; gap: 4px; font: 400 11px var(--f-mono); letter-spacing: .02em; text-transform: uppercase; }
 .ann7-event-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid rgba(35, 31, 32, .12); font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
 
 /* Стопка: краешки следующих карточек под сторис. */
@@ -174,18 +174,18 @@
 
 .ann7-tile { position: relative; width: 76px; height: 76px; border-radius: 20px; background: #f4f4f1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
 .ann7-row.is-active .ann7-tile { background: rgba(255, 255, 255, .12); }
-.ann7-tile-label { font: 400 8px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; opacity: .6; white-space: nowrap; }
+.ann7-tile-label { font: 400 11px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; opacity: .6; white-space: nowrap; }
 .ann7-tile-big { font: 400 22px/1 var(--f-num); letter-spacing: -.04em; white-space: nowrap; }
-.ann7-tile-bottom { font: 400 9px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.ann7-tile-bottom { font: 400 11px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
 .ann7-tile-dot { position: absolute; top: -3px; right: -3px; width: 14px; height: 14px; border-radius: 99px; background: var(--c-main); box-shadow: 0 0 0 3px #fff; }
 
 .ann7-row-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .ann7-row.is-read .ann7-row-text { opacity: .5; }
 .ann7-row-chips { display: flex; align-items: center; gap: 6px; }
-.ann7-row-chips .ann-important { align-self: center; height: 20px; padding: 0 8px; font-size: 9px; }
-.ann7-row-event { display: inline-flex; align-items: center; gap: 3px; height: 20px; padding: 0 8px 0 6px; border-radius: var(--radius-pill); box-shadow: inset 0 0 0 1px currentColor; font: 400 9px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; opacity: .75; }
+.ann7-row-chips .ann-important { align-self: center; height: 20px; padding: 0 8px; font-size: 11px; }
+.ann7-row-event { display: inline-flex; align-items: center; gap: 3px; height: 20px; padding: 0 8px 0 6px; border-radius: var(--radius-pill); box-shadow: inset 0 0 0 1px currentColor; font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; opacity: .75; }
 .ann7-row-title { font: 700 20px/1.1 var(--f-sans); letter-spacing: -.04em; }
-.ann7-row-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font: 400 10px var(--f-mono); letter-spacing: .02em; text-transform: uppercase; opacity: .7; }
+.ann7-row-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font: 400 11px var(--f-mono); letter-spacing: .02em; text-transform: uppercase; opacity: .7; }
 .ann7-row-meta > span { display: inline-flex; align-items: center; gap: 4px; }
 /* Прочитанное — голубые галочки. */
 .ann7-row-done { color: var(--c-main); }

@@ -163,7 +163,7 @@
   align-items: center;
   gap: 10px;
   transform: translateX(-50%);
-  font: 400 10px var(--f-mono);
+  font: 400 11px var(--f-mono);
   letter-spacing: .16em;
   text-transform: uppercase;
   color: rgba(240, 218, 190, .75);
@@ -220,7 +220,7 @@
   border: 0;
   background: none;
   color: rgba(240, 218, 190, .55);
-  font: 400 10px var(--f-mono);
+  font: 400 11px var(--f-mono);
   letter-spacing: .12em;
   text-transform: uppercase;
   cursor: pointer;
@@ -253,7 +253,7 @@
 .sf-fin-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-top: 32px; }
 .sf-fin-card { display: flex; flex-direction: column; gap: 10px; padding: 22px; border: 1px solid rgba(240, 218, 190, .22); border-radius: 18px; color: var(--sf-ink); transition: background .2s, border-color .2s; }
 .sf-fin-card:hover { background: rgba(240, 218, 190, .06); border-color: rgba(240, 218, 190, .5); color: var(--sf-ink); }
-.sf-fin-card small { font: 400 10px var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--sf-gold); }
+.sf-fin-card small { font: 400 11px var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--sf-gold); }
 .sf-fin-card b { font: 400 24px/1.1 var(--f-num); }
 .sf-fin-home { display: inline-block; margin-top: 36px; font: 400 11px var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: rgba(240, 218, 190, .7); }
 .sf-fin-home:hover { color: var(--sf-ink); }

@@ -1,4 +1,4 @@
-/* Сборник на телефоне (resources/design_handoff_songbook_mobile, экраны 01–02). Десктоп — inline-стили в Songs.jsx. */
+/* Сборник (resources/design_handoff_songbook_mobile, экраны 01–02): поиск и список одни и те же на телефоне и десктопе. */
 
 /* Поиск закреплён при прокрутке; белый фон на всю ширину экрана — поверх отступов контейнера. */
 .sb-bar { position: sticky; top: 0; z-index: 2; display: flex; gap: 8px; margin: 0 -14px; padding: 6px 14px 12px; background: #fff; }
@@ -17,6 +17,10 @@
 
 .sb-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px 4px; border-bottom: 1px solid rgba(35, 31, 32, .1); color: var(--c-ink); -webkit-tap-highlight-color: transparent; }
 .sb-row:active { background: #f2f2f3; }
+@media (hover: hover) {
+  .sb-row { transition: background .15s; }
+  .sb-row:hover { background: #f7f7f8; }
+}
 .sb-num { font: 24px/1 var(--f-num); letter-spacing: -.03em; }
 .sb-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .sb-title { font: 700 17px/1.1 var(--f-sans); letter-spacing: -.04em; }
@@ -27,3 +31,14 @@
 
 .sb-empty { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; padding: 22px 20px; border-radius: 28px; background: var(--c-warm); font: 15px/1.45 var(--f-sans); color: var(--c-body); }
 .sb-empty-title { font: 700 24px/1 var(--f-sans); letter-spacing: -.05em; color: var(--c-ink); }
+
+/* Десктоп: список слева прокручивается вместе со страницей, справа закреплена карточка песни (SongCard)
+   с выбранной в списке песней; длинный текст прокручивается внутри карточки, плашка с кнопками остаётся на месте. */
+@media (min-width: 861px) {
+  .songs-layout { margin-top: 66px; } /* как .ann12-panel: низ фонового заголовка закрывает поиск */
+  .sb-bar { margin: 0; padding: 6px 0 12px; }
+  .sb-row.is-active { background: #f2f2f3; }
+  .sb-preview { position: sticky; top: 6px; }
+  .sb-preview .song-card { display: flex; flex-direction: column; max-height: calc(100vh - 12px); box-shadow: 0 0 0 1px rgba(35, 31, 32, .08); }
+  .sb-preview .song-card-text { min-height: 0; overflow-y: auto; }
+}

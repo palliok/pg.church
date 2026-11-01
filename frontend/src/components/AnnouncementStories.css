@@ -27,15 +27,15 @@
 .ann-tile.is-undated { grid-template-columns: minmax(0, 1fr) auto; }
 
 .ann-tile-date { display: flex; flex-direction: column; gap: 6px; }
-.ann-tile-label { font: 400 9px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; opacity: .6; }
+.ann-tile-label { font: 400 11px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; opacity: .6; }
 .ann-tile-day { display: flex; align-items: baseline; gap: 5px; }
 .ann-tile-num { font: 400 46px/.9 var(--f-num); letter-spacing: -.055em; white-space: nowrap; }
-.ann-tile-mon { font: 400 10px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
+.ann-tile-mon { font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
 
 .ann-tile-text { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .ann-tile-pills { display: flex; flex-wrap: wrap; gap: 6px; }
 .ann-tile .ann-important,
-.ann-tile-pill { height: 20px; padding: 0 8px; font-size: 9px; }
+.ann-tile-pill { height: 20px; padding: 0 8px; font-size: 11px; }
 /* Время или уточнение: полупрозрачная на тёмной плитке, белая на прочитанной. */
 .ann-tile-pill {
   display: inline-flex;

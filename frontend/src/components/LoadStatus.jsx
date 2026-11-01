@@ -12,7 +12,7 @@ export default function LoadStatus({ error, onRetry }) {
     <div role="alert" style={{ padding: '56px 20px', borderRadius: 24, background: 'var(--c-panel)', textAlign: 'center' }}>
       <div style={{ font: '500 14px/1.5 var(--f-sans)', color: 'var(--c-gray-text)' }}>Не удалось загрузить данные.</div>
       {onRetry && (
-        <button type="button" onClick={onRetry} className="pill-btn" style={{ marginTop: 16, padding: '11px 20px', fontSize: 11.5, background: '#231f20', color: '#fff' }}>
+        <button type="button" onClick={onRetry} className="pill-btn" style={{ marginTop: 16, padding: '11px 20px', fontSize: 12, background: '#231f20', color: '#fff' }}>
           Повторить
         </button>
       )}

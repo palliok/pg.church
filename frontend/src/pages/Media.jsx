@@ -18,7 +18,7 @@ const isEmpty = ({ posts, loading, error }) => !loading && !error && posts.lengt
 
 function Chip({ label, color = '#fff', text = '#231f20' }) {
   return (
-    <span style={{ background: color, color: text, padding: '3px 9px', borderRadius: 999, fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 8.5, letterSpacing: '.06em', textTransform: 'uppercase' }}>
+    <span style={{ background: color, color: text, padding: '3px 9px', borderRadius: 999, fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 11, letterSpacing: '.06em', textTransform: 'uppercase' }}>
       {label}
     </span>
   );
@@ -48,7 +48,7 @@ export default function Media() {
               <div style={{ height: 100, borderRadius: 14, ...cover(n, i) }} />
               <div style={{ font: '600 11px var(--f-sans)', color: 'var(--c-gray-text-soft)', textTransform: 'uppercase', letterSpacing: '.1em' }}>{n.date}</div>
               <h3 className="h-display" style={{ fontSize: 19, textTransform: 'none' }}>{n.title}</h3>
-              {n.excerpt && <p style={{ font: '500 13.5px/1.55 var(--f-sans)', color: 'var(--c-gray-text)', margin: 0 }}>{n.excerpt}</p>}
+              {n.excerpt && <p style={{ font: '500 14px/1.55 var(--f-sans)', color: 'var(--c-gray-text)', margin: 0 }}>{n.excerpt}</p>}
               <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
                 {n.tags.map((t) => <Chip key={t.label} {...t} />)}
               </div>

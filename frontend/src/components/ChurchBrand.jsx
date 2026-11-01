@@ -1,11 +1,12 @@
 import './ChurchBrand.css';
 
-// Логотип по макету resources/Logo.html; на en и ky его переводит translatePage().
+// Логотип 9b (resources/logo-9b-export): вместо точки после «церковь» — голубой уголок.
+// На en и ky текст переводит translatePage(); уголок не переводится.
 export default function ChurchBrand() {
   return (
     <span className="church-brand">
       <span className="church-brand-word">
-        церковь<span className="church-brand-dot">.</span>
+        церковь<span className="church-brand-corner" aria-hidden="true" />
       </span>
       <span className="church-brand-side">
         <span className="church-brand-name">на поклонной горе</span>

@@ -21,7 +21,7 @@
   gap: 12px;
   padding: 14px 22px 12px;
   border-bottom: 1px solid rgba(35, 31, 32, .22);
-  font: 400 10px var(--f-mono);
+  font: 400 11px var(--f-mono);
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--c-gray-text);
@@ -256,7 +256,7 @@
 .about-calling-current small { font: 400 12px var(--f-mono); letter-spacing: .1em; color: var(--c-gray-text); }
 @keyframes about-num { from { opacity: 0; transform: translateY(14px); } }
 .about-calling-rail { display: flex; flex-direction: column; gap: 2px; }
-.about-calling-rail button { display: flex; align-items: center; gap: 10px; min-height: 22px; padding: 0; border: 0; background: none; color: var(--c-gray-text); font: 400 10px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+.about-calling-rail button { display: flex; align-items: center; gap: 10px; min-height: 22px; padding: 0; border: 0; background: none; color: var(--c-gray-text); font: 400 11px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
 .about-calling-rail i { display: block; width: 10px; height: 1px; background: currentColor; transition: width .3s; }
 .about-calling-rail span { opacity: 0; transition: opacity .25s; }
 .about-calling-rail button:hover span, .about-calling-rail button:focus-visible span, .about-calling-rail button.is-on span { opacity: 1; }
@@ -345,7 +345,7 @@
   gap: 12px;
   padding: 14px 22px 12px;
   border-bottom: 1px solid rgba(35, 31, 32, .08);
-  font: 400 10px var(--f-mono);
+  font: 400 11px var(--f-mono);
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--c-gray-text);
@@ -368,7 +368,7 @@
 .guide-text > p:first-child { text-indent: 0; }
 .guide-quote { margin: 22px 0; padding: 2px 0 2px 20px; border-left: 2px solid var(--c-main); }
 .guide-quote p { margin: 0; font: italic 400 clamp(20px, 1.8vw, 23px)/1.45 var(--f-book); color: var(--e-ink); }
-.guide-quote cite { display: block; margin-top: 8px; font: 400 10px var(--f-mono); font-style: normal; letter-spacing: .14em; text-transform: uppercase; color: var(--c-second); }
+.guide-quote cite { display: block; margin-top: 8px; font: 400 11px var(--f-mono); font-style: normal; letter-spacing: .14em; text-transform: uppercase; color: var(--c-second); }
 .guide-quote + p { text-indent: 0; }
 
 /* Низ экрана: листание и индикатор глав. */

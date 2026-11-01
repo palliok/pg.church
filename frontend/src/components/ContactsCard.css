@@ -37,7 +37,7 @@
 .contacts-card-address:hover { color: var(--c-ink); text-decoration: underline; text-underline-offset: 3px; }
 
 .contacts-card-metro { display: flex; align-items: center; gap: 8px; min-width: 0; font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
-.contacts-card-metro-icon { flex: 0 0 auto; width: 20px; height: 20px; border-radius: var(--radius-pill); background: var(--c-second); color: #fff; display: inline-flex; align-items: center; justify-content: center; font: 700 10px var(--f-sans); }
+.contacts-card-metro-icon { flex: 0 0 auto; width: 20px; height: 20px; border-radius: var(--radius-pill); background: var(--c-second); color: #fff; display: inline-flex; align-items: center; justify-content: center; font: 700 11px var(--f-sans); }
 .contacts-card-metro-dot { flex: 0 0 auto; width: 3px; height: 3px; border-radius: var(--radius-pill); background: #b9b9b3; }
 .contacts-card-metro-num { font: 400 18px/.8 var(--f-num); letter-spacing: -.04em; }
 .contacts-card-metro-rest { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--c-gray-text); }
@@ -72,7 +72,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font: 400 10px var(--f-mono);
+  font: 400 11px var(--f-mono);
   letter-spacing: .04em;
   transition: background .2s, color .2s, box-shadow .2s;
 }
@@ -82,8 +82,8 @@
   .contacts-card-plate { flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 16px 16px 18px; }
   .contacts-card-place { flex: 1; gap: 8px; }
   .contacts-card-address { font-size: clamp(18px, 4cqi, 24px); }
-  .contacts-card-metro { gap: 6px; font-size: 10px; }
-  .contacts-card-metro-icon { width: 18px; height: 18px; font-size: 9px; }
+  .contacts-card-metro { gap: 6px; font-size: 11px; }
+  .contacts-card-metro-icon { width: 18px; height: 18px; font-size: 11px; }
   .contacts-card-metro-num { font-size: 16px; }
   .contacts-card-actions { flex: 0 0 auto; }
   .contacts-card-phone { flex: none; height: 40px; padding: 0 16px; gap: 6px; font-size: 14px; }

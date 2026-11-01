@@ -22,11 +22,11 @@
 .home-sched-item:hover { background: var(--c-main); color: var(--c-ink); }
 .home-sched-date { width: 56px; height: 56px; border-radius: 16px; background: var(--c-page); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
 .home-sched-date-num { font: 400 24px/.9 var(--f-num); letter-spacing: -.04em; }
-.home-sched-date-mon { font: 400 9px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--c-gray-text); }
+.home-sched-date-mon { font: 400 11px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--c-gray-text); }
 .home-sched-item-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .home-sched-item-name { min-width: 0; font: 700 17px/1.05 var(--f-sans); letter-spacing: -.035em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .home-sched-item-time { font: 400 15px var(--f-num); letter-spacing: -.02em; }
-.home-sched-item-place { display: flex; align-items: center; gap: 4px; min-width: 0; font: 400 10px var(--f-mono); letter-spacing: .02em; text-transform: uppercase; color: var(--c-body); }
+.home-sched-item-place { display: flex; align-items: center; gap: 4px; min-width: 0; font: 400 11px var(--f-mono); letter-spacing: .02em; text-transform: uppercase; color: var(--c-body); }
 .home-sched-item-place > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .home-sched-note { padding: 0 10px; font: 400 13px/1.5 var(--f-sans); color: var(--c-gray-text); }
 
@@ -55,8 +55,8 @@
 .home-carousel-date { display: flex; flex-direction: column; gap: 4px; }
 .home-carousel-num { font: 400 64px/.85 var(--f-num); letter-spacing: -.05em; }
 .home-carousel-label { font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; opacity: .7; }
-.home-carousel-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; --tag-h: 26px; --tag-px: 10px; --tag-fs: 10px; }
-.home-carousel-soon { padding: 6px 11px; border-radius: var(--radius-pill); background: var(--c-main); color: var(--c-ink); font: 400 10px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.home-carousel-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; --tag-h: 26px; --tag-px: 10px; --tag-fs: 11px; }
+.home-carousel-soon { padding: 6px 11px; border-radius: var(--radius-pill); background: var(--c-main); color: var(--c-ink); font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
 
 .home-carousel-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .home-carousel-time { font: 400 24px var(--f-num); letter-spacing: -.03em; }

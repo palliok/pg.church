@@ -40,7 +40,7 @@ export default function Donate() {
     <div className="page-enter container">
       <div className="donate-layout">
         <div style={{ borderRadius: 24, background: 'var(--c-main)', color: '#231f20', padding: 'clamp(24px, 4vw, 40px)' }}>
-          <div style={{ display: 'inline-flex', background: '#231f20', color: '#fff', padding: '8px 13px', borderRadius: 9, fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase' }}>
+          <div style={{ display: 'inline-flex', background: '#231f20', color: '#fff', padding: '8px 13px', borderRadius: 9, fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase' }}>
             Пожертвование
           </div>
           <h1 className="h-display" style={{ fontSize: 'clamp(38px, 7vw, 64px)', marginTop: 22 }}>Поддержать<br />служение</h1>
@@ -76,7 +76,7 @@ export default function Donate() {
                 <span style={{ flex: '0 0 44px', height: 44, borderRadius: 12, background: t.color }} />
                 <span style={{ flex: 1 }}>
                   <span style={{ display: 'block', font: '600 16px var(--f-sans)' }}>{t.title}</span>
-                  <span style={{ display: 'block', font: '500 12.5px var(--f-sans)', color: 'rgba(255,255,255,.55)', marginTop: 4 }}>{t.desc}</span>
+                  <span style={{ display: 'block', font: '500 13px var(--f-sans)', color: 'rgba(255,255,255,.55)', marginTop: 4 }}>{t.desc}</span>
                 </span>
               </div>
             ))}

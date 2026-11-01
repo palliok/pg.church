@@ -35,7 +35,7 @@ export default function LiveBanner() {
           gap: 9,
           fontFamily: 'var(--f-sans)',
           fontWeight: 700,
-          fontSize: 10,
+          fontSize: 11,
           textTransform: 'uppercase',
           letterSpacing: '.16em',
         }}
@@ -46,7 +46,7 @@ export default function LiveBanner() {
       <span className="desktop-only" style={{ font: '500 13px var(--f-sans)', color: 'rgba(255,255,255,.6)' }}>
         {live.text || t('Идёт воскресное богослужение — присоединяйся онлайн')}
       </span>
-      <span className="mobile-only" style={{ flex: 1, minWidth: 0, font: '500 11.5px var(--f-sans)', color: 'rgba(255,255,255,.6)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      <span className="mobile-only" style={{ flex: 1, minWidth: 0, font: '500 12px var(--f-sans)', color: 'rgba(255,255,255,.6)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
         Идёт богослужение
       </span>
       <button
@@ -55,7 +55,7 @@ export default function LiveBanner() {
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={() => setOpen(true)}
-        style={{ flex: '0 0 auto', gap: 0, background: 'var(--c-main)', color: 'var(--c-ink)', fontSize: 10, padding: '8px 15px' }}
+        style={{ flex: '0 0 auto', gap: 0, background: 'var(--c-main)', color: 'var(--c-ink)', fontSize: 11, padding: '8px 15px' }}
       >
         <span className="live-play-d">▶ </span>
         <span className="play-dot" aria-hidden="true">

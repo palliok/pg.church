@@ -58,7 +58,7 @@ export default function Header() {
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <LangSwitcher />
-        <NavLink to="/donate" className="pill-btn" style={{ background: 'var(--c-main)', color: 'var(--c-ink)', fontSize: 11.5, padding: '11px 20px' }}>
+        <NavLink to="/donate" className="pill-btn" style={{ background: 'var(--c-main)', color: 'var(--c-ink)', fontSize: 12, padding: '11px 20px' }}>
           Поддержать
         </NavLink>
       </div>

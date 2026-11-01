@@ -21,13 +21,13 @@
   border-radius: var(--radius-pill);
   background: var(--c-signal);
   color: #fff;
-  font: 400 10px var(--f-mono);
+  font: 400 11px var(--f-mono);
   letter-spacing: .04em;
   text-transform: uppercase;
 }
 
 /* ===== Даты: «до 30 июн», один день или «14 июл → 20 июл · 7 дней», рядом пилюля со временем ===== */
-.ann-dates { --d-num: 34px; --d-label: 9px; --d-mon: 10px; --d-gap: 12px; --d-arrow: 30px; --d-pill-h: 26px; --d-pill-fs: 10px; position: relative; display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--d-gap); }
+.ann-dates { --d-num: 34px; --d-label: 11px; --d-mon: 11px; --d-gap: 12px; --d-arrow: 30px; --d-pill-h: 26px; --d-pill-fs: 11px; position: relative; display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--d-gap); }
 .ann-date { display: flex; flex-direction: column; gap: 6px; }
 .ann-date-label { font: 400 var(--d-label) var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: rgba(255, 255, 255, .55); }
 .ann-date-day { display: flex; align-items: baseline; gap: 6px; }
@@ -80,7 +80,7 @@
   border-radius: 99px;
   background: var(--c-signal);
   color: #fff;
-  font: 400 10px var(--f-mono);
+  font: 400 11px var(--f-mono);
   letter-spacing: .04em;
   text-transform: uppercase;
 }
@@ -93,7 +93,7 @@
 }
 
 /* Даты на карточке главной — помельче, чем в открытом объявлении. */
-.ann-home-card .ann-dates { --d-num: 30px; --d-label: 9px; --d-mon: 10px; --d-gap: 10px; --d-arrow: 24px; --d-pill-h: 24px; --d-pill-fs: 10px; }
+.ann-home-card .ann-dates { --d-num: 30px; --d-label: 11px; --d-mon: 11px; --d-gap: 10px; --d-arrow: 24px; --d-pill-h: 24px; --d-pill-fs: 11px; }
 
 .ann-home-more {
   align-self: flex-start;
@@ -105,7 +105,7 @@
   padding: 0 12px 0 14px;
   border-radius: 99px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3);
-  font: 400 10px var(--f-mono);
+  font: 400 11px var(--f-mono);
   letter-spacing: .03em;
   text-transform: uppercase;
   white-space: nowrap;

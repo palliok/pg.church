@@ -62,9 +62,3 @@ export function useSong(id) {
 
   return { song, ...status };
 }
-
-export function useSongCategories() {
-  const { data } = useApi('/song-categories');
-
-  return useMemo(() => (data ?? []).map((category) => ({ ...category, name: t(category.name) })), [data]);
-}

@@ -14,8 +14,17 @@
   letter-spacing: -.07em;
 }
 
-.church-brand-dot {
-  color: var(--c-main);
+/* Уголок из logo-9b: квадрат 0.42em с толщиной 0.12em, низ поднят над базовой линией на 0.3em.
+   В em от кегля слова — масштабируется вместе с ним. Отступ слева учитывает letter-spacing слова. */
+.church-brand-corner {
+  display: inline-block;
+  box-sizing: border-box;
+  width: .42em;
+  height: .42em;
+  margin-left: .16em;
+  vertical-align: .3em;
+  border-top: .12em solid var(--c-main);
+  border-right: .12em solid var(--c-main);
 }
 
 .church-brand-side {
