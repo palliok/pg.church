@@ -36,8 +36,22 @@
    с выбранной в списке песней; длинный текст прокручивается внутри карточки, плашка с кнопками остаётся на месте. */
 @media (min-width: 861px) {
   .songs-layout { margin-top: 66px; } /* как .ann12-panel: низ фонового заголовка закрывает поиск */
-  .sb-bar { margin: 0; padding: 6px 0 12px; }
-  .sb-row.is-active { background: #f2f2f3; }
+  /* Белая подложка поиска лежит поверх фонового заголовка: скруглена вокруг полей, а не обрезана прямыми углами. */
+  .sb-bar { margin: 0 -6px 6px; padding: 6px; border-radius: 32px; }
+  /* Подсветка строки — скруглённая плашка; разделитель под ней и над ней прячем, чтобы не резал скругление. */
+  .sb-row { padding-inline: 12px; border-radius: 18px; }
+  .sb-letter { top: 64px; padding-inline: 12px; }
+
+  /* Под курсором — голубая, выбранная — тёмная. */
+  .sb-row:hover { background: var(--c-main); }
+  .sb-row:hover .sb-line { color: var(--c-ink); }
+  .sb-row:hover .sb-key { box-shadow: inset 0 0 0 1px rgba(35, 31, 32, .35); color: var(--c-ink); }
+  .sb-row:hover .sb-hl { background: #fff; }
+  .sb-row.is-active, .sb-row.is-active:hover { background: var(--c-ink); color: #fff; }
+  .sb-row.is-active .sb-line { color: rgba(255, 255, 255, .65); }
+  .sb-row.is-active .sb-key { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .35); color: #fff; }
+  .sb-row.is-active .sb-hl { background: var(--c-main); color: var(--c-ink); }
+  .sb-row:is(:hover, .is-active), .sb-row:has(+ .sb-row:is(:hover, .is-active)) { border-bottom-color: transparent; }
   .sb-preview { position: sticky; top: 6px; }
   .sb-preview .song-card { display: flex; flex-direction: column; max-height: calc(100vh - 12px); box-shadow: 0 0 0 1px rgba(35, 31, 32, .08); }
   .sb-preview .song-card-text { min-height: 0; overflow-y: auto; }
