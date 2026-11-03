@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Support\ChordPro;
 use App\Support\Text;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -10,12 +9,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['number', 'title', 'song_category_id', 'key', 'chordpro'])]
+#[Fillable(['number', 'title', 'song_category_id'])]
 class Song extends Model
 {
     use CrudTrait;
+
+    /** Варианты этой песни — для подзапросов в selectRaw. */
+    private const string VARIANTS = 'from song_variants v where v.song_id = songs.id';
 
     /**
      * @return BelongsTo<SongCategory, $this>
@@ -26,15 +28,32 @@ class Song extends Model
     }
 
     /**
-     * @return BelongsToMany<Event, $this>
+     * Варианты текста; порядок «основной первым» — скоуп SongVariant::defaultFirst().
+     *
+     * @return HasMany<SongVariant, $this>
      */
-    public function events(): BelongsToMany
+    public function variants(): HasMany
     {
-        return $this->belongsToMany(Event::class);
+        return $this->hasMany(SongVariant::class);
     }
 
     /**
-     * Поиск по названию, строке текста или началу номера.
+     * Номер с буквой варианта: «214б», «214 б», «214Б» → [214, 'б']; иначе null.
+     *
+     * @return array{int, string}|null
+     */
+    public static function parseNumberWithLetter(string $term): ?array
+    {
+        if (! preg_match('/^(\d{1,9})\s*(\p{Cyrillic})$/u', $term, $match)) {
+            return null;
+        }
+
+        return [(int) $match[1], mb_strtolower($match[2])];
+    }
+
+    /**
+     * Поиск по названию, строке текста любого варианта, началу номера
+     * или номеру с буквой варианта («214б»).
      *
      * @param  Builder<Song>  $query
      */
@@ -44,33 +63,51 @@ class Song extends Model
 
         $query->where(function (Builder $query) use ($term, $like) {
             $query->where('title', 'ilike', $like)
-                ->orWhere('lyrics', 'ilike', $like);
+                ->orWhereHas('variants', fn (Builder $query) => $query->where('lyrics', 'ilike', $like));
 
             if (ctype_digit($term)) {
                 $query->orWhereRaw('CAST(number AS TEXT) LIKE ?', [$term.'%']);
+            }
+
+            if ($numbered = self::parseNumberWithLetter($term)) {
+                [$number, $letter] = $numbered;
+                $query->orWhere(fn (Builder $query) => $query->where('number', $number)
+                    ->whereHas('variants', fn (Builder $query) => $query->where('letter', $letter)));
             }
         });
     }
 
     /**
-     * Для списков: всё, кроме текста песни.
+     * Для списков: песня без текстов, но с тональностью основного варианта (`key`).
      *
      * @param  Builder<Song>  $query
      */
     public function scopeWithoutLyrics(Builder $query): void
     {
-        $query->select($query->qualifyColumns(['id', 'number', 'title', 'song_category_id', 'key']));
+        $query->select($query->qualifyColumns(['id', 'number', 'title', 'song_category_id']))->withKey();
     }
 
     /**
-     * Строка текста для списка (`line`): первая, где встречается term, иначе первая строка песни.
-     * По ней в сборнике видно, почему песня нашлась.
+     * Тональность основного варианта (`key`).
+     *
+     * @param  Builder<Song>  $query
+     */
+    public function scopeWithKey(Builder $query): void
+    {
+        $query->addSelect(['key' => SongVariant::query()->select('key')->whereColumn('song_id', 'songs.id')->defaultFirst()->limit(1)]);
+    }
+
+    /**
+     * Строка текста для списка (`line`): первая, где встречается term, иначе первая строка
+     * основного варианта. По ней в сборнике видно, почему песня нашлась. `variant` — буква
+     * варианта, где нашлась строка, если он не основной, или буква из запроса «214б»:
+     * песня откроется сразу на этом варианте.
      *
      * @param  Builder<Song>  $query
      */
     public function scopeWithLine(Builder $query, string $term = ''): void
     {
-        $first = "split_part(lyrics, E'\\n', 1)";
+        $first = "(select split_part(v.lyrics, E'\\n', 1) ".self::VARIANTS.' order by v.is_default desc, v.letter limit 1)';
 
         if ($term === '') {
             $query->selectRaw("$first as line");
@@ -78,9 +115,24 @@ class Song extends Model
             return;
         }
 
+        // «214б» — первая строка и буква именно этого варианта.
+        if ($numbered = self::parseNumberWithLetter($term)) {
+            $query->selectRaw(
+                "(select split_part(v.lyrics, E'\\n', 1) ".self::VARIANTS.' and v.letter = ?) as line, '
+                .'(select v.letter '.self::VARIANTS.' and v.letter = ?) as variant',
+                [$numbered[1], $numbered[1]],
+            );
+
+            return;
+        }
+
+        $match = "from song_variants v, regexp_split_to_table(v.lyrics, E'\\n') with ordinality as t(l, n) "
+            .'where v.song_id = songs.id and l ilike ? order by v.is_default desc, v.letter, n limit 1';
+        $like = '%'.Text::escapeLike($term).'%';
+
         $query->selectRaw(
-            "coalesce((select l from regexp_split_to_table(lyrics, E'\\n') with ordinality as t(l, n) where l ilike ? order by n limit 1), $first) as line",
-            ['%'.Text::escapeLike($term).'%'],
+            "coalesce((select l $match), $first) as line, (select case when v.is_default then null else v.letter end $match) as variant",
+            [$like, $like],
         );
     }
 
@@ -101,29 +153,5 @@ class Song extends Model
             $this->category?->name,
             $this->key ? 'тональность '.$this->key : null,
         ])));
-    }
-
-    /**
-     * Текст с аккордами в формате ChordPro. При записи вставленные «аккорды над
-     * строкой» приводятся к ChordPro, а в lyrics сохраняются одни слова — по ним
-     * идёт поиск: в исходном тексте аккорды разрывают слова.
-     */
-    protected function chordpro(): Attribute
-    {
-        return Attribute::set(function (?string $value) {
-            $chordpro = ChordPro::normalize($value);
-
-            return ['chordpro' => $chordpro, 'lyrics' => ChordPro::plainText($chordpro) ?: null];
-        });
-    }
-
-    /**
-     * Текст, разобранный на секции (куплеты, припевы) со строками и аккордами.
-     *
-     * @return Attribute<list<array{type: ?string, label: ?string, lines: list<list<array{chord: ?string, text: string}>>}>, never>
-     */
-    protected function sections(): Attribute
-    {
-        return Attribute::get(fn () => ChordPro::parse($this->chordpro));
     }
 }

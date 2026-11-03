@@ -22,6 +22,7 @@
   .sb-row:hover { background: #f7f7f8; }
 }
 .sb-num { font: 24px/1 var(--f-num); letter-spacing: -.03em; }
+.sb-num small { font-size: .6em; letter-spacing: 0; }
 .sb-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .sb-title { font: 700 17px/1.1 var(--f-sans); letter-spacing: -.04em; }
 .sb-line { font: 13px/1.35 var(--f-sans); color: var(--c-gray-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

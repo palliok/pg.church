@@ -48,16 +48,17 @@ function firstLetter(title) {
 const DESKTOP = '(min-width: 861px)';
 
 // Строка списка: номер, название, строка текста и тональность; совпадения с поиском подсвечены.
-function SongRow({ song, line, term, isNum, active, onPick }) {
+// variant — буква варианта, где нашлась строка: песня откроется сразу на нём.
+function SongRow({ song, line, variant, term, isNum, active, onPick }) {
   const pick = (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || !window.matchMedia(DESKTOP).matches) return;
     e.preventDefault();
-    onPick(song.id);
+    onPick({ id: song.id, variant });
   };
 
   return (
-    <Link to={`/songs/${song.id}`} className={`sb-row${active ? ' is-active' : ''}`} onClick={pick} aria-current={active || undefined}>
-      <span className="sb-num">{isNum ? highlight(String(song.num), term) : song.num}</span>
+    <Link to={`/songs/${song.id}${variant ? `?v=${encodeURIComponent(variant)}` : ''}`} className={`sb-row${active ? ' is-active' : ''}`} onClick={pick} aria-current={active || undefined}>
+      <span className="sb-num">{isNum ? highlight(String(song.num), term) : song.num}{variant && <small>{variant}</small>}</span>
       <span className="sb-text">
         <span className="sb-title">{isNum ? song.title : highlight(song.title, term)}</span>
         {line && <span className="sb-line">{isNum ? line : highlight(line, term)}</span>}
@@ -70,7 +71,7 @@ function SongRow({ song, line, term, isNum, active, onPick }) {
 export default function Songs() {
   const [q, setQ] = useState('');
   const [sort, setSort] = useState('num');
-  // Песня, выбранная в списке для карточки на десктопе; новый поиск выбор сбрасывает.
+  // Песня, выбранная в списке для карточки на десктопе, и её вариант: { id, variant }; новый поиск выбор сбрасывает.
   const [picked, setPicked] = useState(null);
 
   const { songs, loading, error, retry } = useSongs();
@@ -80,9 +81,9 @@ export default function Songs() {
   const searchedTerm = useDebounced(isNum ? '' : term, 250);
   const found = useSongSearch(searchedTerm);
 
-  // Строки с совпадением от сервера: по ним видно, почему песня нашлась.
+  // Строки с совпадением от сервера (и буква варианта, где оно нашлось): по ним видно, почему песня нашлась.
   const foundLines = useMemo(
-    () => new Map(found && searchedTerm === term ? found.map((s) => [s.id, s.line]) : []),
+    () => new Map(found && searchedTerm === term ? found.map((s) => [s.id, { line: s.line, variant: s.variant ?? null }]) : []),
     [found, searchedTerm, term],
   );
 
@@ -110,7 +111,9 @@ export default function Songs() {
   }, [matched, sort]);
 
   const exact = songs.find((s) => String(s.num) === term);
-  const preview = matched.find((s) => s.id === picked) || exact || matched[0] || songs[0];
+  const preview = matched.find((s) => s.id === picked?.id) || exact || matched[0] || songs[0];
+  // Вариант в превью: выбранный в карточке или тот, где нашлась строка.
+  const previewVariant = picked && picked.id === preview?.id ? picked.variant : foundLines.get(preview?.id)?.variant ?? null;
   const { song: previewSong } = useSong(preview?.id ?? null);
 
   // Пока грузится следующая песня, карточка показывает предыдущую, а не пропадает.
@@ -156,7 +159,8 @@ export default function Songs() {
                 <span>{row.letter}</span>
               </div>
             ) : (
-              <SongRow key={row.song.id} song={row.song} line={foundLines.get(row.song.id) ?? row.song.line} term={term} isNum={isNum}
+              <SongRow key={row.song.id} song={row.song} line={foundLines.get(row.song.id)?.line ?? row.song.line}
+                variant={foundLines.get(row.song.id)?.variant} term={term} isNum={isNum}
                 active={row.song.id === preview?.id} onPick={setPicked} />
             )))}
             {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
@@ -170,7 +174,15 @@ export default function Songs() {
         </div>
 
         <div className="desktop-only sb-preview">
-          {shown && <SongCard song={shown} nav={<Link to={`/songs/${shown.id}`} className="song-card-back">Открыть песню ↗</Link>} />}
+          {shown && (
+            <SongCard
+              song={shown}
+              variant={shown.id === preview?.id ? previewVariant : null}
+              onVariant={(variant) => setPicked({ id: shown.id, variant })}
+              nav={<Link to={`/songs/${shown.id}${shown.id === preview?.id && previewVariant ? `?v=${encodeURIComponent(previewVariant)}` : ''}`}
+                className="song-card-back">Открыть песню ↗</Link>}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -81,9 +81,15 @@ class EventApiTest extends TestCase
             'outline' => "Первый пункт\nВторой пункт\n",
             'duration_minutes' => 42,
         ]);
-        $event->songs()->attach([
-            Song::query()->create(['number' => 214, 'title' => 'Радость моя', 'chordpro' => '[E]Текст'])->id,
-            Song::query()->create(['number' => 88, 'title' => 'Ближе к Тебе', 'chordpro' => 'Текст'])->id,
+        $joy = Song::query()->create(['number' => 214, 'title' => 'Радость моя']);
+        $joy->variants()->createMany([
+            ['letter' => 'а', 'is_default' => true, 'key' => 'E'],
+            ['letter' => 'б', 'label' => '3 хор', 'key' => 'D'],
+        ]);
+        $closer = Song::query()->create(['number' => 88, 'title' => 'Ближе к Тебе']);
+        $event->hymns()->attach([
+            $joy->variants()->where('letter', 'б')->value('id'),
+            $closer->variants()->create(['letter' => 'а', 'is_default' => true, 'key' => 'G'])->id,
         ]);
 
         $response = $this->getJson("/api/v1/events/{$event->id}");
@@ -98,8 +104,11 @@ class EventApiTest extends TestCase
             ->assertJsonPath('data.sermon.outline', [['n' => 1, 'text' => 'Первый пункт'], ['n' => 2, 'text' => 'Второй пункт']])
             ->assertJsonPath('data.sermon.durationLabel', 'Слушать 42 мин')
             ->assertJsonPath('data.hymns.*.num', [88, 214])
-            ->assertJsonPath('data.hymnIds', $event->songs()->orderBy('number')->pluck('songs.id')->all())
-            ->assertJsonMissingPath('data.hymns.0.sections');
+            // Тональность и буква — выбранного варианта; буква только у неосновного.
+            ->assertJsonPath('data.hymns.*.key', ['G', 'D'])
+            ->assertJsonPath('data.hymns.*.variant', [null, 'б'])
+            ->assertJsonPath('data.hymnIds', [$closer->id, $joy->id])
+            ->assertJsonMissingPath('data.hymns.0.variants');
     }
 
     public function test_event_without_own_address_falls_back_to_church_address(): void

@@ -46,11 +46,13 @@ class Event extends Model
     }
 
     /**
-     * @return BelongsToMany<Song, $this>
+     * Гимны служения — варианты текста песен.
+     *
+     * @return BelongsToMany<SongVariant, $this>
      */
-    public function songs(): BelongsToMany
+    public function hymns(): BelongsToMany
     {
-        return $this->belongsToMany(Song::class);
+        return $this->belongsToMany(SongVariant::class);
     }
 
     /**

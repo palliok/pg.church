@@ -15,6 +15,7 @@ use App\Models\Sermon;
 use App\Models\Setting;
 use App\Models\Song;
 use App\Models\SongCategory;
+use App\Models\SongVariant;
 use App\Models\Story;
 use App\Models\StoryPanel;
 use App\Models\Tag;
@@ -56,6 +57,7 @@ class AdminPanelTest extends TestCase
             'minister' => ['minister', Minister::class, true],
             'duty-shift' => ['duty-shift', DutyShift::class, true],
             'song' => ['song', Song::class, true],
+            'song-variant' => ['song-variant', SongVariant::class, true],
             'song-category' => ['song-category', SongCategory::class, true],
             'post' => ['post', Post::class, true],
             'tag' => ['tag', Tag::class, true],
@@ -133,12 +135,17 @@ class AdminPanelTest extends TestCase
     {
         $this->actingAsAdmin();
         $song = Song::query()->create(['number' => 214, 'title' => 'Радость моя']);
+        $song->variants()->create(['letter' => 'а', 'is_default' => true]);
+        $variant = $song->variants()->create(['letter' => 'б', 'label' => '3 хор']);
+
+        // В списке гимнов — варианты с буквой и подписью.
+        $this->get('/admin/event/create')->assertOk()->assertSee('214б · Радость моя · 3 хор');
 
         $this->post('/admin/event', [
             'title' => 'Богослужение',
             'starts_at' => '2026-10-18T11:00',
             'place' => 'Главный зал',
-            'songs' => [$song->id],
+            'hymns' => [$variant->id],
             'is_main' => '1',
             'has_stream' => '0',
             'is_published' => '1',
@@ -150,7 +157,7 @@ class AdminPanelTest extends TestCase
         $this->assertTrue($event->is_main);
         $this->assertFalse($event->has_stream);
         $this->assertTrue($event->is_published);
-        $this->assertSame([$song->id], $event->songs->modelKeys());
+        $this->assertSame([$variant->id], $event->hymns->modelKeys());
 
         // Сообщения об ошибках — на русском и с подписью поля вместо его имени.
         $this->post('/admin/event', ['title' => '', 'starts_at' => 'когда-нибудь'])
@@ -168,31 +175,57 @@ class AdminPanelTest extends TestCase
         $this->post('/admin/song', ['number' => 60, 'title' => 'Дубль'])->assertSessionHasErrors('number');
         $this->assertSame(1, Song::query()->count());
 
-        $this->put("/admin/song/{$song->id}", ['id' => $song->id, 'number' => 60, 'title' => 'Свят, свят, свят!', 'key' => 'E'])
+        $this->put("/admin/song/{$song->id}", ['id' => $song->id, 'number' => 60, 'title' => 'Свят, свят, свят!'])
             ->assertSessionHasNoErrors()->assertRedirect();
 
         $this->assertSame('Свят, свят, свят!', $song->fresh()->title);
-        $this->assertSame('E', $song->fresh()->key);
     }
 
-    public function test_song_pasted_with_chords_above_lyrics_is_stored_as_chordpro(): void
+    public function test_new_song_is_stored_with_first_variant_as_chordpro(): void
     {
         $this->actingAsAdmin();
 
         $this->post('/admin/song', [
             'number' => 12,
             'title' => 'Свят',
+            'label' => '3 хор',
             'key' => 'Am',
             'chordpro' => "Куплет 1\r\nAm      E\r\nСвят, свят\r\n\r\nПрипев\r\n[Dm]Тебе по[E]ём",
         ])->assertSessionHasNoErrors()->assertRedirect();
 
-        $song = Song::query()->sole();
+        $variant = Song::query()->sole()->variants()->sole();
 
-        $this->assertSame("Куплет 1\n[Am]Свят, св[E]ят\n\nПрипев\n[Dm]Тебе по[E]ём", $song->chordpro);
-        $this->assertSame("Свят, свят\n\nТебе поём", $song->lyrics);
+        $this->assertSame('а', $variant->letter);
+        $this->assertTrue($variant->is_default);
+        $this->assertSame('3 хор', $variant->label);
+        $this->assertSame('Am', $variant->key);
+        $this->assertSame("Куплет 1\n[Am]Свят, св[E]ят\n\nПрипев\n[Dm]Тебе по[E]ём", $variant->chordpro);
+        $this->assertSame("Свят, свят\n\nТебе поём", $variant->lyrics);
 
-        // Форма редактирования показывает сохранённый ChordPro.
-        $this->get("/admin/song/{$song->id}/edit")->assertOk()->assertSee('[Am]Свят, св[E]ят', false);
+        // Форма варианта показывает сохранённый ChordPro, форма песни — список вариантов.
+        $this->get("/admin/song-variant/{$variant->id}/edit")->assertOk()->assertSee('[Am]Свят, св[E]ят', false);
+        $this->get("/admin/song/{$variant->song_id}/edit")->assertOk()->assertSee('12а')->assertSee('3 хор');
+    }
+
+    public function test_marking_variant_as_default_unmarks_previous_one(): void
+    {
+        $this->actingAsAdmin();
+        $song = Song::query()->create(['number' => 60, 'title' => 'Свят, свят, свят']);
+        $first = $song->variants()->create(['letter' => 'а', 'is_default' => true]);
+
+        $this->post('/admin/song-variant', ['song_id' => $song->id, 'letter' => 'а', 'is_default' => '1'])
+            ->assertSessionHasErrors('letter');
+
+        $this->post('/admin/song-variant', ['song_id' => $song->id, 'letter' => 'б', 'label' => 'PG music', 'is_default' => '1'])
+            ->assertSessionHasNoErrors()->assertRedirect();
+
+        $this->assertFalse($first->fresh()->is_default);
+        $this->assertSame(['б', 'а'], $song->variants()->defaultFirst()->pluck('letter')->all());
+
+        // Та же буква у другой песни — не повтор.
+        $other = Song::query()->create(['number' => 61, 'title' => 'Ты верен']);
+        $this->post('/admin/song-variant', ['song_id' => $other->id, 'letter' => 'а', 'is_default' => '0'])
+            ->assertSessionHasNoErrors();
     }
 
     public function test_event_can_have_only_one_sermon(): void
@@ -352,8 +385,10 @@ class AdminPanelTest extends TestCase
         Post::query()->create(['type' => PostType::Blog, 'title' => 'Черновик']);
 
         $hymns = SongCategory::query()->create(['name' => 'Гимны']);
-        Song::query()->create(['number' => 1, 'title' => 'С аккордами', 'song_category_id' => $hymns->id, 'chordpro' => '[Am]Свят']);
-        Song::query()->create(['number' => 2, 'title' => 'Без аккордов', 'song_category_id' => $hymns->id, 'chordpro' => 'Свят']);
+        Song::query()->create(['number' => 1, 'title' => 'С аккордами', 'song_category_id' => $hymns->id])
+            ->variants()->createMany([['letter' => 'а', 'chordpro' => 'Свят'], ['letter' => 'б', 'chordpro' => '[Am]Свят']]);
+        Song::query()->create(['number' => 2, 'title' => 'Без аккордов', 'song_category_id' => $hymns->id])
+            ->variants()->create(['letter' => 'а', 'chordpro' => 'Свят']);
         Song::query()->create(['number' => 3, 'title' => 'Без текста']);
 
         $this->get('/admin/event')->assertOk()

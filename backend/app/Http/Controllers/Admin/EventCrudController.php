@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\Concerns\HasListFilters;
 use App\Http\Controllers\Admin\Concerns\ValidatesFromFields;
 use App\Models\CalendarSource;
 use App\Models\Event;
-use App\Models\Song;
+use App\Models\SongVariant;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
@@ -72,9 +72,10 @@ class EventCrudController extends CrudController
             ->attributes(['rows' => 6])
             ->hint('Абзацы разделяйте пустой строкой')
             ->validationRules('nullable|string');
-        CRUD::field('songs')->label('Гимны служения')->type('select_multiple_search')
-            ->entity('songs')->model(Song::class)->attribute('display_name')
-            ->options(fn ($query) => $query->orderBy('number')->get())
+        CRUD::field('hymns')->label('Гимны служения')->type('select_multiple_search')
+            ->entity('hymns')->model(SongVariant::class)->attribute('display_name')
+            ->options(fn ($query) => $query->with(['song' => fn ($query) => $query->withCount('variants')])->orderBySong()->get())
+            ->hint('У песни с несколькими вариантами текста выберите нужный: 214а, 214б')
             ->validationRules('nullable|array');
         CRUD::field('is_main')->label('Главное событие')->type('switch');
         CRUD::field('has_stream')->label('Есть трансляция')->type('switch');

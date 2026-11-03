@@ -11,6 +11,9 @@ import './SongCard.css';
 
 const FONT_SIZES = [17, 19, 22, 26];
 
+// Песня, у которой не осталось ни одного варианта текста.
+const NO_TEXT = { letter: '', key: null, isDefault: true, hasChords: false, sections: [] };
+
 // Включённые аккорды и тёмная тема запоминаются в браузере: кто играет или читает в полутьме,
 // тому они нужны в каждой песне.
 const CHORDS_KEY = 'songs:chords';
@@ -70,20 +73,26 @@ function useShareSong() {
 // Карточка песни (resources/design_handoff_songbook_mobile, экраны 03–05): светлая или тёмная тема,
 // размер текста в плашке, остальное — в шторке настроек. Тема меняет только карточку.
 // Одна и та же на странице песни и в превью сборника на десктопе; nav — ссылка слева в плашке.
-export default function SongCard({ song, nav }) {
+// variant — буква выбранного варианта текста (null — основной), onVariant получает новую.
+export default function SongCard({ song, nav, variant, onVariant }) {
   const [fontStep, setFontStep] = useState(1);
   const [chords, setChords] = useState(() => readFlag(CHORDS_KEY, '1'));
   const [dark, setDark] = useState(() => readFlag(THEME_KEY, 'dark', true));
   const [sheetOpen, setSheetOpen] = useState(false);
   const wake = useWakeLock();
   const { share, toast } = useShareSong();
-  const href = useHref(`/songs/${song.id}`);
-  // Сдвиг в полутонах; у другой песни он начинается заново.
-  const [transpose, setTranspose] = useState({ id: song.id, steps: 0 });
-  const steps = transpose.id === song.id ? transpose.steps : 0;
+  const variants = song.variants;
+  const current = variants.find((item) => item.letter === variant) ?? variants[0] ?? NO_TEXT;
+  // Буква видна, только когда есть из чего выбирать: 214а, 214б.
+  const letter = variants.length > 1 ? current.letter : '';
+  const href = useHref(`/songs/${song.id}${current.isDefault || !letter ? '' : `?v=${encodeURIComponent(letter)}`}`);
+  // Сдвиг в полутонах; у другой песни или другого варианта он начинается заново.
+  const transposeId = `${song.id}:${current.letter}`;
+  const [transpose, setTranspose] = useState({ id: transposeId, steps: 0 });
+  const steps = transpose.id === transposeId ? transpose.steps : 0;
 
-  const key = useMemo(() => songKey(song), [song]);
-  const sections = useMemo(() => (chords ? transposeSections(song.sections, steps, key) : song.sections), [song, chords, steps, key]);
+  const key = useMemo(() => songKey(current), [current]);
+  const sections = useMemo(() => (chords ? transposeSections(current.sections, steps, key) : current.sections), [current, chords, steps, key]);
   const closeSheet = useCallback(() => setSheetOpen(false), []);
 
   const changeChords = (on) => {
@@ -95,7 +104,7 @@ export default function SongCard({ song, nav }) {
     setDark(on);
   };
 
-  const showChords = song.hasChords && chords;
+  const showChords = current.hasChords && chords;
 
   return (
     <>
@@ -122,7 +131,7 @@ export default function SongCard({ song, nav }) {
             <button
               type="button"
               className="song-card-chip song-card-share"
-              onClick={() => share(song, new URL(href, window.location.origin).href)}
+              onClick={() => share({ ...song, num: `${song.num}${letter}` }, new URL(href, window.location.origin).href)}
               aria-label={t('Поделиться')}
             >
               <ShareIcon size={18} />
@@ -131,9 +140,26 @@ export default function SongCard({ song, nav }) {
         </div>
 
         <div className="song-card-head">
-          <span className="song-card-num">{song.num}</span>
+          <span className="song-card-num">{song.num}{letter && <small>{letter}</small>}</span>
           <h1>{song.title}</h1>
         </div>
+
+        {variants.length > 1 && (
+          <div className="song-card-variants" role="group" aria-label={t('Варианты текста')}>
+            {variants.map((item) => (
+              <button
+                key={item.letter}
+                type="button"
+                className={`song-card-variant${item === current ? ' is-active' : ''}`}
+                aria-pressed={item === current}
+                onClick={() => onVariant(item.isDefault ? null : item.letter)}
+              >
+                <span className="song-card-variant-letter">{song.num}{item.letter}</span>
+                {item.label && <span>{item.label}</span>}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="song-card-text">
           <SongText sections={sections} chords={showChords} fontSize={FONT_SIZES[fontStep]} gap={10} />
@@ -144,12 +170,12 @@ export default function SongCard({ song, nav }) {
         <SongSettings
           dark={dark}
           onDark={changeTheme}
-          hasChords={song.hasChords}
+          hasChords={current.hasChords}
           chords={chords}
           onChords={changeChords}
           songKey={key}
           steps={steps}
-          onSteps={(next) => setTranspose({ id: song.id, steps: next })}
+          onSteps={(next) => setTranspose({ id: transposeId, steps: next })}
           wake={wake}
           onClose={closeSheet}
         />

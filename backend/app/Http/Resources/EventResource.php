@@ -47,8 +47,9 @@ class EventResource extends JsonResource
             'addr' => $this->address,
             'desc' => Text::blocks($this->description),
             'sermon' => new SermonResource($this->whenLoaded('sermon')),
-            'hymns' => SongResource::collection($this->whenLoaded('songs')),
-            'hymnIds' => $this->whenLoaded('songs', fn () => $this->songs->pluck('id')),
+            // Гимны — песни с тональностью и буквой (`variant`) выбранного варианта текста.
+            'hymns' => $this->whenLoaded('hymns', fn () => SongResource::collection($this->hymns->map->asSong())),
+            'hymnIds' => $this->whenLoaded('hymns', fn () => $this->hymns->pluck('song_id')),
             // Добавить событие в календарь: файл .ics (Apple, Outlook, Яндекс) и формы Google и Outlook.
             'calendar' => [
                 'ics' => route('api.events.ics', $this->id),

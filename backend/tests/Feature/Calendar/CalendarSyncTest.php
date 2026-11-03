@@ -78,7 +78,7 @@ class CalendarSyncTest extends TestCase
         // На сайте к служению добавили метку, гимн и сняли с публикации, к выезду — проповедь.
         $service = Event::query()->where('external_uid', 'service@google.com#20261018T080000Z')->sole();
         $service->update(['tag' => 'Воскресенье', 'is_main' => true, 'is_published' => false]);
-        $service->songs()->attach(Song::query()->create(['number' => 1, 'title' => 'Гимн']));
+        $service->hymns()->attach(Song::query()->create(['number' => 1, 'title' => 'Гимн'])->variants()->create(['letter' => 'а']));
         $retreat = Event::query()->where('external_uid', 'retreat@example.com')->sole();
         $retreat->sermon()->create(['topic' => 'Тема выезда']);
 
@@ -99,7 +99,7 @@ class CalendarSyncTest extends TestCase
         $this->assertSame('Воскресенье', $service->tag);
         $this->assertTrue($service->is_main);
         $this->assertFalse($service->is_published);
-        $this->assertCount(1, $service->songs);
+        $this->assertCount(1, $service->hymns);
 
         // Удалённое событие с проповедью не удаляется, а скрывается.
         $retreat->refresh();

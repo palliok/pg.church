@@ -245,10 +245,10 @@ function Hymns({ hymns }) {
       </div>
       <div className="ev-hymns">
         {hymns.map((song) => (
-          <Link key={song.id} to={`/songs/${song.id}`} className="ev-hymn">
+          <Link key={`${song.id}${song.variant ?? ''}`} to={`/songs/${song.id}${song.variant ? `?v=${encodeURIComponent(song.variant)}` : ''}`} className="ev-hymn">
             <span className="ev-hymn-num">
               <span className="ev-hymn-word">Гимн</span>
-              <span>{song.num}</span>
+              <span>{song.num}{song.variant}</span>
             </span>
             <span className="ev-hymn-title">{song.title}</span>
             <LongArrow width={28} stroke={2.6} />

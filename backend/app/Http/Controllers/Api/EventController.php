@@ -46,7 +46,8 @@ class EventController extends Controller
             ->published()
             ->with([
                 'sermon.minister',
-                'songs' => fn ($query) => $query->withoutLyrics()->with('category')->orderBy('number'),
+                'hymns' => fn ($query) => $query->select('song_variants.id', 'song_id', 'letter', 'is_default', 'key')
+                    ->with('song.category')->orderBySong(),
             ])
             ->findOrFail($event);
 

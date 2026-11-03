@@ -23,6 +23,7 @@ Route::group([
     Route::crud('minister', 'MinisterCrudController');
     Route::crud('duty-shift', 'DutyShiftCrudController');
     Route::crud('song', 'SongCrudController');
+    Route::crud('song-variant', 'SongVariantCrudController');
     Route::crud('song-category', 'SongCategoryCrudController');
     Route::crud('post', 'PostCrudController');
     Route::crud('tag', 'TagCrudController');

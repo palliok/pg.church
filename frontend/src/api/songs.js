@@ -30,14 +30,20 @@ function toSection(section) {
   };
 }
 
-function toSong(raw) {
+function toVariant(raw) {
   const sections = raw.sections.map(toSection);
 
   return {
-    ...toSummary(raw),
+    ...raw,
+    label: t(raw.label),
     sections,
     hasChords: sections.some((section) => section.lines.some((parts) => parts.some((part) => part.chord))),
   };
+}
+
+// Песня с вариантами текста; основной — первым.
+function toSong(raw) {
+  return { ...toSummary(raw), variants: raw.variants.map(toVariant) };
 }
 
 // Весь сборник без текстов, по номерам.

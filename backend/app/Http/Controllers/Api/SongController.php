@@ -13,7 +13,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class SongController extends Controller
 {
     /**
-     * Сборник песен без текстов; `q` ищет по названию, строке текста и номеру.
+     * Сборник песен без текстов; `q` ищет по названию, строке текста любого варианта и номеру.
      */
     public function index(Request $request): AnonymousResourceCollection
     {
@@ -38,7 +38,7 @@ class SongController extends Controller
 
     public function show(int $song): SongResource
     {
-        return new SongResource(Song::query()->with('category')->findOrFail($song));
+        return new SongResource(Song::query()->withKey()->with(['category', 'variants' => fn ($query) => $query->defaultFirst()])->findOrFail($song));
     }
 
     public function categories(): JsonResponse

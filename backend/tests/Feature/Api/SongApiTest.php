@@ -22,15 +22,21 @@ class SongApiTest extends TestCase
         $this->hymns = SongCategory::query()->create(['name' => 'Гимны', 'sort' => 2]);
         $this->worship = SongCategory::query()->create(['name' => 'Поклонение', 'sort' => 1]);
 
-        Song::query()->create([
-            'number' => 214, 'title' => 'Радость моя', 'song_category_id' => $this->hymns->id,
+        Song::query()->create(['number' => 214, 'title' => 'Радость моя', 'song_category_id' => $this->hymns->id])->variants()->create([
+            'letter' => 'а', 'is_default' => true,
             'chordpro' => "Куплет 1\n[D]Свет Твой сияет во мне,\nИ ра[G]дость напол[A7]няет дом.",
         ]);
-        Song::query()->create([
-            'number' => 60, 'title' => 'Свят, свят, свят', 'song_category_id' => $this->worship->id, 'key' => 'E',
-            'chordpro' => "Куплет 1\r\n\r\nСвят Господь Вседержитель,\r\nВся земля полна славы Твоей.\r\n\r\nПрипев\r\n\r\nТебе поём хвалу на 100%.",
+        Song::query()->create(['number' => 60, 'title' => 'Свят, свят, свят', 'song_category_id' => $this->worship->id])->variants()->createMany([
+            [
+                'letter' => 'а', 'label' => 'PG music', 'key' => 'G',
+                'chordpro' => "Свят, свят, свят Господь,\nНебо и земля полны славы Твоей.",
+            ],
+            [
+                'letter' => 'б', 'label' => '3 хор', 'is_default' => true, 'key' => 'E',
+                'chordpro' => "Куплет 1\r\n\r\nСвят Господь Вседержитель,\r\nВся земля полна славы Твоей.\r\n\r\nПрипев\r\n\r\nТебе поём хвалу на 100%.",
+            ],
         ]);
-        Song::query()->create(['number' => 21, 'title' => 'Ты верен', 'chordpro' => null]);
+        Song::query()->create(['number' => 21, 'title' => 'Ты верен'])->variants()->create(['letter' => 'а', 'chordpro' => null]);
     }
 
     public function test_index_lists_songs_by_number_without_lyrics(): void
@@ -45,8 +51,8 @@ class SongApiTest extends TestCase
             ->assertJsonPath('data.1.sub', 'Поклонение · тональность E')
             ->assertJsonPath('data.0.category', null)
             ->assertJsonPath('data.0.sub', '')
-            ->assertJsonMissingPath('data.0.sections')
-            ->assertJsonMissingPath('data.0.hasChords')
+            ->assertJsonMissingPath('data.0.variants')
+            ->assertJsonMissingPath('data.0.variant')
             ->assertJsonMissingPath('data.0.chordpro')
             ->assertJsonMissingPath('data.0.lyrics');
     }
@@ -78,6 +84,37 @@ class SongApiTest extends TestCase
         $this->getJson('/api/v1/songs?q=моя')->assertJsonPath('data.0.line', 'Свет Твой сияет во мне,');
     }
 
+    public function test_search_looks_into_all_variants_and_names_the_matching_one(): void
+    {
+        // Строка есть только в варианте «а», основной — «б»: песня одна, с буквой найденного варианта.
+        $this->getJson('/api/v1/songs?q=небо')
+            ->assertJsonPath('data.*.num', [60])
+            ->assertJsonPath('data.0.line', 'Небо и земля полны славы Твоей.')
+            ->assertJsonPath('data.0.variant', 'а');
+
+        // Строка есть в обоих вариантах — показывается основной, буква не нужна.
+        $this->getJson('/api/v1/songs?q=земля')
+            ->assertJsonPath('data.*.num', [60])
+            ->assertJsonPath('data.0.line', 'Вся земля полна славы Твоей.')
+            ->assertJsonPath('data.0.variant', null);
+    }
+
+    public function test_search_by_number_with_variant_letter(): void
+    {
+        $this->getJson('/api/v1/songs?q=60б')
+            ->assertJsonPath('data.*.num', [60])
+            ->assertJsonPath('data.0.variant', 'б')
+            ->assertJsonPath('data.0.line', 'Свят Господь Вседержитель,');
+        // Пробел и заглавная буква не мешают; строка — из найденного варианта.
+        $this->getJson('/api/v1/songs?q='.urlencode('60 А'))
+            ->assertJsonPath('data.*.num', [60])
+            ->assertJsonPath('data.0.variant', 'а')
+            ->assertJsonPath('data.0.line', 'Свят, свят, свят Господь,');
+        // Такой буквы у песни нет.
+        $this->getJson('/api/v1/songs?q=60в')->assertJsonPath('data', []);
+        $this->getJson('/api/v1/songs?q=214б')->assertJsonPath('data', []);
+    }
+
     public function test_search_treats_like_wildcards_literally(): void
     {
         $this->getJson('/api/v1/songs?q='.urlencode('%'))->assertJsonPath('data.*.num', [60]);
@@ -91,7 +128,7 @@ class SongApiTest extends TestCase
         $this->getJson('/api/v1/songs?category=abc')->assertUnprocessable()->assertJsonValidationErrors('category');
     }
 
-    public function test_show_returns_song_text_as_sections(): void
+    public function test_show_returns_variants_with_default_first(): void
     {
         $song = Song::query()->where('number', 60)->firstOrFail();
 
@@ -99,8 +136,13 @@ class SongApiTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.num', 60)
             ->assertJsonPath('data.key', 'E')
-            ->assertJsonPath('data.hasChords', false)
-            ->assertJsonPath('data.sections', [
+            ->assertJsonPath('data.sub', 'Поклонение · тональность E')
+            ->assertJsonPath('data.variants.*.letter', ['б', 'а'])
+            ->assertJsonPath('data.variants.*.label', ['3 хор', 'PG music'])
+            ->assertJsonPath('data.variants.*.isDefault', [true, false])
+            ->assertJsonPath('data.variants.*.key', ['E', 'G'])
+            ->assertJsonPath('data.variants.0.hasChords', false)
+            ->assertJsonPath('data.variants.0.sections', [
                 ['type' => 'verse', 'label' => 'Куплет 1', 'lines' => [
                     [['chord' => null, 'text' => 'Свят Господь Вседержитель,']],
                     [['chord' => null, 'text' => 'Вся земля полна славы Твоей.']],
@@ -109,26 +151,28 @@ class SongApiTest extends TestCase
                     [['chord' => null, 'text' => 'Тебе поём хвалу на 100%.']],
                 ]],
             ])
-            ->assertJsonMissingPath('data.chordpro')
-            ->assertJsonMissingPath('data.lyrics');
+            ->assertJsonMissingPath('data.variants.0.chordpro')
+            ->assertJsonMissingPath('data.variants.0.lyrics');
 
         $withChords = Song::query()->where('number', 214)->firstOrFail();
 
         $this->getJson("/api/v1/songs/{$withChords->id}")
             ->assertOk()
-            ->assertJsonPath('data.hasChords', true)
-            ->assertJsonPath('data.sections.0.lines.1', [
+            ->assertJsonPath('data.variants.0.hasChords', true)
+            ->assertJsonPath('data.variants.0.sections.0.lines.1', [
                 ['chord' => null, 'text' => 'И ра'],
                 ['chord' => 'G', 'text' => 'дость напол'],
                 ['chord' => 'A7', 'text' => 'няет дом.'],
             ]);
 
+        // Основной не отмечен — им считается первый по букве; текста нет — секций нет.
         $withoutText = Song::query()->where('number', 21)->firstOrFail();
 
         $this->getJson("/api/v1/songs/{$withoutText->id}")
             ->assertOk()
-            ->assertJsonPath('data.hasChords', false)
-            ->assertJsonPath('data.sections', []);
+            ->assertJsonPath('data.variants.0.isDefault', true)
+            ->assertJsonPath('data.variants.0.hasChords', false)
+            ->assertJsonPath('data.variants.0.sections', []);
         $this->getJson('/api/v1/songs/999999')->assertNotFound();
         $this->getJson('/api/v1/songs/abc')->assertNotFound();
     }

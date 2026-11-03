@@ -1,12 +1,15 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import LoadStatus from '../components/LoadStatus.jsx';
 import SongCard from '../components/SongCard.jsx';
 import { useSong } from '../api/songs.js';
 import './SongDetail.css';
 
 // Страница песни: карточка из SongCard, шапка и меню вокруг остаются светлыми.
+// Вариант текста — в адресе (?v=б), чтобы ссылкой можно было поделиться; основной — без параметра.
 export default function SongDetail() {
   const { id } = useParams();
+  const [params, setParams] = useSearchParams();
+  const pickVariant = (letter) => setParams(letter ? { v: letter } : {}, { replace: true });
   const { song, loading, error, retry } = useSong(id);
 
   if (loading || error) {
@@ -28,7 +31,8 @@ export default function SongDetail() {
 
   return (
     <div className="page-enter song-page">
-      <SongCard song={song} nav={<Link to="/songs" className="song-card-back">← Сборник песен</Link>} />
+      <SongCard song={song} variant={params.get('v')} onVariant={pickVariant}
+        nav={<Link to="/songs" className="song-card-back">← Сборник песен</Link>} />
     </div>
   );
 }

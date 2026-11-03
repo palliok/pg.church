@@ -117,11 +117,29 @@ const songs = SONG_TITLES.map((title, index) => {
   return { id: index + 1, num: 60 + index * 7, title, sub: null, category: category.name, categoryId: category.id, key: 'E', line: PLAIN_LINES[0] };
 });
 
-const songWithText = (song) => ({ ...song, hasChords: true, sections: SECTIONS });
+// У первой песни два варианта текста, чтобы был виден переключатель; основной — первым, как на бэке.
+const songWithText = (song) => ({
+  ...song,
+  variants: [
+    { letter: 'а', label: 'PG music', isDefault: true, key: 'E', hasChords: true, sections: SECTIONS },
+    ...(song.id === 1 ? [{
+      letter: 'б', label: '3 хор', isDefault: false, key: null, hasChords: false,
+      sections: SECTIONS.slice(0, 2).map((section) => ({ ...section, lines: section.lines.map((parts) => [{ chord: null, text: parts.map((part) => part.text).join('') }]) })),
+    }] : []),
+  ],
+});
 
-// Как на бэке: строка с совпадением вместо первой.
+// Как на бэке: строка с совпадением вместо первой; «60б» — песня с этим вариантом.
 function searchSongs(term) {
   const query = term.trim().toLowerCase();
+  const numbered = query.match(/^(\d+)\s*([а-яё])$/);
+
+  if (numbered) {
+    const song = songs.find((item) => String(item.num) === numbered[1]);
+    const variant = song && songWithText(song).variants.find((item) => item.letter === numbered[2]);
+    return variant ? [{ ...song, line: song.line, variant: variant.letter }] : [];
+  }
+
   const line = PLAIN_LINES.find((text) => text.toLowerCase().includes(query));
 
   return songs
@@ -157,7 +175,8 @@ const sermon = {
 function event(id, { title, tag, category, startsAt, minutes, place, desc, main = false, live: hasStream = false, withSermon = false, hymnNums = [] }) {
   const weekday = WEEKDAYS[startsAt.getDay()];
   const time = `${pad(startsAt.getHours())}:${pad(startsAt.getMinutes())}`;
-  const hymns = songs.filter((song) => hymnNums.includes(song.num));
+  // Гимны — песни с буквой выбранного варианта, если он не основной: у песни 60 — «б».
+  const hymns = songs.filter((song) => hymnNums.includes(song.num)).map((song) => ({ ...song, variant: song.id === 1 ? 'б' : null }));
 
   return {
     id,
@@ -291,7 +310,7 @@ function buildEvents() {
         startsAt,
         minutes: duration,
         withSermon: nextSunday,
-        hymnNums: nextSunday ? [88, 214] : [],
+        hymnNums: nextSunday ? [60, 88, 214] : [],
       });
     }
   }

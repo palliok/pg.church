@@ -10,6 +10,7 @@ use App\Models\Minister;
 use App\Models\Post;
 use App\Models\Song;
 use App\Models\SongCategory;
+use App\Models\SongVariant;
 use App\Models\Story;
 use App\Models\Tag;
 use Illuminate\Database\Seeder;
@@ -92,10 +93,17 @@ class DemoContentSeeder extends Seeder
                 'number' => $number,
                 'title' => $title,
                 'song_category_id' => $categories[$index % 3]->id,
-                'key' => 'E',
-                'chordpro' => $lyrics,
             ]);
+            $songs[$number]->variants()->create(['letter' => 'а', 'label' => 'PG music', 'is_default' => true, 'key' => 'E', 'chordpro' => $lyrics]);
         }
+
+        // У первой песни — второй вариант текста, чтобы был виден переключатель.
+        $songs[60]->variants()->create([
+            'letter' => 'б',
+            'label' => '3 хор',
+            'key' => 'D',
+            'chordpro' => "Куплет 1\n[D]Свят, свят, свят Господь Все[G]держи[D]тель,\nНебо и [A]земля полны славы Тво[D]ей.",
+        ]);
 
         return $songs;
     }
@@ -119,7 +127,10 @@ class DemoContentSeeder extends Seeder
             'has_stream' => true,
         ]);
 
-        $service->songs()->attach([$songs[214]->id, $songs[88]->id]);
+        // Гимны — варианты текста: у песни 60 поют вариант «б».
+        $service->hymns()->attach(SongVariant::query()
+            ->where(fn ($query) => $query->whereIn('song_id', [$songs[214]->id, $songs[88]->id])->orWhere(fn ($query) => $query->where('song_id', $songs[60]->id)->where('letter', 'б')))
+            ->pluck('id'));
 
         $service->sermon()->create([
             'minister_id' => $pastor->id,

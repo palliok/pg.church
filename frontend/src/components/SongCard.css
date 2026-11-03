@@ -37,6 +37,15 @@
 .song-card-head { display: flex; align-items: baseline; gap: 12px; margin: 10px 22px 0; padding: 6px 0 14px; border-bottom: 1px solid var(--sc-hair); }
 .song-card-num { flex: none; font: 40px/.85 var(--f-num); letter-spacing: -.05em; }
 .song-card-head h1 { margin: 0; min-width: 0; font: 700 28px/1 var(--f-sans); letter-spacing: -.055em; text-wrap: balance; }
+.song-card-num small { font-size: .6em; letter-spacing: 0; }
+
+/* Переключатель вариантов текста: буква и подпись, активный — в цвет текста. На узком экране ряд листается вбок. */
+.song-card-variants { display: flex; gap: 6px; margin: 12px 22px 0; overflow-x: auto; scrollbar-width: none; }
+.song-card-variants::-webkit-scrollbar { display: none; }
+.song-card-variant { flex: none; display: flex; align-items: baseline; gap: 6px; min-height: 36px; padding: 0 14px; border: none; border-radius: 99px; background: var(--sc-chip); color: var(--sc-fg); font: 500 14px/36px var(--f-sans); white-space: nowrap; cursor: pointer; }
+.song-card-variant-letter { font: 13px var(--f-mono); color: var(--sc-label); }
+.song-card-variant.is-active { background: var(--sc-fg); color: var(--sc-bg); }
+.song-card-variant.is-active .song-card-variant-letter { color: inherit; opacity: .6; }
 
 /* Текст песни (SongText): куплет без подложки, припев — на подложке. */
 .song-card-text { padding: 14px 14px 0; }

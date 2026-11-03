@@ -27,13 +27,12 @@ const TABS = [
     ],
   },
   {
-    key: 'about', to: '/about', label: 'О церкви',
+    key: 'songs', to: '/songs', label: 'Сборник песен',
     icon: [
-      <path key="1" d="M12 2v3" />,
-      <path key="2" d="M10.4 3.4h3.2" />,
-      <path key="3" d="M4.5 11 12 5l7.5 6" />,
-      <path key="4" d="M6.8 11v9h10.4v-9" />,
-      <path key="5" d="M10 20v-3.6a2 2 0 0 1 4 0V20" />,
+      <path key="1" d="M9 17.5V5.5l11-2v12" />,
+      <path key="2" d="M9 9.5l11-2" />,
+      <circle key="3" cx="6.5" cy="17.5" r="2.5" />,
+      <circle key="4" cx="17.5" cy="15.5" r="2.5" />,
     ],
   },
 ];

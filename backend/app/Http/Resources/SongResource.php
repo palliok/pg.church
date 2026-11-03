@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Song;
+use App\Models\SongVariant;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -28,20 +29,23 @@ class SongResource extends JsonResource
             'sub' => $this->subtitle,
             'category' => $this->category?->name,
             'categoryId' => $this->song_category_id,
+            // Тональность основного варианта.
             'key' => $this->key,
             // Строка текста для списка: с совпадением при поиске, иначе первая.
             'line' => $this->whenHas('line'),
-            // Текст отдаётся только там, где он выбран из базы (страница песни).
-            $this->mergeWhen(array_key_exists('chordpro', $this->resource->getAttributes()), fn () => $this->text()),
+            // Буква варианта, где нашлась строка, если это не основной вариант.
+            'variant' => $this->whenHas('variant'),
+            // Тексты отдаются только там, где варианты загружены (страница песни).
+            'variants' => $this->whenLoaded('variants', fn () => $this->variants->map($this->variant(...))->all()),
         ];
     }
 
     /**
-     * @return array{hasChords: bool, sections: list<array<string, mixed>>}
+     * @return array{letter: string, label: ?string, isDefault: bool, key: ?string, hasChords: bool, sections: list<array<string, mixed>>}
      */
-    private function text(): array
+    private function variant(SongVariant $variant, int $index): array
     {
-        $sections = $this->sections;
+        $sections = $variant->sections;
         $hasChords = false;
 
         foreach ($sections as &$section) {
@@ -52,6 +56,14 @@ class SongResource extends JsonResource
             }
         }
 
-        return ['hasChords' => $hasChords, 'sections' => $sections];
+        return [
+            'letter' => $variant->letter,
+            'label' => $variant->label,
+            // Если основной не отмечен, им считается первый в списке.
+            'isDefault' => $index === 0,
+            'key' => $variant->key,
+            'hasChords' => $hasChords,
+            'sections' => $sections,
+        ];
     }
 }

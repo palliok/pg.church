@@ -9,6 +9,7 @@
 
 <x-backpack::menu-dropdown title="Сборник песен" icon="la la-music">
     <x-backpack::menu-dropdown-item title="Песни" icon="la la-file-audio" :link="backpack_url('song')" />
+    <x-backpack::menu-dropdown-item title="Варианты текста" icon="la la-clone" :link="backpack_url('song-variant')" />
     <x-backpack::menu-dropdown-item title="Разделы" icon="la la-folder" :link="backpack_url('song-category')" />
 </x-backpack::menu-dropdown>
 
