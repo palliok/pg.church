@@ -1,6 +1,6 @@
 import './ChurchBrand.css';
 
-// Логотип 9b (resources/logo-9b-export): вместо точки после «церковь» — голубой уголок.
+// Логотип 9b (resources/poklonnaya-logo-dev/logo): вместо точки после «церковь» — голубой уголок.
 // На en и ky текст переводит translatePage(); уголок не переводится.
 export default function ChurchBrand() {
   return (

@@ -1,9 +1,10 @@
 /* Логотип по макету design_handoff_overview, блок 01 (там 44 / 18, на телефоне 32 / 13), увеличен:
-   Arimo 700 50 / 20, город — Mono капсом; на телефоне 36 / 14,5. */
+   Arimo 700 50 / 20, город — Mono капсом; на телефоне 36 / 14,5.
+   Расстояние до «на поклонной горе» — 0.225 кегля слова (resources/poklonnaya-logo-dev). */
 .church-brand {
   display: inline-flex;
   align-items: center;
-  gap: 16px;
+  gap: 11px;
   min-width: 0;
   white-space: nowrap;
   color: var(--c-ink);
@@ -14,14 +15,14 @@
   letter-spacing: -.07em;
 }
 
-/* Уголок из logo-9b: квадрат 0.42em с толщиной 0.12em, низ поднят над базовой линией на 0.3em.
-   В em от кегля слова — масштабируется вместе с ним. Отступ слева учитывает letter-spacing слова. */
+/* Уголок из logo-9b: квадрат 0.42em с толщиной 0.12em, низ поднят над базовой линией на 0.3em
+   и придвинут к слову на 0.06em. В em от кегля слова — масштабируется вместе с ним. */
 .church-brand-corner {
   display: inline-block;
   box-sizing: border-box;
   width: .42em;
   height: .42em;
-  margin-left: .16em;
+  margin-left: -.06em;
   vertical-align: .3em;
   border-top: .12em solid var(--c-main);
   border-right: .12em solid var(--c-main);
@@ -47,7 +48,7 @@
 }
 
 @media (max-width: 860px) {
-  .church-brand { gap: 10px; }
+  .church-brand { gap: 8px; }
   .church-brand-word { font-size: 36px; }
   .church-brand-side { gap: 3px; }
   .church-brand-name { font-size: 14.5px; }
@@ -56,7 +57,7 @@
 
 /* На узких телефонах рядом с логотипом стоит свёрнутый переключатель языка: логотип чуть меньше, чтобы влезть в строку. */
 @media (max-width: 420px) {
-  .church-brand { gap: 8px; }
+  .church-brand { gap: 7px; }
   .church-brand-word { font-size: 32px; }
   .church-brand-name { font-size: 13px; }
   .church-brand-city { font-size: 8px; }
