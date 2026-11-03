@@ -337,8 +337,7 @@ function eventsBetween(params) {
 }
 
 // ===== Объявления =====
-// Формат опережает бэкенд: publishedAt, eventDate, important, details и contact пока есть
-// только здесь, /api/v1/announcements отдаёт { id, title, body }.
+// Тот же формат, что у /api/v1/announcements (AnnouncementResource на бэке).
 // publishedAt — когда опубликовано (для сортировки, на сайте не показывается);
 // eventDate — конкретный день события «YYYY-MM-DD» или null, если дня нет; eventDateEnd — последний день,
 // если событие на несколько дней; deadline — срок «до» у объявления без дня события.
@@ -397,7 +396,7 @@ const announcements = [
     important: true, links: [['Написать в Telegram', 'https://t.me/']], contact: { name: 'Олег', phone: '+7 905 000-78-90' },
   }),
   announcement(4, 6, 'Изучение Библии для молодёжи', 'Каждую пятницу разбираем Евангелие от Марка. Приходите с друзьями.', {
-    weekly: { dow: 5, time: '19:00' }, where: 'Малый зал', links: [['Чат молодёжи в Telegram', 'https://t.me/']],
+    weekly: { dow: 5, time: '19:00' }, event: 'Молодёжная встреча', where: 'Малый зал', links: [['Чат молодёжи в Telegram', 'https://t.me/']],
   }),
   announcement(5, 9, 'Членское собрание после богослужения', 'В воскресенье после богослужения — членское собрание церкви в главном зале.\nПросим членов церкви остаться.', {
     important: true, event: 'Богослужение', when: 'После служения', where: 'Главный зал',

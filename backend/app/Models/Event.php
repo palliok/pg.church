@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AnnouncementWhen;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
@@ -35,6 +37,28 @@ class Event extends Model
             'has_stream' => 'boolean',
             'is_published' => 'boolean',
         ];
+    }
+
+    /**
+     * Удалённое событие (например, пропавшее из календаря при синхронизации) обнуляет связь у объявлений.
+     * Объявлениям без своей даты срок показа ставится по дню события, иначе они висели бы бессрочно.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Event $event) {
+            $event->announcements()
+                ->where('when_type', AnnouncementWhen::None)
+                ->whereNull('visible_until')
+                ->update(['visible_until' => ($event->ends_at ?? $event->starts_at)->toDateString()]);
+        });
+    }
+
+    /**
+     * @return HasMany<Announcement, $this>
+     */
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(Announcement::class);
     }
 
     /**

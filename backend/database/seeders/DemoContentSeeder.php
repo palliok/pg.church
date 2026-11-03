@@ -274,17 +274,69 @@ class DemoContentSeeder extends Seeder
         }
     }
 
+    /**
+     * Те же объявления, что в моках фронта (frontend/src/api/mocks.js), с датами от сегодняшнего дня.
+     */
     private function seedAnnouncements(): void
     {
-        Announcement::query()->create([
-            'title' => 'Членское собрание после богослужения',
-            'body' => "В воскресенье после богослужения — членское собрание церкви в главном зале.\nПросим членов церкви остаться.",
-            'sort' => 1,
-        ]);
-        Announcement::query()->create([
-            'title' => 'Запись в летний лагерь открыта',
-            'body' => 'Записаться можно у служителей после богослужения или по телефону церкви.',
-            'sort' => 2,
-        ]);
+        $service = Event::query()->where('title', 'Богослужение')->where('starts_at', '>=', today())->orderBy('starts_at')->value('id');
+        $youth = Event::query()->where('title', 'Молодёжная встреча')->where('starts_at', '>=', today())->orderBy('starts_at')->value('id');
+        $day = fn (int $days) => today()->addDays($days)->toDateString();
+
+        $announcements = [
+            [0, 'Сбор продуктов для нуждающихся', 'Приносите крупы, консервы и средства гигиены. Всё передадим семьям нашего района.', [
+                'when_type' => 'until', 'deadline' => $day(9), 'when_note' => 'После служений', 'place' => 'Фойе, стол у входа',
+                'contact_name' => 'Анна', 'contact_phone' => '+7 921 000-12-34',
+            ]],
+            [2, 'Запись в детский лагерь', 'Открыта запись на летнюю смену для детей 7–12 лет. Мест: 30.', [
+                'important' => true, 'when_type' => 'date', 'event_date' => $day(20), 'event_date_end' => $day(26),
+                'place' => 'База «Сосновый бор», Ленобласть',
+                'links_text' => "Анкета для записи | https://forms.yandex.ru/\nЧто взять с собой | https://pg.church/", 'primary_link' => true,
+                'contact_name' => 'Марина', 'contact_phone' => '8 911 000-45-67',
+            ]],
+            [4, 'Нужны волонтёры на кухню', 'Ищем помощников готовить обеды после воскресного служения. Можно на одно воскресенье в месяц.', [
+                'important' => true, 'links_text' => 'Написать в Telegram | https://t.me/', 'contact_name' => 'Олег', 'contact_phone' => '+7 905 000-78-90',
+            ]],
+            [6, 'Изучение Библии для молодёжи', 'Каждую пятницу разбираем Евангелие от Марка. Приходите с друзьями.', [
+                'when_type' => 'weekly', 'weekday' => 5, 'weekly_time' => '19:00', 'event_id' => $youth, 'place' => 'Малый зал',
+                'links_text' => 'Чат молодёжи в Telegram | https://t.me/',
+            ]],
+            [9, 'Членское собрание после богослужения', "В воскресенье после богослужения — членское собрание церкви в главном зале.\nПросим членов церкви остаться.", [
+                'important' => true, 'event_id' => $service, 'when_note' => 'После служения', 'place' => 'Главный зал',
+            ]],
+            [14, 'Генеральная уборка зала', 'Наводим порядок перед зимой: моем окна, разбираем склад, чистим стулья. Перчатки выдадим.', [
+                'when_type' => 'date', 'event_date' => today()->next(Carbon::SATURDAY)->toDateString(), 'when_note' => 'С 10:00', 'place' => 'Главный зал',
+                'links_text' => 'Записаться | https://forms.yandex.ru/',
+            ]],
+            [16, 'Подготовка к крещению', 'Если вы хотите принять крещение, приходите на подготовительные встречи. Всего четыре встречи.', [
+                'when_type' => 'date', 'event_date' => $day(12), 'when_note' => 'После служения', 'place' => 'Малый зал',
+                'contact_name' => 'Пастор Алексей', 'contact_phone' => '+7 921 000-55-11',
+            ]],
+            [18, 'Молитвенное служение по средам', 'Собираемся вместе молиться о церкви, городе и друг о друге.', [
+                'when_type' => 'weekly', 'weekday' => 3, 'weekly_time' => '19:30', 'place' => 'Малый зал',
+            ]],
+            [20, 'Сбор тёплых вещей', 'Принимаем куртки, шапки и обувь в хорошем состоянии. Передадим в приют «Ночлежка».', [
+                'when_type' => 'until', 'deadline' => $day(14), 'when_note' => 'До и после служений', 'place' => 'Фойе',
+                'contact_name' => 'Анна', 'contact_phone' => '+7 921 000-12-34',
+            ]],
+            [25, 'Семейный пикник', 'Едем всей церковью на природу: игры для детей, обед на костре. Возьмите плед и хорошее настроение.', [
+                'important' => true, 'when_type' => 'date', 'event_date' => $day(5), 'when_note' => 'С 12:00', 'place' => 'Парк Сосновка',
+                'links_text' => 'Записаться | https://forms.yandex.ru/',
+            ]],
+            [30, 'Женская конференция «Свет»', 'Два дня общения, поклонения и семинаров для сестёр. Регистрация обязательна.', [
+                'when_type' => 'date', 'event_date' => $day(26), 'event_date_end' => $day(27), 'place' => 'Главный зал',
+                'links_text' => 'Регистрация | https://forms.yandex.ru/', 'primary_link' => true,
+                'contact_name' => 'Марина', 'contact_phone' => '8 911 000-45-67',
+            ]],
+        ];
+
+        foreach ($announcements as [$daysAgo, $title, $body, $fields]) {
+            Announcement::query()->create([
+                'title' => $title,
+                'body' => $body,
+                'published_at' => now()->subDays($daysAgo),
+                ...$fields,
+            ]);
+        }
     }
 }

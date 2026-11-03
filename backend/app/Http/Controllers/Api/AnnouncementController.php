@@ -3,23 +3,20 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AnnouncementResource;
 use App\Models\Announcement;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AnnouncementController extends Controller
 {
     /**
-     * Действующие объявления для главной страницы.
+     * Действующие объявления, новые сверху.
      */
-    public function __invoke(): JsonResponse
+    public function __invoke(): AnonymousResourceCollection
     {
-        $announcements = Announcement::query()->visible()->orderBy('sort')->orderByDesc('id')->get()
-            ->map(fn (Announcement $announcement) => [
-                'id' => $announcement->id,
-                'title' => $announcement->title,
-                'body' => $announcement->body,
-            ]);
+        $announcements = Announcement::query()->visible()->with('event')
+            ->orderByDesc('published_at')->orderByDesc('id')->get();
 
-        return response()->json(['data' => $announcements]);
+        return AnnouncementResource::collection($announcements);
     }
 }

@@ -70,8 +70,6 @@ function toRegular(weekly) {
   return { dow: shortDate(date).dow, weekday: weekdayLabel(date), time: weekly.time };
 }
 
-// Даты, «Важно», детали и контакт пока есть только в моках (src/api/mocks.js):
-// бэкенд отдаёт { id, title, body } — тогда объявление показывается без даты и деталей.
 // Дату публикации на сайте не показываем, только день события, если он назначен:
 // eventDate — день или начало, eventDateEnd — конец, если событие на несколько дней, deadline — срок «до»,
 // weekly — день недели и время регулярного, event — связанное событие из расписания (как в /events).
