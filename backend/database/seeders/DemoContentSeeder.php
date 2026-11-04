@@ -286,16 +286,16 @@ class DemoContentSeeder extends Seeder
         $announcements = [
             [0, 'Сбор продуктов для нуждающихся', 'Приносите крупы, консервы и средства гигиены. Всё передадим семьям нашего района.', [
                 'when_type' => 'until', 'deadline' => $day(9), 'when_note' => 'После служений', 'place' => 'Фойе, стол у входа',
-                'contact_name' => 'Анна', 'contact_phone' => '+7 921 000-12-34', 'main_action' => 'contact',
+                'contact_name' => 'Анна', 'contact_phone' => '+7 921 000-12-34', 'main_choice' => 'contact',
             ]],
             [2, 'Запись в детский лагерь', 'Открыта запись на летнюю смену для детей 7–12 лет. Мест: 30.', [
                 'important' => true, 'when_type' => 'date', 'event_date' => $day(20), 'event_date_end' => $day(26),
                 'place' => 'База «Сосновый бор», Ленобласть',
-                'links_text' => "Анкета для записи | https://forms.yandex.ru/\nЧто взять с собой | https://pg.church/", 'main_action' => 'link',
+                'links_text' => "Анкета для записи | https://forms.yandex.ru/\nЧто взять с собой | https://pg.church/", 'main_choice' => 'link:0',
                 'contact_name' => 'Марина', 'contact_phone' => '8 911 000-45-67',
             ]],
             [4, 'Нужны волонтёры на кухню', 'Ищем помощников готовить обеды после воскресного служения. Можно на одно воскресенье в месяц.', [
-                'important' => true, 'links_text' => 'Написать в Telegram | https://t.me/', 'contact_name' => 'Олег', 'contact_phone' => '+7 905 000-78-90', 'main_action' => 'contact',
+                'important' => true, 'links_text' => 'Написать в Telegram | https://t.me/', 'contact_name' => 'Олег', 'contact_phone' => '+7 905 000-78-90', 'main_choice' => 'contact',
             ]],
             [6, 'Изучение Библии для молодёжи', 'Каждую пятницу разбираем Евангелие от Марка. Приходите с друзьями.', [
                 'when_type' => 'weekly', 'weekday' => 5, 'weekly_time' => '19:00', 'event_id' => $youth, 'place' => 'Малый зал',
@@ -310,7 +310,7 @@ class DemoContentSeeder extends Seeder
             ]],
             [16, 'Подготовка к крещению', 'Если вы хотите принять крещение, приходите на подготовительные встречи. Всего четыре встречи.', [
                 'when_type' => 'date', 'event_date' => $day(12), 'when_note' => 'После служения', 'place' => 'Малый зал',
-                'contact_name' => 'Пастор Алексей', 'contact_phone' => '+7 921 000-55-11', 'main_action' => 'contact',
+                'contact_name' => 'Пастор Алексей', 'contact_phone' => '+7 921 000-55-11', 'main_choice' => 'contact',
             ]],
             [18, 'Молитвенное служение по средам', 'Собираемся вместе молиться о церкви, городе и друг о друге.', [
                 'when_type' => 'weekly', 'weekday' => 3, 'weekly_time' => '19:30', 'place' => 'Малый зал',
@@ -325,7 +325,7 @@ class DemoContentSeeder extends Seeder
             ]],
             [30, 'Женская конференция «Свет»', 'Два дня общения, поклонения и семинаров для сестёр. Регистрация обязательна.', [
                 'when_type' => 'date', 'event_date' => $day(26), 'event_date_end' => $day(27), 'place' => 'Главный зал',
-                'links_text' => 'Регистрация | https://forms.yandex.ru/', 'main_action' => 'link',
+                'links_text' => 'Регистрация | https://forms.yandex.ru/', 'main_choice' => 'link:0',
                 'contact_name' => 'Марина', 'contact_phone' => '8 911 000-45-67',
             ]],
         ];

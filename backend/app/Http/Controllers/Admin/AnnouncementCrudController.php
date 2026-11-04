@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\AnnouncementAction;
 use App\Enums\AnnouncementWhen;
 use App\Http\Controllers\Admin\Concerns\ValidatesFromFields;
 use App\Models\Announcement;
 use App\Models\Event;
+use App\Rules\ExistingLink;
 use App\Rules\LinkPerLine;
 use App\Support\RuDate;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
@@ -77,7 +77,7 @@ class AnnouncementCrudController extends CrudController
                 ->orderBy('starts_at')->limit(300)->get())
             ->hint('В сторис появится карточка события. Если у объявления нет своей даты, оно снимется после этого события')
             ->validationRules($this->rules('nullable', Rule::exists('events', 'id')));
-        CRUD::field('when_script')->type('view')->view('admin.announcement-when')->tab('Когда')
+        CRUD::field('form_script')->type('view')->view('admin.announcement-form')->tab('Когда')
             ->wrapper(['class' => 'd-none']);
 
         CRUD::field('place')->label('Где')->tab('Где и контакт')
@@ -89,12 +89,18 @@ class AnnouncementCrudController extends CrudController
         CRUD::field('contact_name')->label('Контакт: имя')->tab('Где и контакт')
             ->validationRules('nullable|string|max:60');
         CRUD::field('contact_phone')->label('Контакт: телефон')->tab('Где и контакт')
-            ->hint('На сайте появится кнопка «Позвонить»')
-            ->validationRules('required_with:contact_name|required_if:main_action,contact|nullable|string|max:30|regex:/^\+?[ ()-]*([0-9][ ()-]*){6,}$/');
-        CRUD::field('main_action')->label('Основное действие')->type('radio')->tab('Где и контакт')
-            ->options(AnnouncementAction::options())->default(AnnouncementAction::None->value)
-            ->hint('Крупная кнопка внизу объявления на телефоне: регистрация, анкета или звонок. Остальное — обычными плашками')
-            ->validationRules($this->rules('required', Rule::enum(AnnouncementAction::class)));
+            ->hint('На сайте — номер с кнопкой звонка; крупной кнопкой внизу — если выбрать звонок основным действием')
+            ->validationRules('required_with:contact_name|required_if:main_choice,contact|nullable|string|max:30|regex:/^\+?[ ()-]*([0-9][ ()-]*){6,}$/');
+        // Варианты — «Нет», ссылки по номеру и звонок; подписи по тексту ссылок и имени контакта
+        // ставит скрипт формы (admin.announcement-form) прямо при вводе.
+        CRUD::field('main_choice')->label('Основное действие')->type('select_from_array')->tab('Где и контакт')
+            ->options([
+                'none' => 'Нет',
+                ...collect(range(0, LinkPerLine::MAX - 1))->mapWithKeys(fn (int $index) => ['link:'.$index => 'Ссылка '.($index + 1)])->all(),
+                'contact' => 'Позвонить контакту',
+            ])->allows_null(false)
+            ->default('none')
+            ->hint('Крупная кнопка внизу объявления на телефоне: регистрация, анкета или звонок. Остальное — обычными плашками');
 
         CRUD::field('published_at')->label('Дата публикации')->type('datetime')->tab('Публикация')
             ->default(now()->format('Y-m-d H:i'))
@@ -105,7 +111,10 @@ class AnnouncementCrudController extends CrudController
             ->validationRules('nullable|date');
         CRUD::field('is_published')->label('Опубликовано')->type('switch')->default(true)->tab('Публикация');
 
-        CRUD::setValidation(['links_text' => ['required_if:main_action,link', 'nullable', 'string', 'max:2000', new LinkPerLine]]);
+        CRUD::setValidation([
+            'links_text' => ['nullable', 'string', 'max:2000', new LinkPerLine],
+            'main_choice' => ['required', 'regex:/^(none|contact|link:\d)$/', new ExistingLink(request()->input('links_text'))],
+        ]);
 
         $this->useFieldLabelsInValidationErrors();
     }

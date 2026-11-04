@@ -35,7 +35,7 @@ class AnnouncementResource extends JsonResource
             'weekly' => $this->weekday ? ['dow' => $this->weekday, 'time' => $this->weekly_time] : null,
             'event' => $event ? new EventResource($event) : null,
             // Строки с иконками: «когда», «где» и ссылки. Основное действие (крупная кнопка внизу) —
-            // первая ссылка или звонок контакту: у него primary.
+            // одна из ссылок или звонок контакту: у него primary.
             'details' => [
                 ...($this->when_note ? [['type' => 'when', 'text' => $this->when_note]] : []),
                 ...($this->place ? [['type' => 'where', 'text' => $this->place]] : []),
@@ -43,7 +43,7 @@ class AnnouncementResource extends JsonResource
                     'type' => 'link',
                     'text' => $link['text'],
                     'url' => $link['url'],
-                    'primary' => $index === 0 && $action === AnnouncementAction::Link,
+                    'primary' => $action === AnnouncementAction::Link && $index === $this->main_link,
                 ], $links, array_keys($links)),
             ],
             'contact' => $this->contact_phone ? [

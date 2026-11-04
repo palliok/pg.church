@@ -15,20 +15,8 @@ enum AnnouncementAction: string
     {
         return match ($this) {
             self::None => 'Нет',
-            self::Link => 'Первая ссылка',
+            self::Link => 'Ссылка',
             self::Contact => 'Позвонить контакту',
         };
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public static function options(): array
-    {
-        return array_column(
-            array_map(fn (self $action) => ['value' => $action->value, 'label' => $action->label()], self::cases()),
-            'label',
-            'value',
-        );
     }
 }

@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'title', 'body', 'important', 'when_type', 'event_date', 'event_date_end', 'deadline', 'weekday', 'weekly_time',
-    'when_note', 'event_id', 'place', 'links', 'links_text', 'main_action', 'contact_name', 'contact_phone',
+    'when_note', 'event_id', 'place', 'links', 'links_text', 'main_action', 'main_link', 'main_choice', 'contact_name', 'contact_phone',
     'published_at', 'visible_until', 'is_published',
 ])]
 class Announcement extends Model
@@ -37,6 +37,7 @@ class Announcement extends Model
             'weekday' => 'integer',
             'links' => 'array',
             'main_action' => AnnouncementAction::class,
+            'main_link' => 'integer',
             'published_at' => 'datetime',
             'visible_until' => 'date',
             'is_published' => 'boolean',
@@ -64,6 +65,14 @@ class Announcement extends Model
             if ($type !== AnnouncementWhen::Weekly) {
                 $announcement->weekday = null;
                 $announcement->weekly_time = null;
+            }
+
+            // Основной может быть только существующая ссылка; без неё основного действия нет.
+            if ($announcement->main_action !== AnnouncementAction::Link) {
+                $announcement->main_link = null;
+            } elseif (! isset(($announcement->links ?? [])[$announcement->main_link ?? -1])) {
+                $announcement->main_action = AnnouncementAction::None;
+                $announcement->main_link = null;
             }
 
             if ($announcement->event_date_end && $announcement->event_date && $announcement->event_date_end->lte($announcement->event_date)) {
@@ -129,6 +138,24 @@ class Announcement extends Model
         return Attribute::make(
             get: fn () => collect($this->links ?? [])->map(fn (array $link) => $link['text'].' | '.$link['url'])->implode("\n"),
             set: fn (?string $value) => ['links' => json_encode(self::parseLinks($value ?? ''), JSON_UNESCAPED_UNICODE)],
+        );
+    }
+
+    /**
+     * Основное действие одним значением для поля в админке: «none», «contact» или «link:N»,
+     * где N — номер ссылки с нуля.
+     */
+    protected function mainChoice(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => match ($this->main_action ?? AnnouncementAction::None) {
+                AnnouncementAction::Link => 'link:'.$this->main_link,
+                AnnouncementAction::Contact => 'contact',
+                AnnouncementAction::None => 'none',
+            },
+            set: fn (?string $value) => preg_match('/^link:(\d+)$/', (string) $value, $match)
+                ? ['main_action' => AnnouncementAction::Link->value, 'main_link' => (int) $match[1]]
+                : ['main_action' => AnnouncementAction::tryFrom((string) $value)?->value ?? AnnouncementAction::None->value, 'main_link' => null],
         );
     }
 

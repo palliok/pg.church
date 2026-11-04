@@ -26,7 +26,7 @@ class AnnouncementApiTest extends TestCase
             'when_note' => 'С 10:00',
             'place' => 'База «Сосновый бор»',
             'links_text' => "Анкета | https://forms.yandex.ru/\nЧто взять | https://pg.church/",
-            'main_action' => 'link',
+            'main_choice' => 'link:1',
             'contact_name' => 'Марина',
             'contact_phone' => '8 911 000-45-67',
             'published_at' => '2026-11-01 10:00',
@@ -48,8 +48,8 @@ class AnnouncementApiTest extends TestCase
                 'details' => [
                     ['type' => 'when', 'text' => 'С 10:00'],
                     ['type' => 'where', 'text' => 'База «Сосновый бор»'],
-                    ['type' => 'link', 'text' => 'Анкета', 'url' => 'https://forms.yandex.ru/', 'primary' => true],
-                    ['type' => 'link', 'text' => 'Что взять', 'url' => 'https://pg.church/', 'primary' => false],
+                    ['type' => 'link', 'text' => 'Анкета', 'url' => 'https://forms.yandex.ru/', 'primary' => false],
+                    ['type' => 'link', 'text' => 'Что взять', 'url' => 'https://pg.church/', 'primary' => true],
                 ],
                 'contact' => ['name' => 'Марина', 'phone' => '8 911 000-45-67', 'tel' => 'tel:+79110004567', 'primary' => false],
             ]]]);
@@ -58,7 +58,7 @@ class AnnouncementApiTest extends TestCase
     public function test_main_action_marks_contact_or_nothing(): void
     {
         $call = Announcement::query()->create([
-            'title' => 'Волонтёры', 'links_text' => 'Чат | https://t.me/', 'contact_phone' => '+7 905 000-78-90', 'main_action' => 'contact',
+            'title' => 'Волонтёры', 'links_text' => 'Чат | https://t.me/', 'contact_phone' => '+7 905 000-78-90', 'main_choice' => 'contact',
             'published_at' => now()->subDay(),
         ]);
         Announcement::query()->create([
@@ -181,7 +181,7 @@ class AnnouncementApiTest extends TestCase
             'contact_name' => 'Анна',
             'contact_phone' => '+7 921 000-12-34',
             'published_at' => '2026-11-03 10:00',
-            'main_action' => 'contact',
+            'main_choice' => 'link:1',
             'is_published' => '1',
         ])->assertRedirect()->assertSessionHasNoErrors();
 
@@ -193,15 +193,17 @@ class AnnouncementApiTest extends TestCase
             ['text' => 'Чат', 'url' => 'https://t.me/chat'],
             ['text' => 'Анкета', 'url' => 'https://forms.yandex.ru/'],
         ], $announcement->links);
+        $this->assertSame('link:1', $announcement->main_choice);
     }
 
     public function test_admin_requires_what_main_action_points_to(): void
     {
         $this->actingAs(User::factory()->create(), backpack_guard_name());
 
-        foreach (['link' => 'links_text', 'contact' => 'contact_phone'] as $action => $field) {
+        foreach (['link:1' => 'main_choice', 'contact' => 'contact_phone'] as $choice => $field) {
             $this->post('/admin/announcement', [
-                'title' => 'Запись', 'when_type' => 'none', 'main_action' => $action, 'published_at' => '2026-11-03 10:00',
+                'title' => 'Запись', 'when_type' => 'none', 'links_text' => 'Анкета | https://forms.yandex.ru/',
+                'main_choice' => $choice, 'published_at' => '2026-11-03 10:00',
             ])->assertSessionHasErrors($field);
         }
 
@@ -218,7 +220,7 @@ class AnnouncementApiTest extends TestCase
             'links_text' => "Анкета | https://forms.yandex.ru/\nНаписать | javascript:alert(1)",
             'contact_name' => 'Анна',
             'contact_phone' => '-- -- --',
-            'main_action' => 'none',
+            'main_choice' => 'none',
             'published_at' => '2026-11-03 10:00',
         ])->assertSessionHasErrors(['deadline', 'links_text', 'contact_phone']);
 

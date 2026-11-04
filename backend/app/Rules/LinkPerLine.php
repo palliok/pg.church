@@ -11,7 +11,10 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 class LinkPerLine implements ValidationRule
 {
-    public function __construct(private int $max = 5) {}
+    /** Больше ссылок в объявлении не помещается. */
+    public const int MAX = 5;
+
+    public function __construct(private int $max = self::MAX) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
