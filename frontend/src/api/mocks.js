@@ -342,7 +342,8 @@ function eventsBetween(params) {
 // eventDate — конкретный день события «YYYY-MM-DD» или null, если дня нет; eventDateEnd — последний день,
 // если событие на несколько дней; deadline — срок «до» у объявления без дня события.
 // details — строки с иконками: { type: 'when' | 'where', text } и ссылки { type: 'link', text, url, primary }.
-// primary — основное действие (регистрация, анкета): на телефоне крупной кнопкой вместо телефона, на десктопе — белой пилюлей.
+// primary — основное действие, крупная кнопка внизу сторис на телефоне: первая ссылка (регистрация, анкета, на десктопе —
+// белой пилюлей) или звонок контакту (contact.primary). Без основного действия внизу только «Поделиться».
 // weekly — регулярное «каждую неделю»: { dow: 1–7 (пн–вс), time }; event — связанное событие из расписания
 // в том же виде, что в /events (здесь — ближайшее с таким названием).
 
@@ -375,14 +376,14 @@ function announcement(id, daysAgo, title, body, { important = false, eventIn = n
       ...(where ? [{ type: 'where', text: where }] : []),
       ...links.map(([text, url, primary = false]) => ({ type: 'link', text, url, primary })),
     ],
-    contact: contact ? { ...contact, tel } : null,
+    contact: contact ? { primary: false, ...contact, tel } : null,
   };
 }
 
 // По дате, новые сверху — как будет отдавать бэкенд.
 const announcements = [
   announcement(1, 0, 'Сбор продуктов для нуждающихся', 'Приносите крупы, консервы и средства гигиены. Всё передадим семьям нашего района.', {
-    deadlineIn: 9, when: 'После служений', where: 'Фойе, стол у входа', contact: { name: 'Анна', phone: '+7 921 000-12-34' },
+    deadlineIn: 9, when: 'После служений', where: 'Фойе, стол у входа', contact: { name: 'Анна', phone: '+7 921 000-12-34', primary: true },
   }),
   announcement(2, 2, 'Запись в детский лагерь', 'Открыта запись на летнюю смену для детей 7–12 лет. Мест: 30.', {
     important: true,
@@ -393,7 +394,7 @@ const announcements = [
     contact: { name: 'Марина', phone: '8 911 000-45-67' },
   }),
   announcement(3, 4, 'Нужны волонтёры на кухню', 'Ищем помощников готовить обеды после воскресного служения. Можно на одно воскресенье в месяц.', {
-    important: true, links: [['Написать в Telegram', 'https://t.me/']], contact: { name: 'Олег', phone: '+7 905 000-78-90' },
+    important: true, links: [['Написать в Telegram', 'https://t.me/']], contact: { name: 'Олег', phone: '+7 905 000-78-90', primary: true },
   }),
   announcement(4, 6, 'Изучение Библии для молодёжи', 'Каждую пятницу разбираем Евангелие от Марка. Приходите с друзьями.', {
     weekly: { dow: 5, time: '19:00' }, event: 'Молодёжная встреча', where: 'Малый зал', links: [['Чат молодёжи в Telegram', 'https://t.me/']],
@@ -405,7 +406,7 @@ const announcements = [
     eventIn: (6 - new Date().getDay() + 7) % 7 || 7, when: 'С 10:00', where: 'Главный зал', links: [['Записаться', 'https://forms.yandex.ru/']],
   }),
   announcement(7, 16, 'Подготовка к крещению', 'Если вы хотите принять крещение, приходите на подготовительные встречи. Всего четыре встречи.', {
-    eventIn: 12, when: 'После служения', where: 'Малый зал', contact: { name: 'Пастор Алексей', phone: '+7 921 000-55-11' },
+    eventIn: 12, when: 'После служения', where: 'Малый зал', contact: { name: 'Пастор Алексей', phone: '+7 921 000-55-11', primary: true },
   }),
   announcement(8, 18, 'Молитвенное служение по средам', 'Собираемся вместе молиться о церкви, городе и друг о друге.', {
     weekly: { dow: 3, time: '19:30' }, where: 'Малый зал',

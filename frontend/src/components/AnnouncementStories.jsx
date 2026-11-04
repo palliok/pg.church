@@ -147,10 +147,12 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
   const where = item.details.find((detail) => detail.type === 'where');
   const when = item.details.find((detail) => detail.type === 'when');
   const links = item.details.filter((detail) => detail.type === 'link');
-  // Основное действие — крупной кнопкой внизу: ссылка с primary, иначе звонок.
-  // Если основная — ссылка, телефон становится обычной прозрачной плашкой в списке ссылок.
+  // Основное действие — крупной кнопкой внизу: ссылка с primary или звонок, если основной выбран контакт.
+  // Всё остальное, и телефон тоже, — обычными прозрачными плашками в списке ссылок.
   const main = links.find((link) => link.primary);
   const other = links.filter((link) => link !== main);
+  const call = item.contact?.primary && !main ? item.contact : null;
+  const contact = item.contact && !call ? item.contact : null;
   const hasDates = Boolean(item.deadline || item.eventDate);
   const hasPills = Boolean(item.days || when);
 
@@ -230,7 +232,7 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
           </span>
         )}
 
-        {(other.length > 0 || (main && item.contact)) && (
+        {(other.length > 0 || contact) && (
           <div className="ann-story-links">
             {other.map((link) => (
               <a key={link.url + link.text} className="ann-story-link" href={link.url} target="_blank" rel="noopener noreferrer">
@@ -238,10 +240,10 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
                 <LongArrow />
               </a>
             ))}
-            {main && item.contact && (
-              <a className="ann-story-link" href={item.contact.tel}>
+            {contact && (
+              <a className="ann-story-link" href={contact.tel}>
                 <PhoneIcon size={14} />
-                {item.contact.name ? `${item.contact.phone} · ${item.contact.name}` : item.contact.phone}
+                {contact.name ? `${contact.phone} · ${contact.name}` : contact.phone}
               </a>
             )}
           </div>
@@ -255,12 +257,12 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
             <LongArrow />
           </a>
         )}
-        {!main && item.contact && (
-          <a className="ann-story-call" href={item.contact.tel}>
+        {call && (
+          <a className="ann-story-call" href={call.tel}>
             <PhoneIcon size={20} />
             {/* Номер всегда целиком, длинное имя обрезается многоточием */}
-            <span className="ann-story-phone">{item.contact.phone}</span>
-            {item.contact.name && <span className="ann-story-call-name">· {item.contact.name}</span>}
+            <span className="ann-story-phone">{call.phone}</span>
+            {call.name && <span className="ann-story-call-name">· {call.name}</span>}
           </a>
         )}
         <button type="button" className="ann-story-share" aria-label={t('Поделиться')} onClick={() => onShare(item)}>

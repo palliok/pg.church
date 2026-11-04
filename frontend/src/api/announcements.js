@@ -100,7 +100,7 @@ function toAnnouncement(raw) {
     regular,
     event,
     details,
-    contact: raw.contact ? { ...raw.contact, name: raw.contact.name ? t(raw.contact.name) : null } : null,
+    contact: raw.contact ? { ...raw.contact, name: raw.contact.name ? t(raw.contact.name) : null, primary: Boolean(raw.contact.primary) } : null,
   };
 }
 

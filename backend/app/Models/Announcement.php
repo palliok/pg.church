@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AnnouncementAction;
 use App\Enums\AnnouncementWhen;
 use App\Support\RuDate;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'title', 'body', 'important', 'when_type', 'event_date', 'event_date_end', 'deadline', 'weekday', 'weekly_time',
-    'when_note', 'event_id', 'place', 'links', 'links_text', 'primary_link', 'contact_name', 'contact_phone',
+    'when_note', 'event_id', 'place', 'links', 'links_text', 'main_action', 'contact_name', 'contact_phone',
     'published_at', 'visible_until', 'is_published',
 ])]
 class Announcement extends Model
@@ -35,7 +36,7 @@ class Announcement extends Model
             'deadline' => 'date',
             'weekday' => 'integer',
             'links' => 'array',
-            'primary_link' => 'boolean',
+            'main_action' => AnnouncementAction::class,
             'published_at' => 'datetime',
             'visible_until' => 'date',
             'is_published' => 'boolean',

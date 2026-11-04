@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\AnnouncementAction;
 use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -19,6 +20,7 @@ class AnnouncementResource extends JsonResource
     public function toArray(Request $request): array
     {
         $links = $this->links ?? [];
+        $action = $this->main_action ?? AnnouncementAction::None;
         $event = $this->upcomingEvent();
 
         return [
@@ -32,7 +34,8 @@ class AnnouncementResource extends JsonResource
             'deadline' => $this->deadline?->toDateString(),
             'weekly' => $this->weekday ? ['dow' => $this->weekday, 'time' => $this->weekly_time] : null,
             'event' => $event ? new EventResource($event) : null,
-            // Строки с иконками: «когда», «где» и ссылки; первая ссылка может быть главной кнопкой.
+            // Строки с иконками: «когда», «где» и ссылки. Основное действие (крупная кнопка внизу) —
+            // первая ссылка или звонок контакту: у него primary.
             'details' => [
                 ...($this->when_note ? [['type' => 'when', 'text' => $this->when_note]] : []),
                 ...($this->place ? [['type' => 'where', 'text' => $this->place]] : []),
@@ -40,13 +43,14 @@ class AnnouncementResource extends JsonResource
                     'type' => 'link',
                     'text' => $link['text'],
                     'url' => $link['url'],
-                    'primary' => $index === 0 && $this->primary_link,
+                    'primary' => $index === 0 && $action === AnnouncementAction::Link,
                 ], $links, array_keys($links)),
             ],
             'contact' => $this->contact_phone ? [
                 'name' => $this->contact_name,
                 'phone' => $this->contact_phone,
                 'tel' => $this->contactTel(),
+                'primary' => $action === AnnouncementAction::Contact,
             ] : null,
         ];
     }

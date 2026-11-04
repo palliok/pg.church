@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\AnnouncementAction;
 use App\Enums\AnnouncementWhen;
 use App\Http\Controllers\Admin\Concerns\ValidatesFromFields;
 use App\Models\Announcement;
@@ -85,13 +86,15 @@ class AnnouncementCrudController extends CrudController
         CRUD::field('links_text')->label('Ссылки')->type('textarea')->tab('Где и контакт')
             ->attributes(['rows' => 4, 'placeholder' => 'Анкета для записи | https://forms.yandex.ru/…'])
             ->hint('По одной на строку: «Текст кнопки | ссылка». Не больше пяти');
-        CRUD::field('primary_link')->label('Первая ссылка — главная кнопка')->type('switch')->tab('Где и контакт')
-            ->hint('Для регистрации или анкеты: на телефоне — крупная кнопка');
         CRUD::field('contact_name')->label('Контакт: имя')->tab('Где и контакт')
             ->validationRules('nullable|string|max:60');
         CRUD::field('contact_phone')->label('Контакт: телефон')->tab('Где и контакт')
             ->hint('На сайте появится кнопка «Позвонить»')
-            ->validationRules('required_with:contact_name|nullable|string|max:30|regex:/^\+?[ ()-]*([0-9][ ()-]*){6,}$/');
+            ->validationRules('required_with:contact_name|required_if:main_action,contact|nullable|string|max:30|regex:/^\+?[ ()-]*([0-9][ ()-]*){6,}$/');
+        CRUD::field('main_action')->label('Основное действие')->type('radio')->tab('Где и контакт')
+            ->options(AnnouncementAction::options())->default(AnnouncementAction::None->value)
+            ->hint('Крупная кнопка внизу объявления на телефоне: регистрация, анкета или звонок. Остальное — обычными плашками')
+            ->validationRules($this->rules('required', Rule::enum(AnnouncementAction::class)));
 
         CRUD::field('published_at')->label('Дата публикации')->type('datetime')->tab('Публикация')
             ->default(now()->format('Y-m-d H:i'))
@@ -102,7 +105,7 @@ class AnnouncementCrudController extends CrudController
             ->validationRules('nullable|date');
         CRUD::field('is_published')->label('Опубликовано')->type('switch')->default(true)->tab('Публикация');
 
-        CRUD::setValidation(['links_text' => ['nullable', 'string', 'max:2000', new LinkPerLine]]);
+        CRUD::setValidation(['links_text' => ['required_if:main_action,link', 'nullable', 'string', 'max:2000', new LinkPerLine]]);
 
         $this->useFieldLabelsInValidationErrors();
     }
