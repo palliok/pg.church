@@ -291,7 +291,7 @@ class DemoContentSeeder extends Seeder
             [2, 'Запись в детский лагерь', 'Открыта запись на летнюю смену для детей 7–12 лет. Мест: 30.', [
                 'important' => true, 'when_type' => 'date', 'event_date' => $day(20), 'event_date_end' => $day(26),
                 'place' => 'База «Сосновый бор», Ленобласть',
-                'links_text' => "Анкета для записи | https://forms.yandex.ru/\nЧто взять с собой | https://pg.church/", 'main_choice' => 'link:0',
+                'links_text' => "Что взять с собой | https://pg.church/\nАнкета для записи | https://forms.yandex.ru/", 'main_choice' => 'link:1',
                 'contact_name' => 'Марина', 'contact_phone' => '8 911 000-45-67',
             ]],
             [4, 'Нужны волонтёры на кухню', 'Ищем помощников готовить обеды после воскресного служения. Можно на одно воскресенье в месяц.', [

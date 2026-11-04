@@ -212,11 +212,15 @@ function StoryWhen({ item }) {
 }
 
 // Карточка объявления: «Важно» и «Поделиться», заголовок, текст, место, ссылки и контакт слева,
-// дата или связанное событие справа. Ссылка с primary — белой пилюлей, как контакт, остальные — обводкой.
+// дата или связанное событие справа. Основное действие — основная ссылка или звонок — белой плашкой последним,
+// остальные ссылки и неосновной телефон — пилюлями с обводкой.
 function StoryCard({ item, onPrev, onNext, onShare }) {
   const where = placeOf(item);
   const links = item.details.filter((entry) => entry.type === 'link');
   const main = links.find((link) => link.primary);
+  const other = links.filter((link) => link !== main);
+  const call = item.contact?.primary && !main ? item.contact : null;
+  const contact = item.contact && !call ? item.contact : null;
 
   return (
     <div className="ann7-story">
@@ -243,28 +247,32 @@ function StoryCard({ item, onPrev, onNext, onShare }) {
               {where}
             </span>
           )}
-          {links.length > 0 && (
+          {(other.length > 0 || contact) && (
             <div className="ann7-story-links">
-              {links.map((link) => (
-                <a
-                  key={link.url + link.text}
-                  className={`ann7-story-link ${link === main ? 'is-main' : ''}`}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+              {other.map((link) => (
+                <a key={link.url + link.text} className="ann7-story-link" href={link.url} target="_blank" rel="noopener noreferrer">
                   {link.text}
                   <span aria-hidden="true">↗</span>
                 </a>
               ))}
+              {contact && (
+                <a className="ann7-story-link" href={contact.tel}>
+                  <PhoneIcon size={14} />
+                  {contact.name ? `${contact.phone} · ${contact.name}` : contact.phone}
+                </a>
+              )}
             </div>
           )}
-          {item.contact && (
-            <a className="ann7-contact" href={item.contact.tel}>
+          {main && (
+            <a className="ann7-contact" href={main.url} target="_blank" rel="noopener noreferrer">
+              <span className="ann7-contact-text">{main.text}</span>
+              <span className="ann7-contact-call"><LongArrow /></span>
+            </a>
+          )}
+          {call && (
+            <a className="ann7-contact" href={call.tel}>
               {/* Номер и имя одной строкой: «+7 921 000-12-34 · Анна» */}
-              <span className="ann7-contact-text">
-                {item.contact.name ? `${item.contact.phone} · ${item.contact.name}` : item.contact.phone}
-              </span>
+              <span className="ann7-contact-text">{call.name ? `${call.phone} · ${call.name}` : call.phone}</span>
               <span className="ann7-contact-call"><PhoneIcon size={20} /></span>
             </a>
           )}

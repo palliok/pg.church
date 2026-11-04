@@ -72,9 +72,6 @@
 }
 .ann7-story-link span { font-size: 13px; }
 .ann7-story-link:hover { background: #fff; color: var(--c-ink); }
-/* Основная ссылка (primary) — белая, как контакт. */
-.ann7-story-link.is-main { background: #fff; box-shadow: none; color: var(--c-ink); }
-.ann7-story-link.is-main:hover { background: var(--c-main); }
 
 .ann7-contact {
   display: inline-flex;
@@ -89,6 +86,8 @@
 .ann7-contact:hover { background: var(--c-main); color: var(--c-ink); }
 .ann7-contact-text { font: 400 13px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
 .ann7-contact-call { width: 44px; height: 44px; border-radius: var(--radius-pill); background: var(--c-ink); color: #fff; display: flex; align-items: center; justify-content: center; }
+
+.ann7-story-link svg { flex: 0 0 auto; }
 
 /* ===== Дата справа ===== */
 .ann7-story-side { display: flex; flex-direction: column; align-items: flex-end; padding-bottom: 4px; }

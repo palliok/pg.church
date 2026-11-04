@@ -390,7 +390,7 @@ const announcements = [
     eventIn: 20,
     eventDays: 7,
     where: 'База «Сосновый бор», Ленобласть',
-    links: [['Анкета для записи', 'https://forms.yandex.ru/', true], ['Что взять с собой', 'https://pg.church/']],
+    links: [['Что взять с собой', 'https://pg.church/'], ['Анкета для записи', 'https://forms.yandex.ru/', true]],
     contact: { name: 'Марина', phone: '8 911 000-45-67' },
   }),
   announcement(3, 4, 'Нужны волонтёры на кухню', 'Ищем помощников готовить обеды после воскресного служения. Можно на одно воскресенье в месяц.', {
