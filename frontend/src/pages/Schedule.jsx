@@ -54,7 +54,6 @@ export default function Schedule() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [showPast, setShowPast] = useState(false);
-  const barRef = useRef(null);
 
   const dim = daysInMonth(ym);
   const monthPrefix = `${ym.year}-${pad(ym.month)}`;
@@ -114,7 +113,7 @@ export default function Schedule() {
       </div>
 
       {/* Одна строка: «Показать прошедшие», выбор месяца и «Подписаться». На телефоне выбор месяца — отдельным рядом сверху. */}
-      <div className="sched-bar" ref={barRef}>
+      <div className="sched-bar">
         {listReady && hiddenCount > 0 && (
           <button type="button" className="sched-feed-past" onClick={() => setShowPast((on) => !on)} aria-expanded={showPast}>
             {/* Через t(): React меняет текст в том же узле, а translatePage() такие правки не видит. */}
@@ -185,7 +184,7 @@ export default function Schedule() {
       {(loading || error) ? (
         <div style={{ marginTop: 24 }}><LoadStatus error={error} onRetry={retry} /></div>
       ) : view === 'list' ? (
-        <ListView key={monthPrefix} byDay={byDay} ym={ym} todayNum={todayNum} hiddenDayCount={showPast ? 0 : hiddenDays.length} showPast={showPast} startRef={barRef} hasFilters={filterCount > 0} onReset={resetFilters} />
+        <ListView key={monthPrefix} byDay={byDay} ym={ym} todayNum={todayNum} hiddenDayCount={showPast ? 0 : hiddenDays.length} showPast={showPast} hasFilters={filterCount > 0} onReset={resetFilters} />
       ) : (
         <MonthView ym={ym} byDay={byDay} selDay={selDay} todayNum={todayNum} onPick={setPickedDay} />
       )}
@@ -274,18 +273,11 @@ function MonthNav({ ym, onChange }) {
 
 // Лента (макет resources/design_handoff_schedule_2b): слева крупное число и день недели, справа события дня.
 // Прошедшие дни бледнее, сегодняшний — на серой подложке. Первые hiddenDayCount дней спрятаны под кнопку
-// «Показать прошедшие» — она в строке над лентой (startRef). key у ListView — месяц.
-function ListView({ byDay, ym, todayNum, hiddenDayCount, showPast, startRef, hasFilters, onReset }) {
+// «Показать прошедшие» — она в строке над лентой. key у ListView — месяц.
+function ListView({ byDay, ym, todayNum, hiddenDayCount, showPast, hasFilters, onReset }) {
   const feedRef = useRef(null);
 
   const visibleDays = [...byDay.entries()].slice(hiddenDayCount);
-
-  // В ленте текущего месяца сразу прокручиваем к строке над ней: над сегодняшним днём только эта строка
-  // и последний прошедший день. Срабатывает, когда лента появляется (новый месяц,
-  // возврат из «Месяц»), — от смены фильтров страница не прыгает.
-  useEffect(() => {
-    if (todayNum != null) startRef.current?.scrollIntoView({ block: 'start' });
-  }, [todayNum, startRef]);
 
   // Раскрытые прошедшие дни появляются выше — показываем их с начала месяца.
   useEffect(() => {
