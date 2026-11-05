@@ -176,8 +176,15 @@ class ChordProTest extends TestCase
             Вся зем[C#m]ля пол[A]на славы Тво[H7]ей.
 
             Проигрыш
-            [Am] [F] [C] [G]
+            [Am] [F] | [C] [G] x2
             TEXT, ChordPro::normalize($source));
+    }
+
+    public function test_plain_text_skips_lines_without_lyrics(): void
+    {
+        $chordpro = "Вступление\n[Am] [F] | [C] [G] x2\n| [D] / / | [A/D] / / |\n\nКуплет 1\n[Am]Свят, [F]свят\n[C] [G] (x2)\n\nПрипев";
+
+        $this->assertSame('Свят, свят', ChordPro::plainText($chordpro));
     }
 
     public function test_normalize_pads_short_lyric_lines(): void
@@ -211,6 +218,7 @@ class ChordProTest extends TestCase
             'си и си-бемоль' => ['H7   Hm   B   Bb', true],
             'сложные аккорды' => ['C#m7  F#m7b5  Dsus4  Cmaj7  E/G#  A7sus4  Gadd9', true],
             'такты и повторы' => ['| Am | F | x2', true],
+            'доли такта' => ['| D / / | A/D / / |', true],
             'русский текст' => ['Свят, свят, свят', false],
             'кириллические буквы, похожие на ноты' => ['А  С  Е', false],
             'английский текст' => ['Amazing grace', false],

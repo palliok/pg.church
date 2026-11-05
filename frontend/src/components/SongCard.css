@@ -49,6 +49,15 @@
 
 /* Текст песни (SongText): куплет без подложки, припев — на подложке. */
 .song-card-text { padding: 14px 14px 0; }
+
+/* Каподастр — над текстом, только в режиме с аккордами. */
+.song-card-capo { margin: 0 8px 6px; font: 12px/1.4 var(--f-mono); letter-spacing: .04em; color: var(--sc-chord); }
+
+/* Авторы — под текстом, мелко: подпись роли и имя. */
+.song-card-credits { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 18px 22px 0; padding-top: 14px; border-top: 1px solid var(--sc-hair); }
+.song-card-credits div { display: flex; gap: 8px; align-items: baseline; }
+.song-card-credits dt { font: 11px/1 var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--sc-label); }
+.song-card-credits dd { margin: 0; font: 14px/1.3 var(--f-sans); }
 .song-card .song-text { display: flex; flex-direction: column; gap: 10px; }
 .song-card .song-text section { display: flex; flex-direction: column; gap: 10px; padding: 12px 8px 14px; border-radius: 24px; }
 .song-card .song-text .song-section-chorus { padding: 18px 18px 20px; background: var(--sc-chorus); }

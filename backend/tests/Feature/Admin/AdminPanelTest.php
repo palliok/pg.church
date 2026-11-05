@@ -190,6 +190,8 @@ class AdminPanelTest extends TestCase
             'title' => 'Свят',
             'label' => '3 хор',
             'key' => 'Am',
+            'capo' => '3',
+            'lyricist' => 'Иван Проханов',
             'chordpro' => "Куплет 1\r\nAm      E\r\nСвят, свят\r\n\r\nПрипев\r\n[Dm]Тебе по[E]ём",
         ])->assertSessionHasNoErrors()->assertRedirect();
 
@@ -199,6 +201,9 @@ class AdminPanelTest extends TestCase
         $this->assertTrue($variant->is_default);
         $this->assertSame('3 хор', $variant->label);
         $this->assertSame('Am', $variant->key);
+        $this->assertSame(3, $variant->capo);
+        $this->assertSame('Иван Проханов', $variant->lyricist);
+        $this->assertNull($variant->composer);
         $this->assertSame("Куплет 1\n[Am]Свят, св[E]ят\n\nПрипев\n[Dm]Тебе по[E]ём", $variant->chordpro);
         $this->assertSame("Свят, свят\n\nТебе поём", $variant->lyrics);
 
@@ -215,6 +220,8 @@ class AdminPanelTest extends TestCase
 
         $this->post('/admin/song-variant', ['song_id' => $song->id, 'letter' => 'а', 'is_default' => '1'])
             ->assertSessionHasErrors('letter');
+        $this->post('/admin/song-variant', ['song_id' => $song->id, 'letter' => 'в', 'capo' => '13'])
+            ->assertSessionHasErrors('capo');
 
         $this->post('/admin/song-variant', ['song_id' => $song->id, 'letter' => 'б', 'label' => 'PG music', 'is_default' => '1'])
             ->assertSessionHasNoErrors()->assertRedirect();

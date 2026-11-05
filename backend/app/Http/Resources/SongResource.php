@@ -41,7 +41,7 @@ class SongResource extends JsonResource
     }
 
     /**
-     * @return array{letter: string, label: ?string, isDefault: bool, key: ?string, hasChords: bool, sections: list<array<string, mixed>>}
+     * @return array{letter: string, label: ?string, isDefault: bool, key: ?string, capo: ?int, artist: ?string, composer: ?string, lyricist: ?string, hasChords: bool, sections: list<array<string, mixed>>}
      */
     private function variant(SongVariant $variant, int $index): array
     {
@@ -62,6 +62,11 @@ class SongResource extends JsonResource
             // Если основной не отмечен, им считается первый в списке.
             'isDefault' => $index === 0,
             'key' => $variant->key,
+            // Лад каподастра и авторы — как {capo}, {artist}, {composer}, {lyricist} в ChordPro.
+            'capo' => $variant->capo,
+            'artist' => $variant->artist,
+            'composer' => $variant->composer,
+            'lyricist' => $variant->lyricist,
             'hasChords' => $hasChords,
             'sections' => $sections,
         ];

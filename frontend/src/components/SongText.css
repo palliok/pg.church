@@ -45,3 +45,28 @@
   width: 0;
   padding-right: 0;
 }
+
+/* Строка без слов (вступление, проигрыш): аккорды, такты и повторы в один ряд. */
+.song-text .song-line-bare {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .2em .9em;
+}
+
+.song-text .song-line-bare .song-chord { padding-right: 0; font-size: .9em; }
+
+.song-text .song-bar { font-size: .85em; opacity: .55; }
+
+/* Число повторов секции («Припев x2») — яркой плашкой рядом с заголовком, в цвет аккордов. */
+.song-text .song-label { display: flex; align-items: center; gap: 10px; }
+
+.song-text .song-repeat {
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: var(--sc-chord, var(--c-second));
+  color: var(--sc-bg, #fff);
+  font: 700 13px/1 var(--f-sans);
+  letter-spacing: 0;
+  text-transform: none;
+}

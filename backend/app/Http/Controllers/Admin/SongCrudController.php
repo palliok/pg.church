@@ -109,7 +109,7 @@ class SongCrudController extends CrudController
             $this->crud->entry->variants()->create([
                 'letter' => SongVariant::nextLetter($this->crud->entry->id),
                 'is_default' => true,
-                ...request()->only(['label', 'key', 'chordpro']),
+                ...request()->only(['label', 'key', 'capo', 'artist', 'composer', 'lyricist', 'chordpro']),
             ]);
 
             return $response;

@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-#[Fillable(['song_id', 'letter', 'label', 'is_default', 'key', 'chordpro'])]
+#[Fillable(['song_id', 'letter', 'label', 'is_default', 'key', 'capo', 'artist', 'composer', 'lyricist', 'chordpro'])]
 class SongVariant extends Model
 {
     use CrudTrait;
@@ -23,6 +23,7 @@ class SongVariant extends Model
     {
         return [
             'is_default' => 'boolean',
+            'capo' => 'integer',
         ];
     }
 

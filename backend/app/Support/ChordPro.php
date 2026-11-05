@@ -36,8 +36,8 @@ class ChordPro
     /** Аккорд: Am, H7, C#m7, F#m7b5, Dsus4, Cmaj7, E/G#. */
     private const string CHORD = '[A-H][#b♯♭]?(?:maj|min|dim|aug|sus|add|m|M|\+|-|°|ø)?\d*(?:(?:maj|min|dim|aug|sus|add|M|\+|-|#|b)\d*)*(?:\([^)\s]*\))?(?:\/[A-H][#b♯♭]?)?';
 
-    /** То, что встречается в строке аккордов помимо самих аккордов: такты, повторы, пауза. */
-    private const string FILLER = '\|+|[-—%]|\(?[xх×]\s?\d+\)?|\(?\d+\s?[xх×]\)?|N\.?C\.?';
+    /** То, что встречается в строке аккордов помимо самих аккордов: такты, доли, повторы, пауза. */
+    private const string FILLER = '\|+|\/+|[-—%]|\(?[xх×]\s?\d+\)?|\(?\d+\s?[xх×]\)?|N\.?C\.?';
 
     /**
      * Разбирает текст на секции. Строка секции — список фрагментов: аккорд
@@ -145,7 +145,8 @@ class ChordPro
             foreach ($section['lines'] as $parts) {
                 $text = trim(preg_replace('/\s+/u', ' ', implode('', array_column($parts, 'text'))));
 
-                if ($text !== '') {
+                // Строка из одних аккордов, тактов и повторов («[Am] | [F] x2») слов не содержит.
+                if (! preg_match('/^(?:\s|'.self::FILLER.')*$/u', $text)) {
                     $lines[] = $text;
                 }
             }
@@ -183,7 +184,11 @@ class ChordPro
                 $result[] = self::merge($chords, $next);
                 $i++;
             } else {
-                $result[] = implode(' ', array_map(fn (array $chord) => '['.$chord[0].']', $chords));
+                // Строка аккордов без слов под ней (вступление, проигрыш): такты и повторы остаются.
+                $result[] = implode(' ', array_map(
+                    fn (string $token) => preg_match('/^(?:'.self::CHORD.')$/u', $token) ? '['.$token.']' : $token,
+                    preg_split('/\s+/u', trim($lines[$i])),
+                ));
             }
         }
 

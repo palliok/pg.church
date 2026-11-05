@@ -6,7 +6,7 @@ use App\Models\SongVariant;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
- * Поля варианта песни — подпись, тональность, текст с аккордами. Общие для формы
+ * Поля варианта песни — подпись, тональность, каподастр, авторы, текст с аккордами. Общие для формы
  * варианта и для формы новой песни, где первый вариант заводится сразу с ней.
  */
 trait DefinesSongTextFields
@@ -25,6 +25,19 @@ trait DefinesSongTextFields
         );
         CRUD::field('key')->label('Тональность')->hint('Например: E, Am, F#m')
             ->validationRules('nullable|string|max:16');
+        CRUD::field('capo')->label('Каподастр')->type('number')
+            ->hint('Лад, на котором стоит каподастр. На сайте виден только с аккордами.')
+            ->wrapper(['class' => 'form-group col-md-3'])
+            ->validationRules('nullable|integer|min:1|max:12');
+        CRUD::field('composer')->label('Музыка')->hint('Автор музыки')
+            ->wrapper(['class' => 'form-group col-md-3'])
+            ->validationRules('nullable|string|max:255');
+        CRUD::field('lyricist')->label('Слова')->hint('Автор слов или переводчик')
+            ->wrapper(['class' => 'form-group col-md-3'])
+            ->validationRules('nullable|string|max:255');
+        CRUD::field('artist')->label('Исполнитель')->hint('Группа или исполнитель оригинала')
+            ->wrapper(['class' => 'form-group col-md-3'])
+            ->validationRules('nullable|string|max:255');
         CRUD::field('chordpro')->label('Текст и аккорды')->type('textarea')
             ->attributes(['rows' => 22, 'spellcheck' => 'false', 'style' => 'font-family: monospace'])
             ->hint(

@@ -94,7 +94,10 @@ const SONG_TITLES = [
 const LYRICS = [
   ['verse', 'Куплет 1', ['[E]Свят, свят, свят Гос[A]подь Вседержи[E]тель,', 'Вся зем[C#m]ля пол[A]на славы Тво[H7]ей.']],
   ['chorus', 'Припев', ['Те[A]бе поём хва[E]лу, Тебе одно[H7]му,', 'Дос[A]тоин Ты при[E]нять честь и [H7]си[E]лу.']],
+  ['interlude', 'Проигрыш', ['[A] [E] | [H7] [E] x2']],
   ['verse', 'Куплет 2', ['[E]Пред престолом Тво[A]им прекло[E]няюсь,', 'В серд[C#m]це ти[A]шина и по[H7]кой.']],
+  // Заголовок без текста — повтор: на сайте под ним текст припева выше.
+  ['chorus', 'Припев x2', []],
 ];
 
 // Строка ChordPro → части { chord, text }, как отдаёт App\Support\ChordPro.
@@ -107,7 +110,8 @@ function chordLine(line) {
   return parts;
 }
 
-const PLAIN_LINES = LYRICS.flatMap(([, , lines]) => lines.map((line) => line.replace(/\[[^\]]+\]/g, '')));
+// Как lyrics на бэке: только строки со словами, проигрыш из одних аккордов в них не попадает.
+const PLAIN_LINES = LYRICS.filter(([type]) => type !== 'interlude').flatMap(([, , lines]) => lines.map((line) => line.replace(/\[[^\]]+\]/g, '')));
 
 const SECTIONS = LYRICS.map(([type, label, lines]) => ({ type, label, lines: lines.map(chordLine) }));
 
@@ -121,9 +125,12 @@ const songs = SONG_TITLES.map((title, index) => {
 const songWithText = (song) => ({
   ...song,
   variants: [
-    { letter: 'а', label: 'PG music', isDefault: true, key: 'E', hasChords: true, sections: SECTIONS },
+    {
+      letter: 'а', label: 'PG music', isDefault: true, key: 'E', capo: 2, hasChords: true, sections: SECTIONS,
+      composer: 'Джон Дайкс', lyricist: 'Иван Проханов', artist: null,
+    },
     ...(song.id === 1 ? [{
-      letter: 'б', label: '3 хор', isDefault: false, key: null, hasChords: false,
+      letter: 'б', label: '3 хор', isDefault: false, key: null, capo: null, composer: null, lyricist: null, artist: null, hasChords: false,
       sections: SECTIONS.slice(0, 2).map((section) => ({ ...section, lines: section.lines.map((parts) => [{ chord: null, text: parts.map((part) => part.text).join('') }]) })),
     }] : []),
   ],

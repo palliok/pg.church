@@ -12,7 +12,7 @@ import './SongCard.css';
 const FONT_SIZES = [17, 19, 22, 26];
 
 // Песня, у которой не осталось ни одного варианта текста.
-const NO_TEXT = { letter: '', key: null, isDefault: true, hasChords: false, sections: [] };
+const NO_TEXT = { letter: '', key: null, capo: null, isDefault: true, hasChords: false, sections: [] };
 
 // Включённые аккорды и тёмная тема запоминаются в браузере: кто играет или читает в полутьме,
 // тому они нужны в каждой песне.
@@ -68,6 +68,24 @@ function useShareSong() {
   };
 
   return { share, toast };
+}
+
+// Авторы варианта под текстом, как в бумажных сборниках: «Музыка», «Слова», «Исполнитель».
+function SongCredits({ variant }) {
+  const credits = [['Музыка', variant.composer], ['Слова', variant.lyricist], ['Исполнитель', variant.artist]].filter(([, name]) => name);
+
+  if (credits.length === 0) return null;
+
+  return (
+    <dl className="song-card-credits">
+      {credits.map(([role, name]) => (
+        <div key={role}>
+          <dt>{role}</dt>
+          <dd>{name}</dd>
+        </div>
+      ))}
+    </dl>
+  );
 }
 
 // Карточка песни (resources/design_handoff_songbook_mobile, экраны 03–05): светлая или тёмная тема,
@@ -162,8 +180,13 @@ export default function SongCard({ song, nav, variant, onVariant }) {
         )}
 
         <div className="song-card-text">
+          {showChords && current.capo > 0 && (
+            <p className="song-card-capo"><span>Каподастр</span> {current.capo}</p>
+          )}
           <SongText sections={sections} chords={showChords} fontSize={FONT_SIZES[fontStep]} gap={10} />
         </div>
+
+        <SongCredits variant={current} />
       </article>
 
       {sheetOpen && (

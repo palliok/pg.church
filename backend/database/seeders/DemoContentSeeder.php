@@ -97,7 +97,8 @@ class DemoContentSeeder extends Seeder
             $songs[$number]->variants()->create(['letter' => 'а', 'label' => 'PG music', 'is_default' => true, 'key' => 'E', 'chordpro' => $lyrics]);
         }
 
-        // У первой песни — второй вариант текста, чтобы был виден переключатель.
+        // У первой песни — авторы и каподастр, а ещё второй вариант текста, чтобы был виден переключатель.
+        $songs[60]->variants()->where('letter', 'а')->update(['capo' => 2, 'composer' => 'Джон Дайкс', 'lyricist' => 'Иван Проханов']);
         $songs[60]->variants()->create([
             'letter' => 'б',
             'label' => '3 хор',
