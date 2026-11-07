@@ -1,0 +1,38 @@
+/* Блок «О церкви» на главной: устроен как «Расписание» (HomeSchedule.css) — две карточки друг под другом. */
+
+.home-about { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+/* ===== Карточка-ссылка: год основания на фоне, как число дня у ближайшего события. Забирает всю свободную высоту. ===== */
+.home-about-card { position: relative; overflow: hidden; flex: 1 0 auto; display: flex; flex-direction: column; gap: 10px; min-height: 220px; padding: 18px 16px 16px; border-radius: 22px; background: var(--c-warm); color: var(--c-ink); }
+.home-about-card:hover { color: var(--c-ink); }
+.home-about-card > * { position: relative; }
+.home-about-card .home-about-year { position: absolute; right: -10px; top: -26px; font: 400 150px/1 var(--f-num); letter-spacing: -.06em; color: rgba(35, 31, 32, .09); pointer-events: none; user-select: none; }
+.home-about-since { font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-gray-text); }
+.home-about-motto { max-width: 280px; margin-top: auto; font: 400 21px/1.15 var(--f-num); letter-spacing: -.01em; color: var(--c-body); text-wrap: balance; }
+.home-about-title { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding-right: 4px; font: 700 44px/.9 var(--f-sans); letter-spacing: -.06em; transition: color .2s; }
+.home-about-title svg { margin-bottom: 8px; transition: transform .2s; }
+.home-about-card:hover .home-about-title { color: var(--c-second); }
+.home-about-card:hover .home-about-title svg { transform: translateX(3px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .home-about-title, .home-about-title svg { transition: none; }
+}
+
+/* Планшет: блок во всю ширину сетки — карточка слева, беседы справа. */
+@media (min-width: 861px) and (max-width: 1080px) {
+  .home-about { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 14px; }
+  .home-about-card { min-height: 240px; }
+}
+
+/* Невысокий десктоп: карточка «О церкви» ниже, чтобы колонка поместилась. */
+@media (min-width: 1081px) and (max-height: 860px) {
+  .home-about-card { min-height: 170px; }
+  .home-about-motto { font-size: 18px; }
+  .home-about-title { font-size: 40px; }
+}
+
+/* Телефон: скругления как у соседних блоков. */
+@media (max-width: 860px) {
+  .home-about { gap: 8px; }
+  .home-about-card { min-height: 240px; padding: 18px; border-radius: 30px; }
+}

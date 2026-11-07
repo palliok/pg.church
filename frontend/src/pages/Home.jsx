@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Announcements from '../components/Announcements.jsx';
 import HomeSchedule, { ScheduleCarousel } from '../components/HomeSchedule.jsx';
 import ContactsCard from '../components/ContactsCard.jsx';
-import { useChurch } from '../api/church.js';
+import HomeAbout from '../components/HomeAbout.jsx';
 import { daysFromToday } from '../api/dates.js';
 import { useEvents } from '../api/events.js';
 import gospelTitle from '../assets/gospel-title.png';
@@ -30,7 +30,6 @@ export default function Home() {
   const upcoming = useMemo(() => homeEvents.filter((e) => (e.allDay && !e.endsAt ? daysFromToday(e) >= 0 : Date.parse(e.endsAt ?? e.startsAt) > now)), [homeEvents, now]);
   // Карусель на телефоне — события на неделю вперёд от текущего момента.
   const week = useMemo(() => upcoming.filter((e) => Date.parse(e.startsAt) < now + 7 * 86_400_000), [upcoming, now]);
-  const duty = useChurch()?.duty;
   // Вопрос «Кто такой Иисус?» нарисован картинкой только по-русски, на en/ky — текстом.
   const titleImage = getLang() === 'ru';
 
@@ -56,6 +55,8 @@ export default function Home() {
         {!eventsLoading && !eventsError && <ScheduleCarousel events={week} now={now} />}
 
         <Announcements />
+
+        <HomeAbout />
 
         <ContactsCard />
       </div>
@@ -89,7 +90,7 @@ export default function Home() {
         <HomeSchedule className="home-schedule" events={upcoming} loading={eventsLoading} error={eventsError} now={now} />
         </div>
 
-        {/* Правая колонка: блог и «Кто мы». */}
+        {/* Правая колонка: блог и «О церкви» с личными беседами. */}
         <div className="home-right">
         {/* Блог ещё не готов: плитка-заглушка без ссылки. Пожертвовать можно через «Поддержать» в шапке. */}
         <div className="home-blog-column">
@@ -102,25 +103,7 @@ export default function Home() {
         </div>
         </div>
 
-        <Link to="/about" className="home-about">
-          <span className="home-knob is-light home-about-knob">↗</span>
-          <span className="home-about-motto">«Прославлять Бога, живя по&nbsp;Его слову»</span>
-          <span className="home-about-title">Кто мы</span>
-          <p className="home-about-text">Наша история, во что мы верим и команда, которая ждёт именно тебя.</p>
-          {duty?.shifts.length > 0 && (
-            <span className="home-duty">
-              <span className="home-label">{[t('Дежурство служителей'), duty.hours].filter(Boolean).join(' · ')}</span>
-              <span className="home-duty-list">
-                {duty.shifts.map((d, i) => (
-                  <span key={i} className="home-duty-row">
-                    <span className="home-duty-dow">{d.dow}</span>
-                    <span className="home-duty-name">{d.name}</span>
-                  </span>
-                ))}
-              </span>
-            </span>
-          )}
-        </Link>
+        <HomeAbout />
         </div>
       </div>
 

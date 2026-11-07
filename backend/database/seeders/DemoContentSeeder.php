@@ -42,11 +42,14 @@ class DemoContentSeeder extends Seeder
 
     private function seedMinisters(): Minister
     {
-        $pastor = Minister::query()->create(['name' => 'Алексей Синичкин', 'role' => 'Старший пастор']);
-        $pastor->dutyShifts()->create(['weekday' => 2]);
+        $pastor = Minister::query()->create(['name' => 'Синичкин Алексей Валерьевич', 'role' => 'Старший пастор']);
+        $tretyak = Minister::query()->create(['name' => 'Третьяк Антон Иванович']);
+        $shvetsov = Minister::query()->create(['name' => 'Швецов Павел Борисович']);
+        $mishchenko = Minister::query()->create(['name' => 'Мищенко Александр Иванович']);
 
-        foreach ([3 => 'Антон Третьяк', 4 => 'Игорь Кузнецов', 5 => 'Павел Швецов'] as $weekday => $name) {
-            Minister::query()->create(['name' => $name])->dutyShifts()->create(['weekday' => $weekday]);
+        // Личные беседы: в среду служителей двое.
+        foreach ([[2, $pastor], [3, $pastor], [3, $tretyak], [4, $shvetsov], [5, $mishchenko]] as [$weekday, $minister]) {
+            $minister->dutyShifts()->create(['weekday' => $weekday]);
         }
 
         return $pastor;

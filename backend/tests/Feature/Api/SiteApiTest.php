@@ -21,8 +21,10 @@ class SiteApiTest extends TestCase
 
     public function test_church_returns_contacts_and_duty(): void
     {
+        $pastor = Minister::query()->create(['name' => 'Алексей Синичкин']);
         Minister::query()->create(['name' => 'Антон Третьяк'])->dutyShifts()->create(['weekday' => 3]);
-        Minister::query()->create(['name' => 'Алексей Синичкин'])->dutyShifts()->create(['weekday' => 2]);
+        $pastor->dutyShifts()->create(['weekday' => 2]);
+        $pastor->dutyShifts()->create(['weekday' => 3]);
 
         $this->set('church_phone', '+7 (911) 123-43-43');
         $this->set('social_youtube', 'https://youtube.com/@pgora');
@@ -35,10 +37,12 @@ class SiteApiTest extends TestCase
             ->assertJsonPath('data.phoneHref', 'tel:+79111234343')
             // Соцсети без ссылки не отдаются.
             ->assertJsonPath('data.social', [['code' => 'YT', 'label' => 'YouTube', 'href' => 'https://youtube.com/@pgora']])
-            ->assertJsonPath('data.duty.hours', '10:00–18:00')
+            ->assertJsonPath('data.duty.hours', '11:00–18:00')
+            // По дням недели, служители одного дня — подряд в порядке добавления.
             ->assertJsonPath('data.duty.shifts', [
                 ['weekday' => 2, 'dow' => 'Вт', 'name' => 'Алексей Синичкин'],
                 ['weekday' => 3, 'dow' => 'Ср', 'name' => 'Антон Третьяк'],
+                ['weekday' => 3, 'dow' => 'Ср', 'name' => 'Алексей Синичкин'],
             ])
             // Трансляция — отдельный адрес /api/v1/live (см. LiveStreamTest).
             ->assertJsonMissingPath('data.live');

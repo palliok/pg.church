@@ -396,26 +396,12 @@
 .guide-flip:disabled { opacity: .35; cursor: default; }
 .guide-flip:focus-visible { outline: 2px solid var(--c-main); outline-offset: 2px; }
 
-/* ----- Во что мы верим + адрес ----- */
+/* ----- Личные беседы + адрес ----- */
 .about-bottom { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: stretch; }
 /* Карточка адреса тянется на высоту соседнего блока: лишнюю высоту забирает карта. */
 .about-bottom .contacts-card { display: flex; flex-direction: column; }
 .about-bottom .contacts-card-inner { flex: 1; }
 .about-bottom .contacts-card-map { flex: 1 0 auto; }
-.about-faith {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 24px;
-  padding: clamp(24px, 3vw, 40px);
-  border-radius: 30px;
-  background: var(--c-second);
-  color: #fff;
-}
-.about-faith .about-kicker { color: rgba(255, 255, 255, .6); }
-.about-faith-words { margin: 0; font: 400 clamp(34px, 3.4vw, 50px)/1.05 var(--f-num); letter-spacing: -.02em; }
-.about-faith-text { margin: 0; max-width: 40ch; font: 400 16px/1.6 var(--f-sans); color: rgba(255, 255, 255, .75); }
-
 /* Обёртка ленты (годы истории, главы справочника). */
 .ribbon { position: relative; min-width: 0; }
 
@@ -515,7 +501,7 @@
 }
 @media (max-width: 860px) {
   .guide { border-radius: 24px; }
-  .about-calling, .about-faith { border-radius: 24px; }
+  .about-calling { border-radius: 24px; }
   .about-calling, .hist, .guide { padding: 26px 20px; }
   .about-calling-item { grid-template-columns: 52px minmax(0, 1fr); gap: 4px 12px; padding: 18px 0; }
   .about-calling-num { font-size: 34px; }

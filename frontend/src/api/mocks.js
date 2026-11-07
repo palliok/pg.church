@@ -43,12 +43,13 @@ const church = {
     { code: 'YT', label: 'YouTube', href: 'https://www.youtube.com/' },
   ],
   duty: {
-    hours: '10:00–18:00',
+    hours: '11:00–18:00',
     shifts: [
-      { weekday: 2, dow: 'Вт', name: 'Алексей Синичкин' },
-      { weekday: 3, dow: 'Ср', name: 'Антон Третьяк' },
-      { weekday: 4, dow: 'Чт', name: 'Игорь Кузнецов' },
-      { weekday: 5, dow: 'Пт', name: 'Павел Швецов' },
+      { weekday: 2, dow: 'Вт', name: 'Синичкин Алексей Валерьевич' },
+      { weekday: 3, dow: 'Ср', name: 'Синичкин Алексей Валерьевич' },
+      { weekday: 3, dow: 'Ср', name: 'Третьяк Антон Иванович' },
+      { weekday: 4, dow: 'Чт', name: 'Швецов Павел Борисович' },
+      { weekday: 5, dow: 'Пт', name: 'Мищенко Александр Иванович' },
     ],
   },
   calendarFeed: { ics: '#', webcal: '#', google: '#' },

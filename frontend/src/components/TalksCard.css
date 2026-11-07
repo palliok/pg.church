@@ -1,0 +1,38 @@
+/* Личные беседы: тёмная карточка как «Ближайшее» (HomeSchedule.css) — день недели на фоне, служители, часы, стрелки. */
+.talks { display: flex; flex-direction: column; gap: 6px; }
+.talks-card { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 10px; padding: 14px 14px 14px 16px; border-radius: 22px; background: var(--c-ink); color: #fff; }
+.talks-card > * { position: relative; }
+.talks-card .talks-mark { position: absolute; right: -4px; top: -22px; font: 400 120px/1 var(--f-num); letter-spacing: -.06em; color: rgba(255, 255, 255, .14); pointer-events: none; user-select: none; }
+.talks-label { margin: 0; font: 400 11px/1.35 var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: rgba(255, 255, 255, .6); }
+.talks-when { color: #fff; }
+.talks-names { display: flex; flex-direction: column; font: 700 22px/1.08 var(--f-sans); letter-spacing: -.045em; }
+.talks-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.talks-hours { font: 400 24px/1 var(--f-num); letter-spacing: -.04em; white-space: nowrap; }
+.talks-nav { display: flex; gap: 6px; }
+.talks-nav button { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3); color: #fff; cursor: pointer; transition: background .2s, color .2s, box-shadow .2s; }
+.talks-nav button:hover { background: var(--c-main); box-shadow: none; color: var(--c-ink); }
+.talks-nav button:first-child svg { transform: scaleX(-1); }
+
+.talks-other { margin: 0; padding: 0 10px; font: 400 13px/1.4 var(--f-sans); color: var(--c-gray-text); text-wrap: pretty; }
+
+/* ===== Все дни сразу (TalksDays): как колонка расписания на главной (HomeSchedule.css) ===== */
+.talks-days { display: flex; flex-direction: column; gap: 6px; }
+.talks-days-head { display: flex; flex-direction: column; gap: 6px; padding: 18px 18px 16px; border-radius: 22px; background: var(--c-ink); color: #fff; }
+.talks-days-hours { margin-top: 18px; font: 400 40px/1 var(--f-num); letter-spacing: -.04em; }
+.talks-days-other { margin: 0; font: 400 13px/1.4 var(--f-sans); color: rgba(255, 255, 255, .6); }
+.talks-days-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.talks-day { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 14px; align-items: center; padding: 6px 12px 6px 8px; }
+.talks-day-tile { width: 56px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 16px; background: var(--c-page); }
+.talks-day-dow { font: 400 24px/.9 var(--f-num); letter-spacing: -.04em; }
+.talks-day-when { font: 400 9px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: rgba(255, 255, 255, .6); }
+.talks-day.is-near .talks-day-tile { background: var(--c-ink); color: #fff; }
+.talks-day-names { display: flex; flex-direction: column; gap: 3px; font: 700 17px/1.05 var(--f-sans); letter-spacing: -.035em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .talks-nav button { transition: none; }
+}
+
+/* Телефон: скругление как у соседних блоков. */
+@media (max-width: 860px) {
+  .talks-card { padding: 16px 16px 16px 18px; border-radius: 30px; }
+}

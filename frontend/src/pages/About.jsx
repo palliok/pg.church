@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import ContactsCard from '../components/ContactsCard.jsx';
 import ChurchHistory from '../components/ChurchHistory.jsx';
 import GospelGuide from '../components/GospelGuide.jsx';
+import TalksCard, { TalksDays } from '../components/TalksCard.jsx';
 import { t } from '../i18n.js';
 import './About.css';
 
@@ -174,15 +175,11 @@ export default function About() {
 
       <Bridge to="visit">Мы открыты для всех, кто ищет, — приходите</Bridge>
 
-      {/* Во что мы верим и как нас найти. */}
+      {/* Поговорить со служителем и как нас найти. */}
       <section className="about-bottom" id="visit">
-        <div className="about-faith">
-          <span className="about-kicker">Во что мы верим</span>
-          <p className="about-faith-words">Библия, Христос, община</p>
-          <p className="about-faith-text">
-            Мы живём по Писанию, верим в спасение по благодати и растём вместе в малых группах.
-          </p>
-        </div>
+        {/* Десктоп — все дни сразу, телефон — невысокая карточка с переключателем, как на главной. */}
+        <div className="desktop-only"><TalksDays /></div>
+        <div className="mobile-only"><TalksCard /></div>
         <ContactsCard />
       </section>
     </div>
