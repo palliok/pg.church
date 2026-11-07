@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Enums\PostType;
 use App\Models\Announcement;
-use App\Models\DonationTarget;
 use App\Models\Event;
 use App\Models\Minister;
 use App\Models\Post;
@@ -36,7 +35,6 @@ class DemoContentSeeder extends Seeder
         $this->seedEvents($pastor, $songs);
         $this->seedPosts();
         $this->seedStories();
-        $this->seedDonationTargets();
         $this->seedAnnouncements();
     }
 
@@ -257,24 +255,6 @@ class DemoContentSeeder extends Seeder
             foreach ($panels as $index => [$scene, $tag, $title, $text]) {
                 $story->panels()->create(['sort' => $index + 1, 'scene' => $scene, 'tag' => $tag, 'title' => $title, 'text' => $text]);
             }
-        }
-    }
-
-    private function seedDonationTargets(): void
-    {
-        $targets = [
-            ['Служение и аренда зала', 'Воскресные богослужения и будние встречи', 'var(--c-second)'],
-            ['Помощь нуждающимся', 'Продукты, лекарства, адресная поддержка', '#f9c9a5'],
-            ['Детское и молодёжное служение', 'Выезды, материалы, лагеря', 'var(--c-main)'],
-        ];
-
-        foreach ($targets as $sort => [$title, $description, $color]) {
-            DonationTarget::query()->create([
-                'title' => $title,
-                'description' => $description,
-                'color' => $color,
-                'sort' => $sort,
-            ]);
         }
     }
 

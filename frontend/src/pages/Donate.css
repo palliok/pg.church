@@ -1,0 +1,88 @@
+/* Страница пожертвований: тёмная сцена со стихом и QR-кодом, под ней светлая панель реквизитов.
+   Prata — стих, JetBrains Mono — подписи капсом и номера, Arimo — текст. */
+
+/* ----- Тёмная сцена ----- */
+.donate-stage { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: center; gap: 48px; margin-top: 6px; padding: 44px 44px 40px; border-radius: 22px; background: var(--c-ink); color: #fff; }
+.donate-stage > * { position: relative; }
+/* Бледные «9:7» на фоне — как год у «О церкви» и число дня у «Ближайшего» на главной. */
+.donate-stage .donate-stage-mark { position: absolute; left: -18px; bottom: -92px; font: 400 340px/1 var(--f-num); letter-spacing: -.06em; color: rgba(255, 255, 255, .06); pointer-events: none; user-select: none; }
+
+.donate-verse { display: flex; flex-direction: column; gap: 26px; margin: 0; }
+.donate-verse-ref { font: 400 11px var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--c-main); }
+.donate-verse blockquote { margin: 0; }
+.donate-verse blockquote p { margin: 0; font: 400 clamp(44px, 5vw, 64px)/1.02 var(--f-num); letter-spacing: -.025em; text-wrap: balance; }
+.donate-verse-text { margin: 0; max-width: 54ch; font: 400 17px/1.6 var(--f-sans); color: rgba(255, 255, 255, .74); text-wrap: pretty; }
+
+.donate-qrs { display: flex; flex-direction: column; gap: 28px; }
+.donate-qr { display: flex; flex-direction: column; align-items: center; gap: 16px; margin: 0; }
+.donate-qr-tile { width: 100%; max-width: 330px; box-sizing: border-box; padding: 20px; border-radius: 22px; background: #fff; }
+.donate-qr-tile img { display: block; width: 100%; height: auto; }
+.donate-qr-caption { font: 400 11px/1.6 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .7); text-align: center; }
+.donate-qr-caption .is-mobile { display: none; }
+/* «Скачать QR-код» нужен только на телефоне. */
+.donate-qr-download { display: none; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; height: 48px; border-radius: var(--radius-pill); background: var(--c-main); color: var(--c-ink); font: 400 12px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; transition: background .2s; }
+.donate-qr-download:hover { background: var(--c-main-hover); color: var(--c-ink); }
+.donate-qr-download:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+.donate-status { margin-top: 14px; }
+
+/* ----- Реквизиты: все поля одного вида — подпись над значением, линия под полем ----- */
+.donate-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 56px; margin-top: 14px; padding: 20px 40px 28px; border-radius: 22px; background: var(--c-page); }
+.donate-details-col { display: flex; flex-direction: column; min-width: 0; }
+.donate-field-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; }
+
+.donate-field { display: grid; grid-template-columns: minmax(0, 1fr) 18px; grid-template-areas: "label icon" "value icon"; align-items: center; gap: 8px 16px; width: calc(100% + 24px); margin: 0 -12px; padding: 16px 12px 17px; border: 0; border-bottom: 1px solid var(--c-line); border-radius: 12px; background: transparent; color: var(--c-ink); text-align: left; cursor: copy; transition: background .2s; }
+.donate-field-label { grid-area: label; font: 400 11px/1.4 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--c-gray-text); }
+.donate-field-value { grid-area: value; min-width: 0; font: 600 17px/1.4 var(--f-sans); letter-spacing: -.01em; }
+.donate-field.is-number .donate-field-value { font: 400 17px/1.4 var(--f-mono); letter-spacing: 0; font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Значок копирования появляется при наведении и после копирования. */
+.donate-field-icon { grid-area: icon; display: flex; color: var(--c-gray-text); opacity: 0; transition: opacity .2s; }
+
+.donate-field:hover, .donate-field[data-state="success"] { background: #fff; }
+.donate-field:hover .donate-field-icon, .donate-field:focus-visible .donate-field-icon, .donate-field[data-state="success"] .donate-field-icon { opacity: 1; }
+.donate-field[data-state="success"] .donate-field-icon, .donate-field[data-state="success"] .donate-field-label { color: var(--c-ink); }
+.donate-field[data-state="error"] .donate-field-label { color: var(--c-signal); }
+.donate-field:focus-visible { outline: 2px solid var(--c-ink); outline-offset: -2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .donate-field, .donate-field-icon, .donate-qr-download { transition: none; }
+}
+
+/* Низ фонового заголовка закрывает сцена, как на странице объявлений. */
+@media (min-width: 861px) {
+  .donate-stage { margin-top: 66px; }
+}
+
+/* Узкий десктоп: всё теснее, номера мельче — чтобы 20 цифр счёта помещались в колонку. */
+@media (min-width: 861px) and (max-width: 1080px) {
+  .donate-stage { gap: 32px; padding: 36px 32px; }
+  .donate-details { column-gap: 32px; padding: 16px 28px 24px; }
+  .donate-field.is-number .donate-field-value { font-size: 15px; }
+}
+
+/* Телефон: всё в столбик; реквизиты одной колонкой в порядке --order, значки копирования видны сразу. */
+@media (max-width: 860px) {
+  /* Слово «Пожертвование» длинное, кегль фонового заголовка мелкий — поднимаем сцену, чтобы она закрывала
+     нижнюю треть букв, как карточки на других страницах. */
+  .donate-stage { grid-template-columns: minmax(0, 1fr); gap: 26px; margin-top: -2px; padding: 26px 18px 22px; border-radius: 30px; }
+  .donate-stage .donate-stage-mark { left: auto; right: -14px; top: -34px; bottom: auto; font-size: 170px; }
+  .donate-verse { gap: 20px; }
+  .donate-verse blockquote p { font-size: 34px; line-height: 1.1; letter-spacing: -.015em; }
+  .donate-verse-text { font-size: 15px; }
+  .donate-qr { gap: 14px; }
+  .donate-qr-tile { max-width: none; padding: 16px; }
+  .donate-qr-caption .is-desktop { display: none; }
+  .donate-qr-caption .is-mobile { display: inline; }
+  .donate-qr-download { display: flex; }
+
+  .donate-details { display: flex; flex-direction: column; margin-top: 10px; padding: 6px 18px 20px; border-radius: 30px; }
+  .donate-details-col { display: contents; }
+  .donate-field-slot, .donate-field-pair { order: var(--order); }
+  .donate-field-pair { column-gap: 20px; }
+  .donate-field { width: 100%; margin: 0; padding: 15px 0 16px; border-radius: 0; }
+  .donate-field:hover, .donate-field[data-state="success"] { background: transparent; }
+  .donate-field-icon { opacity: 1; }
+  .donate-field-value, .donate-field.is-number .donate-field-value { font-size: 16px; }
+  /* Назначение платежа на телефоне последнее — линия под ним не нужна. */
+  .donate-details-col:first-child .donate-field-slot:last-child .donate-field { border-bottom: 0; }
+}

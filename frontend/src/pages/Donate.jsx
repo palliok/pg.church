@@ -1,143 +1,143 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { t } from '../i18n.js';
-import ArrowKnob from '../components/ArrowKnob.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
+import { CheckIcon, CopyIcon } from '../components/Icons.jsx';
 import { useDonation } from '../api/donation.js';
+import './Donate.css';
 
-// Реквизиты-тексты; остальные — числа, их не переносим и выравниваем по цифрам.
-const TEXT_FIELDS = new Set(['recipient', 'bank']);
+// Текстовые реквизиты — Arimo, остальные — номера моноширинным.
+const TEXT_FIELDS = new Set(['recipient', 'bank', 'purpose']);
 
-function CopyIndicator({ state }) {
-  const message = state === 'success' ? 'Скопировано' : state === 'error' ? 'Не удалось скопировать. Скопируйте текст вручную.' : state === 'pending' ? 'Копирование' : '';
+// Порядок полей на телефоне, одной колонкой: сначала то, что вводят в банке первым.
+// На десктопе слева текстовые поля, справа номера (см. Donate.css).
+const MOBILE_ORDER = { recipient: 1, account: 2, bic: 3, innKpp: 4, bank: 5, correspondentAccount: 6, purpose: 7 };
+
+// Счёт в 20 цифр показываем группами, как в банковских документах: 40703 810 5 5500 0000365.
+// Копируется всё равно сплошная строка.
+function groupDigits(key, value) {
+  const digits = String(value);
+  if ((key === 'account' || key === 'correspondentAccount') && /^\d{20}$/.test(digits)) {
+    return `${digits.slice(0, 5)} ${digits.slice(5, 8)} ${digits.slice(8, 9)} ${digits.slice(9, 13)} ${digits.slice(13)}`;
+  }
+  return digits;
+}
+
+// Копирование по нажатию: copy(key, value), stateOf(key) — 'success' | 'error' | ''. Успех гаснет сам.
+function useCopy() {
+  const [status, setStatus] = useState({ key: '', state: '' });
+  const timer = useRef(0);
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  async function copy(key, value) {
+    clearTimeout(timer.current);
+    try {
+      await navigator.clipboard.writeText(value);
+      setStatus({ key, state: 'success' });
+      timer.current = setTimeout(() => setStatus({ key: '', state: '' }), 1800);
+    } catch {
+      setStatus({ key, state: 'error' });
+    }
+  }
+
+  return { copy, stateOf: (key) => (status.key === key ? status.state : '') };
+}
+
+// Поле реквизита: подпись над значением, нажатие копирует значение. После копирования подпись
+// сообщает результат (role="status" — для экранного диктора), значок меняется на галочку.
+function Field({ field, copier, id }) {
+  const state = copier.stateOf(id);
+  const note = state === 'success' ? t('Скопировано') : state === 'error' ? t('Не удалось скопировать') : field.label;
   return (
-    <span className="donate-bank-indicator" data-state={state} role="status" title={message}>
-      <span aria-hidden="true">{state === 'success' ? '✓' : state === 'error' ? '!' : state === 'pending' ? '…' : ''}</span>
-      <span className="visually-hidden">{message}</span>
-    </span>
+    <button type="button" className={`donate-field${TEXT_FIELDS.has(field.key) ? '' : ' is-number'}`} data-state={state} aria-label={`${t('Копировать')} ${field.label}: ${field.value}`} onClick={() => copier.copy(id, field.value)}>
+      <span className="donate-field-label" role="status">{note}</span>
+      <span className="donate-field-value">{TEXT_FIELDS.has(field.key) ? field.value : groupDigits(field.key, field.value)}</span>
+      <span className="donate-field-icon" aria-hidden="true">{state === 'success' ? <CheckIcon /> : <CopyIcon />}</span>
+    </button>
+  );
+}
+
+// Реквизиты счёта: светлая панель, все поля одного вида. Десктоп — две колонки (текст слева, номера справа),
+// телефон — одна, в порядке MOBILE_ORDER.
+function AccountDetails({ account, copier }) {
+  const fields = Object.fromEntries(account.fields.map((field) => [field.key, field]));
+  if (account.paymentPurpose) fields.purpose = { key: 'purpose', label: t('Назначение платежа'), value: account.paymentPurpose };
+  const field = (key) => fields[key] && (
+    <div className="donate-field-slot" style={{ '--order': MOBILE_ORDER[key] }}>
+      <Field field={fields[key]} copier={copier} id={`${account.id}:${key}`} />
+    </div>
+  );
+
+  return (
+    <section className="donate-details" aria-label={account.title ?? t('Реквизиты для пожертвований')}>
+      <div className="donate-details-col">
+        {field('recipient')}
+        {field('bank')}
+        {field('purpose')}
+      </div>
+      <div className="donate-details-col">
+        {field('account')}
+        {field('correspondentAccount')}
+        {field('bic')}
+        {(fields.inn || fields.kpp) && (
+          <div className="donate-field-pair" style={{ '--order': MOBILE_ORDER.innKpp }}>
+            {fields.inn && <Field field={fields.inn} copier={copier} id={`${account.id}:inn`} />}
+            {fields.kpp && <Field field={fields.kpp} copier={copier} id={`${account.id}:kpp`} />}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
 export default function Donate() {
   const { donation, loading, error, retry } = useDonation();
-  const amounts = donation?.amounts ?? [];
-  const [chosenAmount, setAmount] = useState(null);
-  // Пока посетитель не выбрал сумму сам, выбрана вторая из предложенных.
-  const amount = chosenAmount ?? amounts[1] ?? amounts[0];
-  const [copyStatus, setCopyStatus] = useState({ key: '', state: '' });
-  const copying = copyStatus.state === 'pending';
-
-  async function copyDetails(key, value) {
-    setCopyStatus({ key, state: 'pending' });
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopyStatus({ key, state: 'success' });
-    } catch {
-      setCopyStatus({ key, state: 'error' });
-    }
-  }
+  const copier = useCopy();
+  const accounts = donation?.accounts ?? [];
 
   return (
-    <div className="page-enter container">
-      <div className="donate-layout">
-        <div style={{ borderRadius: 24, background: 'var(--c-main)', color: '#231f20', padding: 'clamp(24px, 4vw, 40px)' }}>
-          <div style={{ display: 'inline-flex', background: '#231f20', color: '#fff', padding: '8px 13px', borderRadius: 9, fontFamily: 'var(--f-sans)', fontWeight: 700, fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase' }}>
-            Пожертвование
-          </div>
-          <h1 className="h-display" style={{ fontSize: 'clamp(38px, 7vw, 64px)', marginTop: 22 }}>Поддержать<br />служение</h1>
-          <p style={{ font: '500 16px/1.6 var(--f-sans)', color: 'rgba(35,31,32,.7)', margin: '18px 0 0', maxWidth: 460 }}>
-            Вместе мы несём служение церкви и заботу о ближних. Любой дар важен — от него зависит и аренда
-            зала, и помощь тем, кому сейчас тяжело.
+    <div className="page-enter container page-bg" style={{ '--title-chars': t('Пожертвование').length }}>
+      <h1 className="page-title page-title--bg">Пожертвование</h1>
+
+      {/* Тёмная сцена: слева стих, справа QR-код — главный способ. На телефоне всё в столбик. */}
+      <section className="donate-stage">
+        <span className="donate-stage-mark" aria-hidden="true">9:7</span>
+        <figure className="donate-verse">
+          <figcaption className="donate-verse-ref">2 Коринфянам 9:7</figcaption>
+          <blockquote>
+            <p>Доброхотно дающего любит&nbsp;Бог</p>
+          </blockquote>
+          <p className="donate-verse-text">
+            Отдавать — огромная привилегия: стать участником Божьего дела и послужить Ему тем, чем Он нас
+            благословил. Ваш дар — это забота о доме молитвы, поддержка служителей, новые служения и помощь
+            тем, кому сейчас нелегко.
           </p>
+        </figure>
 
-          <div style={{ display: 'flex', gap: 10, marginTop: 28, flexWrap: 'wrap' }}>
-            {amounts.map((a) => (
-              <button
-                key={a}
-                onClick={() => setAmount(a)}
-                className="pill-btn"
-                style={{ padding: '14px 22px', fontSize: 14, background: amount === a ? '#231f20' : 'rgba(35,31,32,.08)', color: amount === a ? '#fff' : '#231f20' }}
-              >
-                {a.toLocaleString('ru-RU')} ₽
-              </button>
+        {accounts.length > 0 && (
+          <div className="donate-qrs">
+            {/* Реквизитов может быть несколько: у каждых свой QR-код. */}
+            {accounts.map((account) => (
+              <figure key={account.id} className="donate-qr">
+                <div className="donate-qr-tile">
+                  <img src={account.qrCode} alt={t('QR-код для пожертвования')} width="1068" height="1068" />
+                </div>
+                {/* Телефон: свой экран не отсканировать — картинку сохраняют и открывают в приложении банка. */}
+                <figcaption className="donate-qr-caption">
+                  <span className="is-desktop">Наведите камеру из приложения банка</span>
+                  <span className="is-mobile">Откройте в приложении банка</span>
+                </figcaption>
+                <a href={`${account.qrCode}?download=1`} download="donation-qr.svg" className="donate-qr-download">Скачать QR-код</a>
+              </figure>
             ))}
           </div>
-
-          <a href="#pay" className="pill-btn" style={{ marginTop: 16, padding: '8px 8px 8px 26px', background: '#231f20', color: '#fff' }}>
-            <span style={{ fontSize: 15 }}>{t('Пожертвовать')}{amount ? ` ${amount.toLocaleString('ru-RU')} ₽` : ''}</span>
-            <ArrowKnob size={44} bg="var(--c-main)" fg="#231f20" />
-          </a>
-        </div>
-
-        <div style={{ borderRadius: 24, background: '#231f20', color: '#fff', padding: 'clamp(24px, 4vw, 34px)' }}>
-          <div className="eyebrow" style={{ color: 'rgba(255,255,255,.5)' }}>Куда идут пожертвования</div>
-          <div style={{ display: 'flex', flexDirection: 'column', marginTop: 18 }}>
-            {(donation?.targets ?? []).map((t) => (
-              <div key={t.title} className="card-row" style={{ padding: '18px 0', borderTop: '1px solid rgba(255,255,255,.14)' }}>
-                <span style={{ flex: '0 0 44px', height: 44, borderRadius: 12, background: t.color }} />
-                <span style={{ flex: 1 }}>
-                  <span style={{ display: 'block', font: '600 16px var(--f-sans)' }}>{t.title}</span>
-                  <span style={{ display: 'block', font: '500 13px var(--f-sans)', color: 'rgba(255,255,255,.55)', marginTop: 4 }}>{t.desc}</span>
-                </span>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 22, padding: '18px 20px', borderRadius: 18, background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.12)', font: '500 13px/1.6 var(--f-sans)', color: 'rgba(255,255,255,.7)' }}>
-            Раз в квартал мы публикуем отчёт: сколько собрали и на что израсходовали.
-          </div>
-        </div>
-      </div>
+        )}
+      </section>
 
       {(loading || error) && (
-        <div style={{ marginTop: 16 }}>
-          <LoadStatus error={error} onRetry={retry} />
-        </div>
+        <div className="donate-status"><LoadStatus error={error} onRetry={retry} /></div>
       )}
 
-      {/* Реквизитов может быть несколько: у каждых свой блок и свой QR-код. */}
-      {(donation?.accounts ?? []).map((account) => {
-        const titleId = `donate-bank-title-${account.id}`;
-        const copyKey = (key) => `${account.id}:${key}`;
-
-        return (
-          <section key={account.id} className="donate-bank card" aria-labelledby={titleId}>
-            <div className="donate-bank-main">
-              <div className="eyebrow">Банковский перевод</div>
-              <h2 id={titleId} className="h-display">{account.title ?? 'Реквизиты для пожертвований'}</h2>
-              <dl className="donate-bank-details">
-                {account.fields.map(({ key, label, value }) => (
-                  <div key={key} className={`donate-bank-field-${key}`}>
-                    <dt>{label}</dt>
-                    <dd>
-                      <button type="button" className={`donate-bank-value${TEXT_FIELDS.has(key) ? '' : ' donate-bank-number'}`} aria-label={`Копировать ${label}: ${value}`} title="Нажмите, чтобы скопировать" disabled={copying} onClick={() => copyDetails(copyKey(key), value)}>
-                        <span>{value}</span>
-                        <CopyIndicator state={copyStatus.key === copyKey(key) ? copyStatus.state : ''} />
-                      </button>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-
-            {account.paymentPurpose && (
-              <div className="donate-bank-purpose">
-                <div>Назначение платежа</div>
-                <p>
-                  <button type="button" className="donate-bank-value" aria-label={`Копировать назначение платежа: ${account.paymentPurpose}`} title="Нажмите, чтобы скопировать" disabled={copying} onClick={() => copyDetails(copyKey('purpose'), account.paymentPurpose)}>
-                    <span>«{account.paymentPurpose}»</span>
-                    <CopyIndicator state={copyStatus.key === copyKey('purpose') ? copyStatus.state : ''} />
-                  </button>
-                </p>
-              </div>
-            )}
-
-            <figure className="donate-bank-qr">
-              <img src={account.qrCode} alt="QR-код для пожертвования" width="1068" height="1068" />
-              <figcaption>Отсканируйте QR-код в приложении банка</figcaption>
-              <a href={`${account.qrCode}?download=1`} download="donation-qr.svg" className="pill-btn donate-bank-qr-download">Скачать QR-код</a>
-            </figure>
-          </section>
-        );
-      })}
+      {accounts.map((account) => <AccountDetails key={account.id} account={account} copier={copier} />)}
     </div>
   );
 }

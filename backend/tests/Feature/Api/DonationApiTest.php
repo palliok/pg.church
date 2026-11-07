@@ -3,10 +3,7 @@
 namespace Tests\Feature\Api;
 
 use App\Models\DonationAccount;
-use App\Models\DonationTarget;
-use App\Models\Setting;
 use Database\Seeders\DonationAccountSeeder;
-use Database\Seeders\SettingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -20,14 +17,8 @@ class DonationApiTest extends TestCase
         .'|CorrespAcc=30101810500000000653|Purpose=Пожертвование на уставную деятельность|Sum=0'
         .'|PayeeINN=7802038805|KPP=780201001';
 
-    public function test_donation_returns_targets_amounts_and_every_published_account(): void
+    public function test_donation_returns_every_published_account(): void
     {
-        $this->seed(SettingSeeder::class);
-        Setting::query()->where('key', 'donation_amounts')->update(['value' => '300; 1500,  abc 0 5000']);
-
-        DonationTarget::query()->create(['title' => 'Помощь нуждающимся', 'description' => 'Продукты', 'color' => '#f9c9a5', 'sort' => 2]);
-        DonationTarget::query()->create(['title' => 'Аренда зала', 'sort' => 1]);
-
         $main = $this->account(['sort' => 2]);
         $building = $this->account([
             'title' => 'На строительство', 'account' => '40703810555000000999',
@@ -38,11 +29,8 @@ class DonationApiTest extends TestCase
         $response = $this->getJson('/api/v1/donation');
 
         $response->assertOk()
-            ->assertJsonPath('data.targets', [
-                ['title' => 'Аренда зала', 'desc' => null, 'color' => null],
-                ['title' => 'Помощь нуждающимся', 'desc' => 'Продукты', 'color' => '#f9c9a5'],
-            ])
-            ->assertJsonPath('data.amounts', [300, 1500, 5000])
+            ->assertJsonMissingPath('data.targets')
+            ->assertJsonMissingPath('data.amounts')
             ->assertJsonPath('data.accounts.*.id', [$building->id, $main->id])
             ->assertJsonPath('data.accounts.*.title', ['На строительство', null])
             // Пустой реквизит (КПП) пропускается.
@@ -62,11 +50,11 @@ class DonationApiTest extends TestCase
             ->assertJsonMissingPath('data.bankDetails');
     }
 
-    public function test_donation_without_accounts_and_settings(): void
+    public function test_donation_without_accounts(): void
     {
         $this->getJson('/api/v1/donation')
             ->assertOk()
-            ->assertExactJson(['data' => ['targets' => [], 'amounts' => [], 'accounts' => []]]);
+            ->assertExactJson(['data' => ['accounts' => []]]);
     }
 
     public function test_qr_code_is_served_as_svg(): void

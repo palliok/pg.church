@@ -6,7 +6,6 @@ use App\Enums\PostType;
 use App\Models\Announcement;
 use App\Models\CalendarSource;
 use App\Models\DonationAccount;
-use App\Models\DonationTarget;
 use App\Models\DutyShift;
 use App\Models\Event;
 use App\Models\Minister;
@@ -64,7 +63,6 @@ class AdminPanelTest extends TestCase
             'story' => ['story', Story::class, true],
             'story-panel' => ['story-panel', StoryPanel::class, true],
             'announcement' => ['announcement', Announcement::class, true],
-            'donation-target' => ['donation-target', DonationTarget::class, true],
             'donation-account' => ['donation-account', DonationAccount::class, true],
             'setting' => ['setting', Setting::class, false],
             'user' => ['user', User::class, true],

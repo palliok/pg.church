@@ -32,7 +32,6 @@
 
 <x-backpack::menu-dropdown title="Пожертвования" icon="la la-hand-holding-heart">
     <x-backpack::menu-dropdown-item title="Реквизиты и QR-коды" icon="la la-university" :link="backpack_url('donation-account')" />
-    <x-backpack::menu-dropdown-item title="Цели пожертвований" icon="la la-bullseye" :link="backpack_url('donation-target')" />
 </x-backpack::menu-dropdown>
 
 <x-backpack::menu-item title="Настройки сайта" icon="la la-cog" :link="backpack_url('setting')" />

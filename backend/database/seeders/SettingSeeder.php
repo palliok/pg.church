@@ -53,8 +53,6 @@ class SettingSeeder extends Seeder
             ['stream_text', 'Трансляция', 'Текст плашки «В эфире»', SettingType::Text, 'Идёт воскресное богослужение — присоединяйся онлайн', null],
 
             ['duty_hours', 'Дежурство', 'Часы личных бесед со служителями', SettingType::Text, '11:00–18:00', null],
-
-            ['donation_amounts', 'Пожертвования', 'Предлагаемые суммы, ₽', SettingType::Text, '500, 1000, 3000', 'Числа через запятую'],
         ];
     }
 }

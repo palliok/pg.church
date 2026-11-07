@@ -464,12 +464,6 @@ const QR_PLACEHOLDER = `data:image/svg+xml;base64,${btoa(
 )}`;
 
 const donation = {
-  targets: [
-    { title: 'Служение и аренда зала', desc: 'Воскресные богослужения и будние встречи', color: 'var(--c-second)' },
-    { title: 'Помощь нуждающимся', desc: 'Продукты, лекарства, адресная поддержка', color: '#f9c9a5' },
-    { title: 'Детское и молодёжное служение', desc: 'Выезды, материалы, лагеря', color: 'var(--c-main)' },
-  ],
-  amounts: [500, 1000, 3000],
   accounts: [{
     id: 1,
     title: 'Пожертвование на уставную деятельность',

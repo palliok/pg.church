@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\DonationAccount;
-use App\Models\DonationTarget;
-use App\Models\Setting;
 use App\Support\QrCode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,22 +23,10 @@ class DonationController extends Controller
     ];
 
     /**
-     * Цели пожертвований, предлагаемые суммы и реквизиты (их может быть несколько).
+     * Реквизиты для пожертвований (их может быть несколько).
      */
     public function index(): JsonResponse
     {
-        $targets = DonationTarget::query()->orderBy('sort')->orderBy('id')->get()
-            ->map(fn (DonationTarget $target) => [
-                'title' => $target->title,
-                'desc' => $target->description,
-                'color' => $target->color,
-            ]);
-
-        $amounts = collect(preg_split('/[\s,;]+/', (string) Setting::query()->where('key', 'donation_amounts')->value('value')))
-            ->map(fn (string $amount) => (int) $amount)
-            ->filter(fn (int $amount) => $amount > 0)
-            ->values();
-
         $accounts = DonationAccount::query()->published()->orderBy('sort')->orderBy('id')->get()
             ->map(fn (DonationAccount $account) => [
                 'id' => $account->id,
@@ -54,8 +40,6 @@ class DonationController extends Controller
             ]);
 
         return response()->json(['data' => [
-            'targets' => $targets,
-            'amounts' => $amounts,
             'accounts' => $accounts,
         ]]);
     }
