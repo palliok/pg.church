@@ -1,5 +1,6 @@
 import { cloneElement, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import LongArrow from './LongArrow.jsx';
 import './TabBar.css';
 
 // Нижняя панель на телефоне по макету design_handoff_tabbar_5a: 4 вкладки, бургер в центре и меню на весь экран.
@@ -37,9 +38,10 @@ const TABS = [
   },
 ];
 
+// Евангелие — отдельной тёплой карточкой над списком, остальные разделы — списком.
+const GOSPEL = { to: '/story/jesus', label: 'Евангелие' };
 const MENU_ITEMS = [
   { to: '/', label: 'Главная' },
-  { to: '/story/jesus', label: 'Евангелие', gospel: true },
   { to: '/about', label: 'О церкви' },
   { to: '/schedule', label: 'Расписание' },
   { to: '/announcements', label: 'Объявления' },
@@ -171,14 +173,21 @@ export default function TabBar() {
   return (
     <div className={`mobile-only tabbar-root${menuOpen ? ' is-menu-open' : ''}`}>
       <nav className="tabbar-menu" aria-hidden={!menuOpen} inert={!menuOpen}>
+        {/* Карточка, как плитки bento на главной: подпись сверху, название снизу, бледный «?» на фоне. */}
+        <Link to={GOSPEL.to} className="tabbar-menu-gospel" aria-current={pathname === GOSPEL.to ? 'page' : undefined} onClick={() => setMenuOpen(false)}>
+          <span className="tabbar-menu-gospel-mark" aria-hidden="true">?</span>
+          <span className="tabbar-menu-gospel-note">Весть о спасении</span>
+          <span className="tabbar-menu-gospel-title">
+            {GOSPEL.label}
+            <LongArrow width={34} stroke={3} />
+          </span>
+        </Link>
+        {/* Остальные разделы — список: жирные названия и тонкие линии. */}
         <ul className="tabbar-menu-list">
           {MENU_ITEMS.map((item, i) => (
-            <li key={item.to} className={`tabbar-menu-item${item.gospel ? ' tabbar-menu-item--gospel' : ''}`} style={{ '--i': i }}>
-              <Link to={item.to} onClick={() => setMenuOpen(false)}>
-                {item.gospel && <span className="tabbar-menu-badge">Весть о спасении</span>}
-                <span className="tabbar-menu-num">{String(i + 1).padStart(2, '0')}</span>
+            <li key={item.to} className="tabbar-menu-item" style={{ '--i': i + 1 }}>
+              <Link to={item.to} aria-current={pathname === item.to ? 'page' : undefined} onClick={() => setMenuOpen(false)}>
                 <span className="tabbar-menu-label">{item.label}</span>
-                {item.gospel && <span className="tabbar-menu-arrow" aria-hidden="true">→</span>}
               </Link>
             </li>
           ))}
