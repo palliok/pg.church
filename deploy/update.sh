@@ -27,6 +27,8 @@ docker compose run --rm -T app composer install --no-dev --optimize-autoloader -
 docker compose up -d
 docker compose exec -T app php artisan migrate --force
 docker compose exec -T app php artisan db:seed --class=SettingSeeder --force
+# Сборник: добавляются только новые песни, правки из админки не затираются.
+docker compose exec -T app php artisan songs:import
 docker compose exec -T app php artisan optimize
 
 step "Фронтенд"

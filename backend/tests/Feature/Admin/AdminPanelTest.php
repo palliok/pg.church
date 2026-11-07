@@ -103,6 +103,10 @@ class AdminPanelTest extends TestCase
     public function test_crud_pages_render(string $route, string $model, bool $canCreate): void
     {
         $this->seed([SettingSeeder::class, DonationAccountSeeder::class, DemoContentSeeder::class]);
+        // Песен в демо-наполнении нет — они загружаются из сборника; здесь хватит одной.
+        $category = SongCategory::query()->create(['name' => 'Гимны']);
+        Song::query()->create(['number' => 214, 'title' => 'Свят, свят, свят', 'song_category_id' => $category->id])
+            ->variants()->create(['letter' => 'а', 'is_default' => true, 'key' => 'E', 'chordpro' => '[E]Свят, свят, свят Гос[A]подь']);
         CalendarSource::query()->create(['name' => 'Календарь служений', 'url' => 'https://calendar.google.com/calendar/ical/secret/basic.ics']);
         $this->actingAsAdmin();
 

@@ -126,11 +126,12 @@ grep -q '^APP_KEY=base64:' "$BACKEND_ENV" || as_app "docker compose run --rm -T 
 as_app "docker compose up -d"
 as_app "docker compose exec -T app php artisan storage:link" > /dev/null 2>&1 || true
 
-step "База данных: таблицы, администратор, настройки, реквизиты"
+step "База данных: таблицы, администратор, настройки, реквизиты, сборник песен"
 as_app "docker compose exec -T app php artisan migrate --force"
 for seeder in AdminUserSeeder SettingSeeder DonationAccountSeeder; do
     as_app "docker compose exec -T app php artisan db:seed --class=$seeder --force"
 done
+as_app "docker compose exec -T app php artisan songs:import"
 as_app "docker compose exec -T app php artisan optimize"
 
 step "Фронтенд: сборка"

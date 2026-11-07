@@ -7,8 +7,6 @@ use App\Models\Announcement;
 use App\Models\Event;
 use App\Models\Minister;
 use App\Models\Post;
-use App\Models\Song;
-use App\Models\SongCategory;
 use App\Models\SongVariant;
 use App\Models\Story;
 use App\Models\Tag;
@@ -17,22 +15,21 @@ use Illuminate\Support\Carbon;
 
 /**
  * Демонстрационное наполнение — то же, что было в моках фронтенда
- * (frontend/src/data/mockData.js и stories.js). В базу с уже заведёнными
- * песнями ничего не добавляет.
+ * (frontend/src/data/mockData.js и stories.js), кроме песен: они берутся из сборника.
+ * В базу с уже заведёнными событиями ничего не добавляет.
  */
 class DemoContentSeeder extends Seeder
 {
     public function run(): void
     {
-        if (Song::query()->exists()) {
-            $this->command?->info('В базе уже есть песни — демо-наполнение пропущено.');
+        if (Event::query()->exists()) {
+            $this->command?->info('В базе уже есть события — демо-наполнение пропущено.');
 
             return;
         }
 
         $pastor = $this->seedMinisters();
-        $songs = $this->seedSongs();
-        $this->seedEvents($pastor, $songs);
+        $this->seedEvents($pastor);
         $this->seedPosts();
         $this->seedStories();
         $this->seedAnnouncements();
@@ -53,67 +50,7 @@ class DemoContentSeeder extends Seeder
         return $pastor;
     }
 
-    /**
-     * @return array<int, Song> песни по номерам
-     */
-    private function seedSongs(): array
-    {
-        $categories = [];
-        foreach (['Поклонение', 'Прославление', 'Гимны'] as $sort => $name) {
-            $categories[] = SongCategory::query()->create(['name' => $name, 'sort' => $sort]);
-        }
-
-        $titles = [
-            'Свят, свят, свят', 'Ты верен', 'Хвалите Господа', 'Милость без границ',
-            'Ближе к Тебе', 'Вечная любовь', 'Твой свет во мне', 'Я верю',
-            'Господь — пастырь мой', 'Славлю Тебя', 'Дух Святой, приди', 'Ты — моя скала',
-            'Аллилуйя навсегда', 'В руках Твоих', 'Милосердие Твоё', 'Царь царей',
-            'Ты рядом', 'Песнь искупленных', 'Свобода во Христе', 'Твоя благодать',
-            'Немеркнущий свет', 'Радость моя', 'Голгофский крест', 'Живая вода',
-        ];
-
-        $lyrics = <<<'TEXT'
-            Куплет 1
-            [E]Свят, свят, свят Гос[A]подь Вседержи[E]тель,
-            Вся зем[C#m]ля пол[A]на славы Тво[H7]ей.
-
-            Припев
-            Те[A]бе поём хва[E]лу, Тебе одно[H7]му,
-            Дос[A]тоин Ты при[E]нять честь и [H7]си[E]лу.
-
-            Куплет 2
-            [E]Пред престолом Тво[A]им прекло[E]няюсь,
-            В серд[C#m]це ти[A]шина и по[H7]кой.
-            TEXT;
-
-        $songs = [];
-        foreach ($titles as $index => $title) {
-            $number = 60 + $index * 7;
-
-            $songs[$number] = Song::query()->create([
-                'number' => $number,
-                'title' => $title,
-                'song_category_id' => $categories[$index % 3]->id,
-            ]);
-            $songs[$number]->variants()->create(['letter' => 'а', 'label' => 'PG music', 'is_default' => true, 'key' => 'E', 'chordpro' => $lyrics]);
-        }
-
-        // У первой песни — авторы и каподастр, а ещё второй вариант текста, чтобы был виден переключатель.
-        $songs[60]->variants()->where('letter', 'а')->update(['capo' => 2, 'composer' => 'Джон Дайкс', 'lyricist' => 'Иван Проханов']);
-        $songs[60]->variants()->create([
-            'letter' => 'б',
-            'label' => '3 хор',
-            'key' => 'D',
-            'chordpro' => "Куплет 1\n[D]Свят, свят, свят Господь Все[G]держи[D]тель,\nНебо и [A]земля полны славы Тво[D]ей.",
-        ]);
-
-        return $songs;
-    }
-
-    /**
-     * @param  array<int, Song>  $songs
-     */
-    private function seedEvents(Minister $pastor, array $songs): void
+    private function seedEvents(Minister $pastor): void
     {
         $service = Event::query()->create([
             'title' => 'Богослужение',
@@ -129,9 +66,10 @@ class DemoContentSeeder extends Seeder
             'has_stream' => true,
         ]);
 
-        // Гимны — варианты текста: у песни 60 поют вариант «б».
+        // Гимны — варианты текста из сборника (songs:import), если он загружен: у песни 13 поют вариант «б».
         $service->hymns()->attach(SongVariant::query()
-            ->where(fn ($query) => $query->whereIn('song_id', [$songs[214]->id, $songs[88]->id])->orWhere(fn ($query) => $query->where('song_id', $songs[60]->id)->where('letter', 'б')))
+            ->where(fn ($query) => $query->where('letter', 'а')->whereHas('song', fn ($query) => $query->whereIn('number', [1, 3])))
+            ->orWhere(fn ($query) => $query->where('letter', 'б')->whereHas('song', fn ($query) => $query->where('number', 13)))
             ->pluck('id'));
 
         $service->sermon()->create([
