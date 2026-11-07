@@ -31,6 +31,29 @@ class Text
     }
 
     /**
+     * Текст для поиска: строчные буквы, «ё» как «е», знаки препинания — пробелы.
+     * Тогда «Свят свят» находит «Свят, свят», а «твердо» — «Твёрдо».
+     */
+    public static function searchable(?string $text): string
+    {
+        $text = str_replace('ё', 'е', mb_strtolower((string) $text));
+
+        return trim(preg_replace('/[^\p{L}\p{N}]+/u', ' ', $text));
+    }
+
+    /**
+     * Слова поискового запроса после searchable(), без повторов.
+     *
+     * @return list<string>
+     */
+    public static function searchWords(?string $text): array
+    {
+        $text = self::searchable($text);
+
+        return $text === '' ? [] : array_values(array_unique(explode(' ', $text)));
+    }
+
+    /**
      * Экранирует спецсимволы LIKE, чтобы пользовательский ввод искался буквально.
      */
     public static function escapeLike(string $value): string

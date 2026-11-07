@@ -19,19 +19,31 @@ function useDebounced(value, delay) {
   return debounced;
 }
 
-// Текст с подсвеченными вхождениями needle (без учёта регистра).
-function highlight(text, needle) {
-  if (!text || !needle) return text;
+// Слова запроса так же, как на бэке (Text::searchWords): строчные, «ё» как «е», знаки препинания — разделители.
+function searchWords(text) {
+  return [...new Set(text.toLowerCase().replaceAll('ё', 'е').split(/[^\p{L}\p{N}]+/u).filter(Boolean))];
+}
 
-  const lower = text.toLowerCase();
-  const query = needle.toLowerCase();
+// Все слова запроса есть в тексте — с начала какого-нибудь слова, как ищет бэк.
+function hasWords(text, words) {
+  const tokens = searchWords(text);
+  return words.every((word) => tokens.some((token) => token.startsWith(word)));
+}
+
+// Текст с подсвеченными словами запроса: с начала слова, без учёта регистра, «е» и «ё» — одно.
+// Найденное с опечаткой не подсвечивается.
+function highlight(text, words) {
+  if (!text || !words.length) return text;
+
+  // В словах только буквы и цифры (searchWords), экранировать нечего; длинные — первыми.
+  const pattern = [...words].sort((a, b) => b.length - a.length).map((word) => word.replaceAll('е', '[её]')).join('|');
   const parts = [];
   let from = 0;
 
-  for (let at = lower.indexOf(query); at !== -1; at = lower.indexOf(query, from)) {
-    if (at > from) parts.push(text.slice(from, at));
-    parts.push(<mark key={at} className="sb-hl">{text.slice(at, at + query.length)}</mark>);
-    from = at + query.length;
+  for (const match of text.matchAll(new RegExp(`(?<![\\p{L}\\p{N}])(?:${pattern})`, 'giu'))) {
+    if (match.index > from) parts.push(text.slice(from, match.index));
+    parts.push(<mark key={match.index} className="sb-hl">{match[0]}</mark>);
+    from = match.index + match[0].length;
   }
   if (from < text.length) parts.push(text.slice(from));
 
@@ -49,7 +61,7 @@ const DESKTOP = '(min-width: 861px)';
 
 // Строка списка: номер, название, строка текста и тональность; совпадения с поиском подсвечены.
 // variant — буква варианта, где нашлась строка: песня откроется сразу на нём.
-function SongRow({ song, line, variant, term, isNum, active, onPick }) {
+function SongRow({ song, line, variant, words, isNum, active, onPick }) {
   const pick = (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || !window.matchMedia(DESKTOP).matches) return;
     e.preventDefault();
@@ -58,10 +70,10 @@ function SongRow({ song, line, variant, term, isNum, active, onPick }) {
 
   return (
     <Link to={`/songs/${song.id}${variant ? `?v=${encodeURIComponent(variant)}` : ''}`} className={`sb-row${active ? ' is-active' : ''}`} onClick={pick} aria-current={active || undefined}>
-      <span className="sb-num">{isNum ? highlight(String(song.num), term) : song.num}{variant && <small>{variant}</small>}</span>
+      <span className="sb-num">{isNum ? highlight(String(song.num), words) : song.num}{variant && <small>{variant}</small>}</span>
       <span className="sb-text">
-        <span className="sb-title">{isNum ? song.title : highlight(song.title, term)}</span>
-        {line && <span className="sb-line">{isNum ? line : highlight(line, term)}</span>}
+        <span className="sb-title">{isNum ? song.title : highlight(song.title, words)}</span>
+        {line && <span className="sb-line">{isNum ? line : highlight(line, words)}</span>}
       </span>
       {song.key && <span className="sb-key">{song.key}</span>}
     </Link>
@@ -87,13 +99,16 @@ export default function Songs() {
     [found, searchedTerm, term],
   );
 
+  const words = useMemo(() => searchWords(term), [term]);
+
   const matched = useMemo(() => {
     if (!term) return songs;
     if (isNum) return songs.filter((s) => String(s.num).startsWith(term));
 
-    // По названию ищем сразу в загруженном списке, по строке текста — на сервере.
-    return songs.filter((s) => foundLines.has(s.id) || s.title.toLowerCase().includes(term.toLowerCase()));
-  }, [songs, foundLines, term, isNum]);
+    // Ответ сервера — в его порядке, самые подходящие выше. Пока его нет, ищем по названию прямо в списке.
+    if (found && searchedTerm === term) return found;
+    return songs.filter((s) => hasWords(s.title, words));
+  }, [songs, found, searchedTerm, term, words, isNum]);
 
   // Список: по номеру или по алфавиту с заголовками-буквами.
   const rows = useMemo(() => {
@@ -130,7 +145,7 @@ export default function Songs() {
       <h1 className="page-title page-title--bg">Сборник песен</h1>
 
       <div className="songs-layout">
-        {/* Поиск и список — один и тот же блок для телефона и десктопа (resources/design_handoff_songbook_mobile):
+        {/* Поиск и список — один и тот же блок для телефона и десктопа:
             поиск закрепляется при прокрутке, рядом — сортировка. На десктопе справа — превью песни. */}
         <div>
           <div className="sb-bar">
@@ -160,7 +175,7 @@ export default function Songs() {
               </div>
             ) : (
               <SongRow key={row.song.id} song={row.song} line={foundLines.get(row.song.id)?.line ?? row.song.line}
-                variant={foundLines.get(row.song.id)?.variant} term={term} isNum={isNum}
+                variant={foundLines.get(row.song.id)?.variant} words={words} isNum={isNum}
                 active={row.song.id === preview?.id} onPick={setPicked} />
             )))}
             {(loading || error) && <LoadStatus error={error} onRetry={retry} />}

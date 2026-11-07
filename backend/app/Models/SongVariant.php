@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\ChordPro;
+use App\Support\Text;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -120,15 +121,17 @@ class SongVariant extends Model
 
     /**
      * Текст с аккордами в формате ChordPro. При записи вставленные «аккорды над
-     * строкой» приводятся к ChordPro, а в lyrics сохраняются одни слова — по ним
-     * идёт поиск: в исходном тексте аккорды разрывают слова.
+     * строкой» приводятся к ChordPro, а в lyrics сохраняются одни слова: в исходном
+     * тексте аккорды разрывают слова. По lyrics подбирается строка для списка,
+     * а поиск идёт по search_text — тем же словам без знаков препинания.
      */
     protected function chordpro(): Attribute
     {
         return Attribute::set(function (?string $value) {
             $chordpro = ChordPro::normalize($value);
+            $lyrics = ChordPro::plainText($chordpro) ?: null;
 
-            return ['chordpro' => $chordpro, 'lyrics' => ChordPro::plainText($chordpro) ?: null];
+            return ['chordpro' => $chordpro, 'lyrics' => $lyrics, 'search_text' => Text::searchable($lyrics) ?: null];
         });
     }
 

@@ -137,7 +137,12 @@ const songWithText = (song) => ({
   ],
 });
 
-// Как на бэке: строка с совпадением вместо первой; «60б» — песня с этим вариантом.
+// Слова как на бэке: строчные, «ё» как «е», знаки препинания — разделители.
+const searchTokens = (text) => text.toLowerCase().replaceAll('ё', 'е').split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+const hasWords = (text, words) => words.every((word) => searchTokens(text).some((token) => token.startsWith(word)));
+
+// Упрощённо, как на бэке: слова с начала слова в названии или тексте, совпавшие в названии выше;
+// строка с совпадением вместо первой; «60б» — песня с этим вариантом. Опечатки мок не прощает.
 function searchSongs(term) {
   const query = term.trim().toLowerCase();
   const numbered = query.match(/^(\d+)\s*([а-яё])$/);
@@ -148,10 +153,17 @@ function searchSongs(term) {
     return variant ? [{ ...song, line: song.line, variant: variant.letter }] : [];
   }
 
-  const line = PLAIN_LINES.find((text) => text.toLowerCase().includes(query));
+  const words = [...new Set(searchTokens(query))];
+  if (!words.length) return [];
+
+  // У всех песен мока один текст.
+  const lyrics = PLAIN_LINES.join(' ');
+  const line = PLAIN_LINES.find((text) => words.some((word) => hasWords(text, [word])));
+  const inTitle = (song) => Number(hasWords(song.title, words));
 
   return songs
-    .filter((song) => line || song.title.toLowerCase().includes(query) || String(song.num).startsWith(query))
+    .filter((song) => String(song.num).startsWith(query) || hasWords(`${song.title} ${lyrics}`, words))
+    .sort((a, b) => inTitle(b) - inTitle(a) || a.num - b.num)
     .map((song) => ({ ...song, line: line ?? song.line }));
 }
 

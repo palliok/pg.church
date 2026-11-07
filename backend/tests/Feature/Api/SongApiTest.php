@@ -116,10 +116,61 @@ class SongApiTest extends TestCase
         $this->getJson('/api/v1/songs?q=214б')->assertJsonPath('data', []);
     }
 
-    public function test_search_treats_like_wildcards_literally(): void
+    public function test_search_ignores_punctuation_yo_and_word_order(): void
     {
-        $this->getJson('/api/v1/songs?q='.urlencode('%'))->assertJsonPath('data.*.num', [60]);
+        // «Свят, свят» в тексте, «Твоей.» с точкой, «поём» через «е».
+        $this->getJson('/api/v1/songs?q='.urlencode('свят господь'))->assertJsonPath('data.*.num', [60]);
+        $this->getJson('/api/v1/songs?q='.urlencode('славы твоей земля'))->assertJsonPath('data.*.num', [60]);
+        $this->getJson('/api/v1/songs?q='.urlencode('Тебе поем хвалу'))
+            ->assertJsonPath('data.*.num', [60])
+            ->assertJsonPath('data.0.line', 'Тебе поём хвалу на 100%.');
+        // Все слова — в одном варианте: «небо» есть только в «а», «вседержитель» — только в «б».
+        $this->getJson('/api/v1/songs?q='.urlencode('небо вседержитель'))->assertJsonPath('data', []);
+        // Запрос из одних знаков ничего не находит, а не всё подряд.
+        $this->getJson('/api/v1/songs?q='.urlencode('%'))->assertJsonPath('data', []);
         $this->getJson('/api/v1/songs?q=_')->assertJsonPath('data', []);
+    }
+
+    public function test_search_matches_from_word_start(): void
+    {
+        Song::query()->create(['number' => 7, 'title' => 'Суверенный Бог']);
+
+        // «верен» — начало слова в «Ты верен», но не в «Суверенный»; «рад» — начало «радость».
+        $this->getJson('/api/v1/songs?q=верен')->assertJsonPath('data.*.num', [21]);
+        $this->getJson('/api/v1/songs?q=рад')->assertJsonPath('data.*.num', [214]);
+    }
+
+    public function test_search_ranks_title_and_phrase_above_scattered_words(): void
+    {
+        Song::query()->create(['number' => 5, 'title' => 'Хвала'])->variants()->create([
+            'letter' => 'а', 'is_default' => true, 'chordpro' => "Радость в доме моём,\nСвет над нами горит.",
+        ]);
+        Song::query()->create(['number' => 6, 'title' => 'Утро'])->variants()->create([
+            'letter' => 'а', 'is_default' => true, 'chordpro' => 'Свет Твой сияет над нами.',
+        ]);
+
+        // Название целиком, потом слова подряд в тексте, потом вразбивку; внутри — по номеру.
+        $this->getJson('/api/v1/songs?q=радость')->assertJsonPath('data.*.num', [214, 5]);
+        $this->getJson('/api/v1/songs?q='.urlencode('свет твой'))->assertJsonPath('data.*.num', [6, 214]);
+        $this->getJson('/api/v1/songs?q='.urlencode('свет нами'))->assertJsonPath('data.*.num', [5, 6]);
+    }
+
+    public function test_search_tolerates_typos_only_when_nothing_found(): void
+    {
+        // Опечатка: «сеяет», «наполнят» — песня находится, строка с совпадением подобрана.
+        $this->getJson('/api/v1/songs?q='.urlencode('сеяет'))
+            ->assertJsonPath('data.*.num', [214])
+            ->assertJsonPath('data.0.line', 'Свет Твой сияет во мне,');
+        $this->getJson('/api/v1/songs?q='.urlencode('радасть наполнят'))
+            ->assertJsonPath('data.*.num', [214])
+            ->assertJsonPath('data.0.line', 'И радость наполняет дом.');
+        // Опечатка в названии — и песня без текста находится.
+        $this->getJson('/api/v1/songs?q='.urlencode('Ты верин'))->assertJsonPath('data.*.num', [21]);
+        // Две ошибки в коротком слове — уже не похоже; короткие слова с опечатками не ищутся.
+        $this->getJson('/api/v1/songs?q='.urlencode('сеаят'))->assertJsonPath('data', []);
+        $this->getJson('/api/v1/songs?q='.urlencode('дем'))->assertJsonPath('data', []);
+        // Если точное совпадение есть, похожие слова не подмешиваются: «свят» не находит «свет».
+        $this->getJson('/api/v1/songs?q=свят')->assertJsonPath('data.*.num', [60]);
     }
 
     public function test_index_filters_by_category(): void
