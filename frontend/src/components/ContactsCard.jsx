@@ -1,9 +1,9 @@
 import { useChurch } from '../api/church.js';
 import { t } from '../i18n.js';
 import { PhoneIcon } from './Icons.jsx';
+import { CHURCH_MAP_URL } from '../api/maps.js';
 import './ContactsCard.css';
 
-const MAP_URL = 'https://yandex.ru/maps/-/CXeDE0zH';
 const MAP_EMBED_URL = 'https://yandex.ru/map-widget/v1/?um=constructor%3A406ce76e3eab2cea5d9dd707c1d06b8a569aac16f7129a3526693a2407a42d39&source=constructor';
 
 // Метро «Озерки · 7 минут пешком» по частям: станция, число минут и остаток подписи.
@@ -32,7 +32,7 @@ export default function ContactsCard({ className = '' }) {
         <div className="contacts-card-plate">
           <div className="contacts-card-place">
             {/* Адрес открывает карту целиком — там можно построить маршрут. */}
-            <a href={MAP_URL} target="_blank" rel="noreferrer" title={t('На карте')} className="contacts-card-address">
+            <a href={CHURCH_MAP_URL} target="_blank" rel="noreferrer" title={t('На карте')} className="contacts-card-address">
               {church?.address}
             </a>
 

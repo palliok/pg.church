@@ -9,6 +9,8 @@ import LoadStatus from '../components/LoadStatus.jsx';
 import LongArrow from '../components/LongArrow.jsx';
 import { categoryLabel, useEvent, useEvents } from '../api/events.js';
 import { useLive } from '../api/live.js';
+import { useChurch } from '../api/church.js';
+import { placeMapUrl } from '../api/maps.js';
 import './EventDetail.css';
 
 // Тип события задаёт цвет панели с датой и кнопки (макет design_handoff_overview, блоки 08–09, вариант 1A):
@@ -111,7 +113,8 @@ function InfoPanel({ event: ev }) {
   const closeLive = useCallback(() => setLiveOpen(false), []);
   const [toast, showToast] = useToast();
 
-  const routeUrl = ev.addr ? `https://yandex.ru/maps/?text=${encodeURIComponent(ev.addr)}` : null;
+  const church = useChurch();
+  const routeUrl = placeMapUrl(ev.addr, church);
   // «Смотреть» — прямая ссылка события или, пока идёт эфир, выбор площадки, как в плашке «В эфире».
   const canWatch = Boolean(ev.streamUrl) || Boolean(ev.live && live?.isLive && (live.links.length > 0 || live.signLink));
 
