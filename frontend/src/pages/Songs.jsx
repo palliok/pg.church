@@ -1,5 +1,5 @@
 import { t } from '../i18n.js';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSong, useSongs, useSongSearch } from '../api/songs.js';
 import LoadStatus from '../components/LoadStatus.jsx';
@@ -56,14 +56,39 @@ function firstLetter(title) {
   return letter === 'Ё' ? 'Е' : letter;
 }
 
+// Где был список, когда открыли песню: поиск, сортировка и прокрутка. Вернувшись к сборнику
+// (кнопкой «Назад» или «← К сборнику»), попадаешь на то же место, а не к первой песне.
+// Хранится в sessionStorage — пока открыта вкладка; недоступное хранилище просто ничего не помнит.
+const SAVED_KEY = 'songs-list';
+
+function loadSaved() {
+  try {
+    return JSON.parse(sessionStorage.getItem(SAVED_KEY)) ?? {};
+  } catch {
+    return {};
+  }
+}
+
+function save(state) {
+  try {
+    sessionStorage.setItem(SAVED_KEY, JSON.stringify({ ...state, y: window.scrollY }));
+  } catch {
+    // Без хранилища возврат будет к началу списка.
+  }
+}
+
 // На десктопе рядом со списком карточка песни: клик по строке открывает песню в ней, а не на отдельной странице.
 const DESKTOP = '(min-width: 861px)';
 
 // Строка списка: номер, название, строка текста и тональность; совпадения с поиском подсвечены.
 // variant — буква варианта, где нашлась строка: песня откроется сразу на нём.
-function SongRow({ song, line, variant, words, isNum, active, onPick }) {
+function SongRow({ song, line, variant, words, isNum, active, onPick, onOpen }) {
   const pick = (e) => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || !window.matchMedia(DESKTOP).matches) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+    if (!window.matchMedia(DESKTOP).matches) {
+      onOpen();
+      return;
+    }
     e.preventDefault();
     onPick({ id: song.id, variant });
   };
@@ -81,8 +106,11 @@ function SongRow({ song, line, variant, words, isNum, active, onPick }) {
 }
 
 export default function Songs() {
-  const [q, setQ] = useState('');
-  const [sort, setSort] = useState('num');
+  const [saved] = useState(loadSaved);
+  const [q, setQ] = useState(saved.q ?? '');
+  const [sort, setSort] = useState(saved.sort ?? 'num');
+  // Прокрутка, к которой вернуться, когда список снова построится; один раз.
+  const restoreY = useRef(saved.y ?? null);
   // Песня, выбранная в списке для карточки на десктопе, и её вариант: { id, variant }; новый поиск выбор сбрасывает.
   const [picked, setPicked] = useState(null);
 
@@ -135,6 +163,19 @@ export default function Songs() {
   const [shown, setShown] = useState(null);
   if (previewSong && previewSong !== shown) setShown(previewSong);
 
+  // Список готов, когда сборник загружен и, если ищем словами, пришёл ответ сервера.
+  const ready = songs.length > 0 && (!term || isNum || (found && searchedTerm === term));
+  useEffect(() => {
+    if (!ready || restoreY.current == null) return;
+    const y = restoreY.current;
+    restoreY.current = null;
+    // После кадра: при смене страницы общий макет сначала прокручивает её наверх.
+    requestAnimationFrame(() => window.scrollTo({ top: y, behavior: 'instant' }));
+  }, [ready]);
+
+  // Уходя на страницу песни, запоминаем место в списке.
+  const remember = () => save({ q, sort });
+
   const search = (value) => {
     setQ(value);
     setPicked(null);
@@ -176,7 +217,7 @@ export default function Songs() {
             ) : (
               <SongRow key={row.song.id} song={row.song} line={foundLines.get(row.song.id)?.line ?? row.song.line}
                 variant={foundLines.get(row.song.id)?.variant} words={words} isNum={isNum}
-                active={row.song.id === preview?.id} onPick={setPicked} />
+                active={row.song.id === preview?.id} onPick={setPicked} onOpen={remember} />
             )))}
             {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
             {!loading && !error && matched.length === 0 && (
@@ -195,7 +236,7 @@ export default function Songs() {
               variant={shown.id === preview?.id ? previewVariant : null}
               onVariant={(variant) => setPicked({ id: shown.id, variant })}
               nav={<Link to={`/songs/${shown.id}${shown.id === preview?.id && previewVariant ? `?v=${encodeURIComponent(previewVariant)}` : ''}`}
-                className="song-card-back">Открыть песню ↗</Link>}
+                className="song-card-back" onClick={remember}>Открыть песню ↗</Link>}
             />
           )}
         </div>
