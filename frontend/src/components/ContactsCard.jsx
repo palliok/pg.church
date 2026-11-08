@@ -4,7 +4,10 @@ import { PhoneIcon } from './Icons.jsx';
 import { CHURCH_MAP_URL } from '../api/maps.js';
 import './ContactsCard.css';
 
-const MAP_EMBED_URL = 'https://yandex.ru/map-widget/v1/?um=constructor%3A406ce76e3eab2cea5d9dd707c1d06b8a569aac16f7129a3526693a2407a42d39&source=constructor';
+// Карта с меткой самой организации (oid — как в CHURCH_MAP_URL): на метке название церкви,
+// а «Открыть в Яндекс Картах» открывает её карточку. Метка из Конструктора карт была безымянной.
+// Центр чуть севернее церкви, чтобы метка с подписью стояла посередине карты.
+const MAP_EMBED_URL = 'https://yandex.ru/map-widget/v1/?ll=30.313463%2C60.03352&z=16&oid=54522682685&ol=biz';
 
 // Метро «Озерки · 7 минут пешком» по частям: станция, число минут и остаток подписи.
 // Если подпись другого вида — станцией считается она вся.
