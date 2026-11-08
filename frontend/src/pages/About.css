@@ -303,6 +303,8 @@
 }
 .guide-tab-num {
   flex: 0 0 36px;
+  /* Ширина явно: по flex-basis браузер не считает ширину самой плашки. */
+  width: 36px;
   height: 36px;
   display: flex;
   align-items: center;
@@ -494,10 +496,10 @@
   .guide-tabs { flex-direction: row; gap: 8px; margin: 0 -4px; padding: 4px; overflow-x: auto; scrollbar-width: none; }
   .guide-tabs::-webkit-scrollbar { display: none; }
   .guide-tabs::before { display: none; }
-  .guide-tab { flex: 0 0 auto; gap: 10px; min-height: 44px; width: max-content; padding: 4px 18px 4px 4px; border: 1px solid var(--c-line); border-radius: 99px; background: #fff; white-space: nowrap; }
+  .guide-tab { flex: 0 0 auto; gap: 10px; min-height: 44px; padding: 4px 18px 4px 4px; border: 1px solid var(--c-line); border-radius: 99px; background: #fff; white-space: nowrap; }
   .guide-tab.is-on { border-color: var(--c-ink); }
-  .guide-tab-num { flex-basis: 34px; height: 34px; border: 0; }
-  .guide-tab-word { flex: none; font-size: 19px; white-space: nowrap; }
+  .guide-tab-num { flex-basis: 34px; width: 34px; height: 34px; border: 0; }
+  .guide-tab-word { font-size: 19px; }
 }
 @media (max-width: 860px) {
   .guide { border-radius: 24px; }
