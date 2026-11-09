@@ -13,6 +13,9 @@ use Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Prologue\Alerts\Facades\Alert;
 
 class EventCrudController extends CrudController
 {
@@ -29,6 +32,7 @@ class EventCrudController extends CrudController
     protected function setupListOperation(): void
     {
         CRUD::orderBy('starts_at', 'desc');
+        CRUD::addButtonFromView('line', 'copy', 'event_copy');
 
         CRUD::column('starts_at')->label('Начало')->type('datetime');
         CRUD::column('title')->label('Название');
@@ -36,7 +40,7 @@ class EventCrudController extends CrudController
         CRUD::column('place')->label('Место');
         CRUD::column('is_main')->label('Главное')->type('boolean');
         CRUD::column('has_stream')->label('Трансляция')->type('boolean');
-        CRUD::column('is_published')->label('Опубликовано')->type('boolean');
+        CRUD::column('is_published')->label('Опубликовано')->type('event_published')->searchLogic(false);
         CRUD::column('calendar_source_id')->label('Из календаря')->type('select')
             ->entity('calendarSource')->model(CalendarSource::class)->attribute('name');
 
@@ -49,6 +53,28 @@ class EventCrudController extends CrudController
                 ? CRUD::addClause('whereNull', 'calendar_source_id')
                 : CRUD::addClause('where', 'calendar_source_id', (int) $source));
         $this->showListFilters();
+    }
+
+    public function copy(Event $event): RedirectResponse
+    {
+        CRUD::hasAccessOrFail('create');
+
+        $copy = DB::transaction(function () use ($event) {
+            $copy = $event->replicate(['calendar_source_id', 'external_uid']);
+            $copy->is_published = false;
+            $copy->save();
+            $copy->hymns()->attach($event->hymns()->allRelatedIds());
+
+            if ($event->sermon) {
+                $copy->sermon()->save($event->sermon->replicate());
+            }
+
+            return $copy;
+        });
+
+        Alert::success('Копия события создана.')->flash();
+
+        return redirect(backpack_url('event/'.$copy->getKey().'/edit'));
     }
 
     protected function setupCreateOperation(): void

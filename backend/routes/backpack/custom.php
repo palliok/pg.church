@@ -17,6 +17,7 @@ Route::group([
     'namespace' => 'App\Http\Controllers\Admin',
 ], function () { // custom admin routes
     Route::crud('event', 'EventCrudController');
+    Route::post('event/{event}/copy', 'EventCrudController@copy')->whereNumber('event')->name('event.copy');
     Route::crud('calendar-source', 'CalendarSourceCrudController');
     Route::post('calendar-source/{id}/sync', 'CalendarSourceCrudController@sync')->whereNumber('id')->name('calendar-source.sync');
     Route::crud('sermon', 'SermonCrudController');
