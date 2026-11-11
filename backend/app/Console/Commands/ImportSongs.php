@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 class ImportSongs extends Command
 {
     /** Директивы шапки: они становятся полями песни и варианта, в текст не попадают. */
-    private const array HEADER = ['title', 't', 'subtitle', 'st', 'meta', 'key', 'capo', 'artist', 'composer', 'lyricist'];
+    private const array HEADER = ['title', 't', 'subtitle', 'st', 'meta', 'key', 'capo', 'tempo', 'time', 'artist', 'composer', 'lyricist'];
 
     public function handle(): int
     {
@@ -53,7 +53,7 @@ class ImportSongs extends Command
     }
 
     /**
-     * @param  array{number: int, letter: string, title: string, label: ?string, key: ?string, capo: ?int, artist: ?string, composer: ?string, lyricist: ?string, chordpro: string}  $data
+     * @param  array{number: int, letter: string, title: string, label: ?string, key: ?string, capo: ?int, tempo: ?int, time: ?string, artist: ?string, composer: ?string, lyricist: ?string, chordpro: string}  $data
      * @return 'created'|'updated'|'skipped'
      */
     private function save(array $data, bool $update): string
@@ -71,7 +71,7 @@ class ImportSongs extends Command
                 $song->update(['title' => $data['title']]);
             }
 
-            $fields = collect($data)->only(['label', 'key', 'capo', 'artist', 'composer', 'lyricist', 'chordpro'])->all();
+            $fields = collect($data)->only(['label', 'key', 'capo', 'tempo', 'time', 'artist', 'composer', 'lyricist', 'chordpro'])->all();
             $isNew = $variant === null;
 
             $variant ??= new SongVariant(['song_id' => $song->id, 'letter' => $data['letter']]);
@@ -91,14 +91,14 @@ class ImportSongs extends Command
      * Делит файл на варианты по {new_song} и вынимает из каждого шапку.
      * Строки «# …» — заметки составителя сборника, в текст они не попадают.
      *
-     * @return list<array{number: ?int, letter: ?string, title: ?string, label: ?string, key: ?string, capo: ?int, artist: ?string, composer: ?string, lyricist: ?string, chordpro: string}>
+     * @return list<array{number: ?int, letter: ?string, title: ?string, label: ?string, key: ?string, capo: ?int, tempo: ?int, time: ?string, artist: ?string, composer: ?string, lyricist: ?string, chordpro: string}>
      */
     public static function parse(string $source): array
     {
         $variants = [];
 
         foreach (preg_split('/^\{\s*(?:new_song|ns)\s*\}\s*$/mu', $source) as $block) {
-            $data = ['number' => null, 'letter' => null, 'title' => null, 'label' => null, 'key' => null, 'capo' => null,
+            $data = ['number' => null, 'letter' => null, 'title' => null, 'label' => null, 'key' => null, 'capo' => null, 'tempo' => null, 'time' => null,
                 'artist' => null, 'composer' => null, 'lyricist' => null];
             $body = [];
 
@@ -120,6 +120,7 @@ class ImportSongs extends Command
                     'subtitle', 'st' => $data['label'] = $value,
                     'key' => $data['key'] = $value,
                     'capo' => $data['capo'] = (int) $value ?: null,
+                    'tempo' => $data['tempo'] = (int) $value ?: null,
                     'meta' => self::meta($data, $value),
                     default => $data[$match[1]] = $value,
                 };

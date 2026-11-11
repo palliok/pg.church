@@ -2,4 +2,6 @@
 .song-page { padding-bottom: 24px; }
 @media (min-width: 861px) {
   .song-page { max-width: 760px; margin: 24px auto 64px; padding: 0 16px; }
+  /* В две колонки карточка шире, чтобы строки не переносились чаще, чем в одну. */
+  .song-page:has(.is-two-columns) { max-width: 1200px; }
 }

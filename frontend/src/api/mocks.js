@@ -127,11 +127,11 @@ const songWithText = (song) => ({
   ...song,
   variants: [
     {
-      letter: 'а', label: 'PG music', isDefault: true, key: 'E', capo: 2, hasChords: true, sections: SECTIONS,
+      letter: 'а', label: 'PG music', isDefault: true, key: 'E', capo: 2, tempo: 87, time: '6/8', hasChords: true, sections: SECTIONS,
       composer: 'Джон Дайкс', lyricist: 'Иван Проханов', artist: null,
     },
     ...(song.id === 1 ? [{
-      letter: 'б', label: '3 хор', isDefault: false, key: null, capo: null, composer: null, lyricist: null, artist: null, hasChords: false,
+      letter: 'б', label: '3 хор', isDefault: false, key: null, capo: null, tempo: null, time: null, composer: null, lyricist: null, artist: null, hasChords: false,
       sections: SECTIONS.slice(0, 2).map((section) => ({ ...section, lines: section.lines.map((parts) => [{ chord: null, text: parts.map((part) => part.text).join('') }]) })),
     }] : []),
   ],

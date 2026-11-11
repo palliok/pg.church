@@ -133,6 +133,20 @@ class ChordPro
     }
 
     /**
+     * Значение директивы-метаданных из текста: {tempo: 87} → «87». Первое найденное, иначе null.
+     */
+    public static function directive(?string $source, string $name): ?string
+    {
+        foreach (self::lines($source) as $line) {
+            if (preg_match('/^\{\s*'.preg_quote($name, '/').'\s*:\s*(.*?)\s*\}$/iu', trim($line), $match) && $match[1] !== '') {
+                return $match[1];
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Только слова, без аккордов, заголовков и директив: для поиска по строке.
      */
     public static function plainText(?string $source): string

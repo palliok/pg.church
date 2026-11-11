@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-#[Fillable(['song_id', 'letter', 'label', 'is_default', 'key', 'capo', 'artist', 'composer', 'lyricist', 'chordpro'])]
+#[Fillable(['song_id', 'letter', 'label', 'is_default', 'key', 'capo', 'tempo', 'time', 'artist', 'composer', 'lyricist', 'chordpro'])]
 class SongVariant extends Model
 {
     use CrudTrait;
@@ -25,15 +25,22 @@ class SongVariant extends Model
         return [
             'is_default' => 'boolean',
             'capo' => 'integer',
+            'tempo' => 'integer',
         ];
     }
 
     /**
      * Основной вариант у песни один: отмеченный снимает отметку с остальных.
+     * Темп и размер, не заполненные в форме, берутся из {tempo} и {time} в тексте:
+     * так их не нужно переписывать из вставленного файла ChordPro.
      */
     protected static function booted(): void
     {
         static::saving(function (SongVariant $variant) {
+            $tempo = ChordPro::directive($variant->chordpro, 'tempo');
+            $variant->tempo ??= $tempo !== null && preg_match('/^\d{2,3}$/', $tempo) && $tempo >= 20 && $tempo <= 400 ? (int) $tempo : null;
+            $variant->time ??= self::meter(ChordPro::directive($variant->chordpro, 'time'));
+
             if ($variant->is_default && $variant->isDirty(['is_default', 'song_id'])) {
                 static::query()
                     ->where('song_id', $variant->song_id)
@@ -90,6 +97,14 @@ class SongVariant extends Model
     public function scopeDefaultFirst(Builder $query): void
     {
         $query->orderByDesc('is_default')->orderBy('letter');
+    }
+
+    /**
+     * Размер вида «6/8»; всё остальное (опечатки, «4/4 swing») не сохраняется.
+     */
+    private static function meter(?string $value): ?string
+    {
+        return $value !== null && preg_match('/^\d{1,2}\/\d{1,2}$/', $value) ? $value : null;
     }
 
     /**

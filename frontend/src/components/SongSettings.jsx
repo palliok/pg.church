@@ -18,8 +18,8 @@ function Toggle({ label, on, onChange }) {
 }
 
 // Шторка настроек песни (resources/design_handoff_songbook_mobile, экран 04): тема карточки, аккорды,
-// тональность. В body — поверх нижнего меню; тап по затемнению или Esc закрывает.
-export default function SongSettings({ dark, onDark, hasChords, chords, onChords, songKey, steps, onSteps, onClose }) {
+// колонки текста (только на десктопе), тональность. В body — поверх нижнего меню; тап по затемнению или Esc закрывает.
+export default function SongSettings({ dark, onDark, twoColumns, onTwoColumns, hasChords, chords, onChords, songKey, steps, onSteps, onClose }) {
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose();
     document.addEventListener('keydown', onKey);
@@ -42,6 +42,18 @@ export default function SongSettings({ dark, onDark, hasChords, chords, onChords
           <button type="button" className={dark ? 'is-on' : ''} onClick={() => onDark(true)} aria-pressed={dark}>
             <DarkModeIcon size={20} /><span>Тёмная</span>
           </button>
+        </div>
+
+        <div className="ss-columns">
+          <span className="ss-mono">Колонки</span>
+          <div className="ss-seg">
+            <button type="button" className={twoColumns ? '' : 'is-on'} onClick={() => onTwoColumns(false)} aria-pressed={!twoColumns} aria-label={t('Одна колонка')}>
+              <span>1</span>
+            </button>
+            <button type="button" className={twoColumns ? 'is-on' : ''} onClick={() => onTwoColumns(true)} aria-pressed={twoColumns} aria-label={t('Две колонки')}>
+              <span>2</span>
+            </button>
+          </div>
         </div>
 
         {hasChords && (

@@ -214,6 +214,25 @@ class AdminPanelTest extends TestCase
         $this->get("/admin/song/{$variant->song_id}/edit")->assertOk()->assertSee('12а')->assertSee('3 хор');
     }
 
+    public function test_tempo_and_time_are_taken_from_text_unless_filled_in(): void
+    {
+        $this->actingAsAdmin();
+        $song = Song::query()->create(['number' => 61, 'title' => 'Псалом 61']);
+        $text = "{tempo: 87}\n{time: 6/8}\n\nКуплет 1\n[Bbm]В Тебе моя душа";
+
+        $this->post('/admin/song-variant', ['song_id' => $song->id, 'letter' => 'а', 'chordpro' => $text])
+            ->assertSessionHasNoErrors();
+        $this->post('/admin/song-variant', ['song_id' => $song->id, 'letter' => 'б', 'tempo' => '72', 'time' => '3/4', 'chordpro' => $text])
+            ->assertSessionHasNoErrors();
+
+        $variants = $song->variants()->orderBy('letter')->get();
+
+        $this->assertSame([87, '6/8'], [$variants[0]->tempo, $variants[0]->time]);
+        $this->assertSame([72, '3/4'], [$variants[1]->tempo, $variants[1]->time]);
+        // Директивы в текст песни не попадают.
+        $this->assertSame('В Тебе моя душа', $variants[0]->lyrics);
+    }
+
     public function test_marking_variant_as_default_unmarks_previous_one(): void
     {
         $this->actingAsAdmin();
@@ -222,8 +241,8 @@ class AdminPanelTest extends TestCase
 
         $this->post('/admin/song-variant', ['song_id' => $song->id, 'letter' => 'а', 'is_default' => '1'])
             ->assertSessionHasErrors('letter');
-        $this->post('/admin/song-variant', ['song_id' => $song->id, 'letter' => 'в', 'capo' => '13'])
-            ->assertSessionHasErrors('capo');
+        $this->post('/admin/song-variant', ['song_id' => $song->id, 'letter' => 'в', 'capo' => '13', 'time' => '6/8 swing'])
+            ->assertSessionHasErrors(['capo', 'time']);
 
         $this->post('/admin/song-variant', ['song_id' => $song->id, 'letter' => 'б', 'label' => 'PG music', 'is_default' => '1'])
             ->assertSessionHasNoErrors()->assertRedirect();

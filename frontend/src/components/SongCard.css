@@ -4,7 +4,7 @@
   --sc-fg: var(--c-ink);
   --sc-chip: #f2f2f3;
   --sc-hair: rgba(35, 31, 32, .12);
-  --sc-chorus: #f2f2f3;
+  --sc-band: #f2f2f3;
   --sc-label: var(--c-gray-text);
   --sc-chord: #02809f;
   padding: 6px 0 32px;
@@ -18,7 +18,7 @@
   --sc-fg: #f4f4f1;
   --sc-chip: rgba(255, 255, 255, .1);
   --sc-hair: rgba(255, 255, 255, .14);
-  --sc-chorus: rgba(255, 255, 255, .07);
+  --sc-band: rgba(255, 255, 255, .07);
   --sc-label: rgba(255, 255, 255, .55);
   --sc-chord: var(--c-main);
 }
@@ -47,11 +47,11 @@
 .song-card-variant.is-active { background: var(--sc-fg); color: var(--sc-bg); }
 .song-card-variant.is-active .song-card-variant-letter { color: inherit; opacity: .6; }
 
-/* Текст песни (SongText): куплет без подложки, припев — на подложке. */
+/* Текст песни (SongText): секции через одну на подложке, чтобы глаз не терял, где кончается одна и начинается другая. */
 .song-card-text { padding: 14px 14px 0; }
 
-/* Каподастр — над текстом, только в режиме с аккордами. */
-.song-card-capo { margin: 0 8px 6px; font: 12px/1.4 var(--f-mono); letter-spacing: .04em; color: var(--sc-chord); }
+/* Каподастр, темп и размер — над текстом, только в режиме с аккордами. */
+.song-card-capo { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 8px 6px; font: 12px/1.4 var(--f-mono); letter-spacing: .04em; color: var(--sc-chord); }
 
 /* Авторы — под текстом, мелко: подпись роли и имя. */
 .song-card-credits { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 18px 22px 0; padding-top: 14px; border-top: 1px solid var(--sc-hair); }
@@ -60,12 +60,19 @@
 .song-card-credits dd { margin: 0; font: 14px/1.3 var(--f-sans); }
 .song-card .song-text { display: flex; flex-direction: column; gap: 10px; }
 .song-card .song-text section { display: flex; flex-direction: column; gap: 10px; padding: 12px 8px 14px; border-radius: 24px; }
-.song-card .song-text .song-section-chorus { padding: 18px 18px 20px; background: var(--sc-chorus); }
+.song-card .song-text section:nth-child(even) { padding: 18px 18px 20px; background: var(--sc-band); }
 .song-card .song-text .song-label { margin: 0; font: 11px/1 var(--f-mono); letter-spacing: .04em; color: var(--sc-label); }
 .song-card .song-text .song-lines { display: flex; flex-direction: column; margin: 0; font-weight: 400; line-height: 1.5; letter-spacing: -.015em; color: inherit; }
 .song-card.has-chords .song-text .song-lines { gap: 4px; }
 .song-card .song-text .song-line-chords { margin-top: 0; line-height: 1.5; }
-.song-card .song-text .song-chord { font: 700 .72em/1.3 var(--f-sans); color: var(--sc-chord); }
+/* Arimo жирнее 700 не бывает: обводка в цвет аккорда утолщает буквы ещё немного. */
+.song-card .song-text .song-chord { font: 700 .82em/1.3 var(--f-sans); color: var(--sc-chord); -webkit-text-stroke: .025em currentColor; }
+
+/* Две колонки на десктопе: блоки (куплет, припев) не рвутся между колонками. */
+@media (min-width: 861px) {
+  .song-card.is-two-columns .song-text { display: block; columns: 2; column-gap: 12px; }
+  .song-card.is-two-columns .song-text section { break-inside: avoid; margin-bottom: 10px; }
+}
 
 .song-toast {
   position: fixed;

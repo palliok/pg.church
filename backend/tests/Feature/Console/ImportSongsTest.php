@@ -38,6 +38,8 @@ class ImportSongsTest extends TestCase
             {meta: variant б}
             {key: E}
             {capo: 2}
+            {tempo: 87}
+            {time: 6/8}
 
             {start_of_verse: label="Куплет 1"}
             Ты — пом[E]ощь мне, Госп[E]одь
@@ -66,7 +68,7 @@ class ImportSongsTest extends TestCase
         $this->assertStringNotContainsString('Источник', $first->chordpro);
 
         $this->assertFalse($second->is_default);
-        $this->assertSame(['Workship', 'E', 2], [$second->label, $second->key, $second->capo]);
+        $this->assertSame(['Workship', 'E', 2, 87, '6/8'], [$second->label, $second->key, $second->capo, $second->tempo, $second->time]);
         $this->assertSame('Ты — помощь мне, Господь', $second->lyrics);
     }
 

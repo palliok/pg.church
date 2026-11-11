@@ -6,7 +6,7 @@ use App\Models\SongVariant;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
- * Поля варианта песни — подпись, тональность, каподастр, авторы, текст с аккордами. Общие для формы
+ * Поля варианта песни — подпись, тональность, каподастр, темп и размер, авторы, текст с аккордами. Общие для формы
  * варианта и для формы новой песни, где первый вариант заводится сразу с ней.
  */
 trait DefinesSongTextFields
@@ -29,6 +29,13 @@ trait DefinesSongTextFields
             ->hint('Лад, на котором стоит каподастр. На сайте виден только с аккордами.')
             ->wrapper(['class' => 'form-group col-md-3'])
             ->validationRules('nullable|integer|min:1|max:12');
+        CRUD::field('tempo')->label('Темп')->type('number')
+            ->hint('Ударов в минуту. Пусто — возьмётся из <code>{tempo: 87}</code> в тексте.')
+            ->wrapper(['class' => 'form-group col-md-3'])
+            ->validationRules('nullable|integer|min:20|max:400');
+        CRUD::field('time')->label('Размер')->hint('Например: 4/4, 6/8. Пусто — возьмётся из <code>{time: 6/8}</code> в тексте.')
+            ->wrapper(['class' => 'form-group col-md-3'])
+            ->validationRules('nullable|string|regex:/^\d{1,2}\/\d{1,2}$/');
         CRUD::field('composer')->label('Музыка')->hint('Автор музыки')
             ->wrapper(['class' => 'form-group col-md-3'])
             ->validationRules('nullable|string|max:255');

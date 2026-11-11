@@ -29,7 +29,7 @@ class SongApiTest extends TestCase
         Song::query()->create(['number' => 60, 'title' => 'Свят, свят, свят', 'song_category_id' => $this->worship->id])->variants()->createMany([
             [
                 'letter' => 'а', 'label' => 'PG music', 'key' => 'G',
-                'capo' => 2, 'composer' => 'Джон Дайкс', 'lyricist' => 'Иван Проханов', 'artist' => 'Хор церкви',
+                'capo' => 2, 'tempo' => 87, 'time' => '6/8', 'composer' => 'Джон Дайкс', 'lyricist' => 'Иван Проханов', 'artist' => 'Хор церкви',
                 'chordpro' => "Свят, свят, свят Господь,\nНебо и земля полны славы Твоей.",
             ],
             [
@@ -194,6 +194,8 @@ class SongApiTest extends TestCase
             ->assertJsonPath('data.variants.*.isDefault', [true, false])
             ->assertJsonPath('data.variants.*.key', ['E', 'G'])
             ->assertJsonPath('data.variants.*.capo', [null, 2])
+            ->assertJsonPath('data.variants.*.tempo', [null, 87])
+            ->assertJsonPath('data.variants.*.time', [null, '6/8'])
             ->assertJsonPath('data.variants.1.composer', 'Джон Дайкс')
             ->assertJsonPath('data.variants.1.lyricist', 'Иван Проханов')
             ->assertJsonPath('data.variants.1.artist', 'Хор церкви')

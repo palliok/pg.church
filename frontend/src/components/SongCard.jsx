@@ -11,12 +11,13 @@ import './SongCard.css';
 const FONT_SIZES = [17, 19, 22, 26];
 
 // Песня, у которой не осталось ни одного варианта текста.
-const NO_TEXT = { letter: '', key: null, capo: null, isDefault: true, hasChords: false, sections: [] };
+const NO_TEXT = { letter: '', key: null, capo: null, tempo: null, time: null, isDefault: true, hasChords: false, sections: [] };
 
-// Включённые аккорды и тёмная тема запоминаются в браузере: кто играет или читает в полутьме,
-// тому они нужны в каждой песне.
+// Включённые аккорды, тёмная тема и две колонки запоминаются в браузере: кто играет или читает в полутьме,
+// тому они нужны в каждой песне. Колонки — только на десктопе, на телефоне текст всегда в одну.
 const CHORDS_KEY = 'songs:chords';
 const THEME_KEY = 'songs:theme';
+const COLUMNS_KEY = 'songs:columns';
 
 // fallback — если в хранилище ничего нет: аккорды по умолчанию выключены, тема тёмная.
 function readFlag(key, on, fallback = false) {
@@ -95,6 +96,7 @@ export default function SongCard({ song, nav, variant, onVariant }) {
   const [fontStep, setFontStep] = useState(1);
   const [chords, setChords] = useState(() => readFlag(CHORDS_KEY, '1'));
   const [dark, setDark] = useState(() => readFlag(THEME_KEY, 'dark', true));
+  const [twoColumns, setTwoColumns] = useState(() => readFlag(COLUMNS_KEY, '2'));
   const [sheetOpen, setSheetOpen] = useState(false);
   const { share, toast } = useShareSong();
   const variants = song.variants;
@@ -119,12 +121,16 @@ export default function SongCard({ song, nav, variant, onVariant }) {
     writeFlag(THEME_KEY, on ? 'dark' : 'light');
     setDark(on);
   };
+  const changeColumns = (on) => {
+    writeFlag(COLUMNS_KEY, on ? '2' : '1');
+    setTwoColumns(on);
+  };
 
   const showChords = current.hasChords && chords;
 
   return (
     <>
-      <article className={`song-card${dark ? ' is-dark' : ''}${showChords ? ' has-chords' : ''}`}>
+      <article className={`song-card${dark ? ' is-dark' : ''}${showChords ? ' has-chords' : ''}${twoColumns ? ' is-two-columns' : ''}`}>
         <div className="song-card-bar">
           {nav}
           <div className="song-card-tools">
@@ -178,8 +184,12 @@ export default function SongCard({ song, nav, variant, onVariant }) {
         )}
 
         <div className="song-card-text">
-          {showChords && current.capo > 0 && (
-            <p className="song-card-capo"><span>Каподастр</span> {current.capo}</p>
+          {showChords && (current.capo > 0 || current.tempo || current.time) && (
+            <p className="song-card-capo">
+              {current.capo > 0 && <span><span>Каподастр</span> {current.capo}</span>}
+              {current.tempo && <span>{current.tempo} bpm</span>}
+              {current.time && <span>{current.time}</span>}
+            </p>
           )}
           <SongText sections={sections} chords={showChords} fontSize={FONT_SIZES[fontStep]} gap={10} />
         </div>
@@ -191,6 +201,8 @@ export default function SongCard({ song, nav, variant, onVariant }) {
         <SongSettings
           dark={dark}
           onDark={changeTheme}
+          twoColumns={twoColumns}
+          onTwoColumns={changeColumns}
           hasChords={current.hasChords}
           chords={chords}
           onChords={changeChords}
