@@ -498,7 +498,7 @@ class AdminPanelTest extends TestCase
             ->assertSessionHasNoErrors();
         $this->getJson('/api/v1/live')->assertJsonPath('data.links.*.platform', ['youtube', 'vk']);
 
-        $this->assertSame('+7 812 000-00-00', $phone->fresh()->value);
+        $this->assertSame('+7 (812) 000-00-00', $phone->fresh()->value);
         $this->assertSame('church_phone', $phone->fresh()->key);
         $this->assertSame('Телефон', $phone->fresh()->label);
         $this->assertSame('Мы в эфире', Setting::values()->get('stream_text'));

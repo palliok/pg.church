@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\AnnouncementAction;
 use App\Enums\AnnouncementWhen;
+use App\Support\Phone;
 use App\Support\RuDate;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -182,17 +183,19 @@ class Announcement extends Model
     }
 
     /**
-     * «tel:+79210001234» для кнопки «Позвонить»: только цифры, российская 8 в начале — как +7.
+     * «tel:+79210001234» для кнопки «Позвонить».
      */
     public function contactTel(): ?string
     {
-        $digits = preg_replace('/\D/', '', (string) $this->contact_phone);
+        return Phone::tel($this->contact_phone);
+    }
 
-        if ($digits === '') {
-            return null;
-        }
-
-        return 'tel:+'.preg_replace('/^8(\d{10})$/', '7$1', $digits);
+    /**
+     * Телефон контакта хранится в едином виде: «+7 (921) 000-12-34».
+     */
+    protected function contactPhone(): Attribute
+    {
+        return Attribute::make(set: fn (?string $value) => Phone::format($value));
     }
 
     /**

@@ -8,6 +8,8 @@ use App\Models\Announcement;
 use App\Models\Event;
 use App\Rules\ExistingLink;
 use App\Rules\LinkPerLine;
+use App\Rules\PhoneNumber;
+use App\Support\Phone;
 use App\Support\RuDate;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
@@ -90,7 +92,7 @@ class AnnouncementCrudController extends CrudController
             ->validationRules('nullable|string|max:60');
         CRUD::field('contact_phone')->label('Контакт: телефон')->tab('Где и контакт')
             ->hint('На сайте — номер с кнопкой звонка; крупной кнопкой внизу — если выбрать звонок основным действием')
-            ->validationRules('required_with:contact_name|required_if:main_choice,contact|nullable|string|max:30|regex:/^\+?[ ()-]*([0-9][ ()-]*){6,}$/');
+            ->attributes(Phone::INPUT_ATTRIBUTES);
         // Варианты — «Нет», ссылки по номеру и звонок; подписи по тексту ссылок и имени контакта
         // ставит скрипт формы (admin.announcement-form) прямо при вводе.
         CRUD::field('main_choice')->label('Основное действие')->type('select_from_array')->tab('Где и контакт')
@@ -113,6 +115,7 @@ class AnnouncementCrudController extends CrudController
 
         CRUD::setValidation([
             'links_text' => ['nullable', 'string', 'max:2000', new LinkPerLine],
+            'contact_phone' => ['required_with:contact_name', 'required_if:main_choice,contact', 'nullable', 'string', 'max:30', new PhoneNumber],
             'main_choice' => ['required', 'regex:/^(none|contact|link:\d)$/', new ExistingLink(request()->input('links_text'))],
         ]);
 

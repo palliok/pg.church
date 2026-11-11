@@ -113,25 +113,6 @@
 }
 .ann-home-card:hover .ann-home-more { background: var(--c-main); color: var(--c-ink); box-shadow: none; }
 
-/* На телефоне кнопки нет: на страницу ведут сама карточка и вкладка в нижнем меню. */
-.ann-home-foot { display: none; justify-content: flex-end; margin-top: 12px; }
-
-.ann-home-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 34px;
-  padding: 0 14px 0 16px;
-  border-radius: 99px;
-  box-shadow: inset 0 0 0 1px var(--c-stroke);
-  color: var(--c-ink);
-  font: 400 11px var(--f-mono);
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  transition: background .2s, box-shadow .2s;
-}
-.ann-home-all:hover { background: var(--c-main); box-shadow: none; }
-
 /* ===== Страница ===== */
 .ann-empty { margin-top: 30px; padding: 56px 20px; border-radius: var(--radius-lg); background: var(--c-panel); text-align: center; }
 
@@ -159,8 +140,6 @@
 
 /* ===== Десктоп ===== */
 @media (min-width: 861px) {
-  .ann-home-foot { display: flex; }
-
   .ann-toast { bottom: 28px; }
 }
 

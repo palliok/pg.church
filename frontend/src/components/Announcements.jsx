@@ -5,7 +5,7 @@ import LongArrow from './LongArrow.jsx';
 import './Announcements.css';
 
 // Блок объявлений на главной (макет design_handoff_overview, блоки 02 и 03): последнее объявление
-// чёрной карточкой, под ней на десктопе — кнопка «Все объявления».
+// чёрной карточкой.
 // Карточка ведёт на это объявление: на телефоне открываются его сторис, на десктопе — его карточка справа;
 // закрыл сторис — остаёшься в списке объявлений.
 // Пока объявлений нет, блок не показывается.
@@ -29,12 +29,6 @@ export default function Announcements({ className = '' }) {
           <LongArrow />
         </span>
       </Link>
-      <div className="ann-home-foot">
-        <Link to="/announcements" className="ann-home-all">
-          Все объявления
-          <LongArrow />
-        </Link>
-      </div>
     </section>
   );
 }

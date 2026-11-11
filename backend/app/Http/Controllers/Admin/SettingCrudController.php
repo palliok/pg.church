@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\SettingType;
 use App\Http\Controllers\Admin\Concerns\ValidatesFromFields;
 use App\Models\Setting;
+use App\Rules\PhoneNumber;
 use App\Rules\UrlPerLine;
+use App\Support\Phone;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
@@ -52,6 +54,10 @@ class SettingCrudController extends CrudController
             // Правило-объект в validationRules() поля не передать: Backpack принимает там только строку.
             CRUD::setValidation(['value' => ['nullable', 'string', 'max:5000', new UrlPerLine]]);
             $field->attributes(['rows' => 5, 'spellcheck' => 'false']);
+        } elseif ($setting->type === SettingType::Phone) {
+            CRUD::setValidation(['value' => ['nullable', 'string', 'max:30', new PhoneNumber]]);
+            $field->attributes(Phone::INPUT_ATTRIBUTES);
+            CRUD::field('phone_mask')->type('view')->view('admin.phone-mask');
         } else {
             $field->validationRules(match ($setting->type) {
                 SettingType::Boolean => 'boolean',

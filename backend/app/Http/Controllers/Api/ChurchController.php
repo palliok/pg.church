@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\DutyShift;
 use App\Models\Setting;
+use App\Support\Phone;
 use App\Support\RuDate;
 use Illuminate\Http\JsonResponse;
 
@@ -41,8 +42,8 @@ class ChurchController extends Controller
             'city' => $settings->get('church_city'),
             'address' => $settings->get('church_address'),
             'metro' => $settings->get('church_metro'),
-            'phone' => $phone,
-            'phoneHref' => $phone ? 'tel:'.preg_replace('/[^\d+]/', '', $phone) : null,
+            'phone' => Phone::format($phone),
+            'phoneHref' => Phone::tel($phone),
             'social' => $social,
             'duty' => [
                 'hours' => $settings->get('duty_hours'),

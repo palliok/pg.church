@@ -36,7 +36,7 @@ const church = {
   city: 'Санкт-Петербург',
   address: ADDRESS,
   metro: 'Озерки · 7 минут пешком',
-  phone: '+7 911 123-43-43',
+  phone: '+7 (911) 123-43-43',
   phoneHref: 'tel:+79111234343',
   social: [
     { code: 'TG', label: 'Telegram', href: 'https://t.me/' },
@@ -378,7 +378,7 @@ function nextEvent(title) {
 }
 
 function announcement(id, daysAgo, title, body, { important = false, eventIn = null, eventDays = 1, deadlineIn = null, weekly = null, event = null, when = null, where = null, links = [], contact = null } = {}) {
-  const tel = contact ? `tel:+${contact.phone.replace(/\D/g, '').replace(/^8(\d{10})$/, '7$1')}` : null;
+  const tel = contact ? `tel:+${contact.phone.replace(/\D/g, '')}` : null;
 
   return {
     id,
@@ -403,7 +403,7 @@ function announcement(id, daysAgo, title, body, { important = false, eventIn = n
 // По дате, новые сверху — как будет отдавать бэкенд.
 const announcements = [
   announcement(1, 0, 'Сбор продуктов для нуждающихся', 'Приносите крупы, консервы и средства гигиены. Всё передадим семьям нашего района.', {
-    deadlineIn: 9, when: 'После служений', where: 'Фойе, стол у входа', contact: { name: 'Анна', phone: '+7 921 000-12-34', primary: true },
+    deadlineIn: 9, when: 'После служений', where: 'Фойе, стол у входа', contact: { name: 'Анна', phone: '+7 (921) 000-12-34', primary: true },
   }),
   announcement(2, 2, 'Запись в детский лагерь', 'Открыта запись на летнюю смену для детей 7–12 лет. Мест: 30.', {
     important: true,
@@ -411,10 +411,10 @@ const announcements = [
     eventDays: 7,
     where: 'База «Сосновый бор», Ленобласть',
     links: [['Что взять с собой', 'https://pg.church/'], ['Анкета для записи', 'https://forms.yandex.ru/', true]],
-    contact: { name: 'Марина', phone: '8 911 000-45-67' },
+    contact: { name: 'Марина', phone: '+7 (911) 000-45-67' },
   }),
   announcement(3, 4, 'Нужны волонтёры на кухню', 'Ищем помощников готовить обеды после воскресного служения. Можно на одно воскресенье в месяц.', {
-    important: true, links: [['Написать в Telegram', 'https://t.me/']], contact: { name: 'Олег', phone: '+7 905 000-78-90', primary: true },
+    important: true, links: [['Написать в Telegram', 'https://t.me/']], contact: { name: 'Олег', phone: '+7 (905) 000-78-90', primary: true },
   }),
   announcement(4, 6, 'Изучение Библии для молодёжи', 'Каждую пятницу разбираем Евангелие от Марка. Приходите с друзьями.', {
     weekly: { dow: 5, time: '19:00' }, event: 'Молодёжная встреча', where: 'Малый зал', links: [['Чат молодёжи в Telegram', 'https://t.me/']],
@@ -426,19 +426,19 @@ const announcements = [
     eventIn: (6 - new Date().getDay() + 7) % 7 || 7, when: 'С 10:00', where: 'Главный зал', links: [['Записаться', 'https://forms.yandex.ru/']],
   }),
   announcement(7, 16, 'Подготовка к крещению', 'Если вы хотите принять крещение, приходите на подготовительные встречи. Всего четыре встречи.', {
-    eventIn: 12, when: 'После служения', where: 'Малый зал', contact: { name: 'Пастор Алексей', phone: '+7 921 000-55-11', primary: true },
+    eventIn: 12, when: 'После служения', where: 'Малый зал', contact: { name: 'Пастор Алексей', phone: '+7 (921) 000-55-11', primary: true },
   }),
   announcement(8, 18, 'Молитвенное служение по средам', 'Собираемся вместе молиться о церкви, городе и друг о друге.', {
     weekly: { dow: 3, time: '19:30' }, where: 'Малый зал',
   }),
   announcement(9, 20, 'Сбор тёплых вещей', 'Принимаем куртки, шапки и обувь в хорошем состоянии. Передадим в приют «Ночлежка».', {
-    deadlineIn: 14, when: 'До и после служений', where: 'Фойе', contact: { name: 'Анна', phone: '+7 921 000-12-34' },
+    deadlineIn: 14, when: 'До и после служений', where: 'Фойе', contact: { name: 'Анна', phone: '+7 (921) 000-12-34' },
   }),
   announcement(10, 25, 'Семейный пикник', 'Едем всей церковью на природу: игры для детей, обед на костре. Возьмите плед и хорошее настроение.', {
     important: true, eventIn: 5, when: 'С 12:00', where: 'Парк Сосновка', links: [['Записаться', 'https://forms.yandex.ru/']],
   }),
   announcement(11, 30, 'Женская конференция «Свет»', 'Два дня общения, поклонения и семинаров для сестёр. Регистрация обязательна.', {
-    eventIn: 26, eventDays: 2, where: 'Главный зал', links: [['Регистрация', 'https://forms.yandex.ru/', true]], contact: { name: 'Марина', phone: '8 911 000-45-67' },
+    eventIn: 26, eventDays: 2, where: 'Главный зал', links: [['Регистрация', 'https://forms.yandex.ru/', true]], contact: { name: 'Марина', phone: '+7 (911) 000-45-67' },
   }),
 ];
 

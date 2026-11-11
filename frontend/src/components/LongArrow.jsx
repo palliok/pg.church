@@ -1,4 +1,4 @@
-// Длинная стрелка «→» из макета design_handoff_overview: в кнопках «Подробнее», «Все объявления» и строках списков.
+// Длинная стрелка «→» из макета design_handoff_overview: в кнопках «Подробнее» и строках списков.
 export default function LongArrow({ width = 16, stroke = 3 }) {
   return (
     <svg width={width} height={width * 0.375} viewBox="0 0 64 24" aria-hidden="true" style={{ display: 'block', flex: '0 0 auto' }}>

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\SettingType;
+use App\Support\Phone;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +24,18 @@ class Setting extends Model
         return [
             'type' => SettingType::class,
         ];
+    }
+
+    /**
+     * Телефон хранится в едином виде «+7 (911) 123-45-67», как бы его ни ввели.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (self $setting) {
+            if ($setting->type === SettingType::Phone) {
+                $setting->value = Phone::format($setting->value);
+            }
+        });
     }
 
     /**

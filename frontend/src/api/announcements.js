@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { getLang, t } from '../i18n.js';
+import { formatPhone } from '../phone.js';
 import { dayLabel, formatDate, isoDate, monthLabel, shortDate } from './dates.js';
 import { toEvent } from './events.js';
 import { useApi } from './useApi.js';
@@ -100,7 +101,7 @@ function toAnnouncement(raw) {
     regular,
     event,
     details,
-    contact: raw.contact ? { ...raw.contact, name: raw.contact.name ? t(raw.contact.name) : null, primary: Boolean(raw.contact.primary) } : null,
+    contact: raw.contact ? { ...raw.contact, phone: formatPhone(raw.contact.phone), name: raw.contact.name ? t(raw.contact.name) : null, primary: Boolean(raw.contact.primary) } : null,
   };
 }
 

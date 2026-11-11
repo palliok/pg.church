@@ -8,6 +8,8 @@ enum SettingType: string
     case Textarea = 'textarea';
     case Url = 'url';
     case Boolean = 'boolean';
+    /** Телефон: в админке — с маской, хранится как «+7 (911) 123-45-67». */
+    case Phone = 'phone';
     /** Несколько ссылок, по одной на строке. */
     case UrlList = 'url_list';
 
@@ -19,6 +21,7 @@ enum SettingType: string
         return match ($this) {
             self::Boolean => 'switch',
             self::UrlList => 'textarea',
+            self::Phone => 'text',
             default => $this->value,
         };
     }

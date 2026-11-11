@@ -51,7 +51,7 @@ class AnnouncementApiTest extends TestCase
                     ['type' => 'link', 'text' => 'Анкета', 'url' => 'https://forms.yandex.ru/', 'primary' => false],
                     ['type' => 'link', 'text' => 'Что взять', 'url' => 'https://pg.church/', 'primary' => true],
                 ],
-                'contact' => ['name' => 'Марина', 'phone' => '8 911 000-45-67', 'tel' => 'tel:+79110004567', 'primary' => false],
+                'contact' => ['name' => 'Марина', 'phone' => '+7 (911) 000-45-67', 'tel' => 'tel:+79110004567', 'primary' => false],
             ]]]);
     }
 

@@ -58,14 +58,14 @@ class SiteApiTest extends TestCase
 
     public function test_setting_seeder_keeps_edited_values_on_rerun(): void
     {
-        $this->set('church_phone', '+7 812 000-00-00');
+        $this->set('church_phone', '+7 (812) 000-00-00');
         Setting::query()->where('key', 'church_phone')->update(['label' => 'Старая подпись']);
 
         $this->seed(SettingSeeder::class);
 
         $setting = Setting::query()->where('key', 'church_phone')->firstOrFail();
 
-        $this->assertSame('+7 812 000-00-00', $setting->value);
+        $this->assertSame('+7 (812) 000-00-00', $setting->value);
         $this->assertSame('Телефон', $setting->label);
         $this->assertSame(1, Setting::query()->where('key', 'church_phone')->count());
     }

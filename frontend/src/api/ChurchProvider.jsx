@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { t } from '../i18n.js';
+import { formatPhone } from '../phone.js';
 import { ChurchContext } from './church.js';
 import { useApi } from './useApi.js';
 
@@ -30,6 +31,7 @@ function toChurch(raw) {
     city: t(raw.city),
     address: t(raw.address),
     metro: t(raw.metro),
+    phone: formatPhone(raw.phone),
     duty: {
       ...raw.duty,
       shifts: raw.duty.shifts.map((shift) => ({ ...shift, dow: t(shift.dow), name: t(shift.name) })),

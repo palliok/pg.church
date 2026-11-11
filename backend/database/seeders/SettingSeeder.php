@@ -43,7 +43,7 @@ class SettingSeeder extends Seeder
             ['church_city', 'Контакты', 'Город', SettingType::Text, 'Санкт-Петербург', null],
             ['church_address', 'Контакты', 'Адрес', SettingType::Text, 'Большая Озёрная, 27', null],
             ['church_metro', 'Контакты', 'Метро', SettingType::Text, 'Озерки · 7 минут пешком', null],
-            ['church_phone', 'Контакты', 'Телефон', SettingType::Text, '+7 911 123-43-43', null],
+            ['church_phone', 'Контакты', 'Телефон', SettingType::Phone, '+7 (911) 123-43-43', null],
 
             ['social_telegram', 'Соцсети', 'Telegram', SettingType::Url, null, 'Пустая ссылка скрывает значок на сайте'],
             ['social_youtube', 'Соцсети', 'YouTube', SettingType::Url, null, 'Пустая ссылка скрывает значок на сайте'],
