@@ -111,7 +111,7 @@
 /* Тона карточек событий, как в макете. */
 .tone-purple { --tone-bg: #02407d; --tone-fg: #fff; --chip-bg: #fff; --chip-fg: #231f20; --knob-bg: #fff; --knob-fg: #231f20; }
 .tone-yellow { --tone-bg: #00b7e3; --tone-fg: #231f20; --chip-bg: rgba(35,31,32,.12); --chip-fg: #231f20; --knob-bg: #231f20; --knob-fg: #fff; }
-.tone-peach { --tone-bg: #f9c9a5; --tone-fg: #231f20; --chip-bg: rgba(35,31,32,.12); --chip-fg: #231f20; --knob-bg: #231f20; --knob-fg: #fff; }
+.tone-wine { --tone-bg: var(--c-third); --tone-fg: #fff; --chip-bg: rgba(255,255,255,.16); --chip-fg: #fff; --knob-bg: #fff; --knob-fg: #231f20; }
 .tone-dark { --tone-bg: #231f20; --tone-fg: #fff; --chip-bg: rgba(255,255,255,.16); --chip-fg: #fff; --knob-bg: #00b7e3; --knob-fg: #231f20; }
 
 .sched-dot { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 99px; background: var(--dot); }

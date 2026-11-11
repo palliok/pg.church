@@ -17,12 +17,12 @@ const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 const CATEGORY_STYLE = {
   'Богослужение': { color: '#02407d', tone: 'purple' },
   'Таинство': { color: '#02407d', tone: 'purple' },
-  'Молодёжь': { color: '#f9c9a5', tone: 'peach' },
-  'Дети': { color: '#f9c9a5', tone: 'peach' },
+  'Молодёжь': { color: 'var(--c-third)', tone: 'wine' },
+  'Дети': { color: 'var(--c-third)', tone: 'wine' },
   'Молитва': { color: '#231f20', tone: 'dark' },
   'Общение': { color: '#00b7e3', tone: 'yellow' },
 };
-const LEGEND = [['#02407d', 'Богослужение'], ['#f9c9a5', 'Молодёжь и дети'], ['#231f20', 'Молитва'], ['#00b7e3', 'Общение']];
+const LEGEND = [['#02407d', 'Богослужение'], ['var(--c-third)', 'Молодёжь и дети'], ['#231f20', 'Молитва'], ['#00b7e3', 'Общение']];
 
 const categoryColor = (e) => CATEGORY_STYLE[e.category]?.color ?? '#a3a3a3';
 const eventTone = (e) => (e.main ? 'purple' : CATEGORY_STYLE[e.category]?.tone ?? 'dark');

@@ -20,8 +20,7 @@
   --c-main: #02b7e3;
   --c-main-hover: #00ceff;
   --c-second: #02407d;
-  --c-third: #f9c9a5;
-  --c-third-dark: #ef8f5a;
+  --c-third: #742a2a; /* винный: главное событие в расписании, молодёжь и дети в календаре месяца */
   --c-signal: #ec3a2f;
   --c-stroke: rgba(35, 31, 32, 0.3);
   --c-white-70: rgba(255, 255, 255, 0.7);

@@ -12,6 +12,7 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
-.ev-tag--notice { box-shadow: none; background: var(--c-signal); color: #fff; }
-.ev-tag--live { box-shadow: none; background: var(--c-signal); color: #fff; }
-.ev-tag--live::before { content: ''; width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: #fff; }
+/* На винной карточке главного события красная плашка сливается с фоном: блок меняет её на белую
+   с тёмным текстом переменными --tag-alert-bg и --tag-alert-fg, точка «Эфира» остаётся красной (--tag-alert-dot). */
+.ev-tag--notice, .ev-tag--live { box-shadow: none; background: var(--tag-alert-bg, var(--c-signal)); color: var(--tag-alert-fg, #fff); }
+.ev-tag--live::before { content: ''; width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: var(--tag-alert-dot, currentColor); }

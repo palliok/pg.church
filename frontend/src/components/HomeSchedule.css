@@ -45,11 +45,13 @@
 /* Карусель во всю ширину экрана: отрицательные поля компенсируют отступы .home-mobile (14px). */
 .home-carousel { display: flex; gap: 10px; margin: 0 -14px; padding: 0 14px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-left: 14px; overscroll-behavior-x: contain; }
 
-.home-carousel-card { --tag-h: 28px; --tag-px: 11px; --tag-fs: 11px; flex: 0 0 270px; height: 310px; scroll-snap-align: start; display: flex; flex-direction: column; padding: 18px; border-radius: 30px; background: #fff; box-shadow: inset 0 0 0 1px var(--c-line); color: var(--c-ink); }
-.home-carousel-card.is-today { --tag-line: rgba(255,255,255,.4); background: var(--c-ink); box-shadow: none; color: #fff; }
-.home-carousel-card.is-live { background: var(--c-main); box-shadow: none; }
-/* Последняя карточка «В календарь» — на тёплом сером, как сегодняшний день в ленте. */
-.home-carousel-card.is-more { background: var(--c-warm); box-shadow: none; }
+.home-carousel-card { --tag-h: 28px; --tag-px: 11px; --tag-fs: 11px; flex: 0 0 270px; height: 310px; scroll-snap-align: start; display: flex; flex-direction: column; padding: 18px; border-radius: 30px; background: var(--c-warm); color: var(--c-ink); }
+/* Цвет — по типу события, как у панели на странице события: встреча — тёплый серый, богослужение — тёмный,
+   важное разовое событие — винный. */
+.home-carousel-card.is-service, .home-carousel-card.is-oneoff { --tag-line: rgba(255,255,255,.4); background: var(--c-ink); color: #fff; }
+.home-carousel-card.is-oneoff { --tag-alert-bg: #fff; --tag-alert-fg: var(--c-ink); --tag-alert-dot: var(--c-signal); background: var(--c-third); }
+/* Последняя карточка «В календарь» — белая с обводкой: это переход, а не событие. */
+.home-carousel-card.is-more { background: #fff; box-shadow: inset 0 0 0 1px var(--c-line); }
 
 .home-carousel-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .home-carousel-date { display: flex; flex-direction: column; gap: 4px; }

@@ -5,7 +5,7 @@ import LoadStatus from '../components/LoadStatus.jsx';
 const GRADIENTS = [
   'linear-gradient(150deg, var(--c-second), var(--c-ink))',
   'linear-gradient(150deg, var(--c-main), var(--c-second))',
-  'linear-gradient(150deg, #f9c9a5, #ef8f5a)',
+  'linear-gradient(150deg, var(--c-third), var(--c-ink))',
 ];
 
 const cover = (post, index) => ({

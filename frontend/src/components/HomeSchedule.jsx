@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { getLang, t } from '../i18n.js';
 import { daysFromToday, startsIn } from '../api/dates.js';
+import { eventKind } from '../api/events.js';
 import { EventTag, LiveTag, NoticeTag } from './EventVisuals.jsx';
 import { PlaceIcon } from './Icons.jsx';
 import LongArrow from './LongArrow.jsx';
@@ -81,8 +82,8 @@ function dayWord(event) {
 }
 
 // Расписание на мобильной главной (макет design_handoff_overview, блок 05): карусель событий на неделю вперёд
-// и в конце карточка «В календарь». Сегодняшнее событие — тёмная карточка, с эфиром — голубая,
-// остальные — белые с обводкой.
+// и в конце карточка «В календарь». Цвет карточки — по типу события (eventKind), как панель на странице события:
+// встреча — тёплая серая, богослужение — тёмная, важное разовое событие — винная.
 export function ScheduleCarousel({ events, now }) {
   return (
     <div className="home-carousel hide-scrollbar">
@@ -108,10 +109,9 @@ function moreTitle() {
 function CarouselCard({ event: e, now }) {
   const today = daysFromToday(e) === 0;
   const soon = today ? startsIn(e, { now }) : null;
-  const tone = today ? 'is-today' : e.live ? 'is-live' : '';
 
   return (
-    <Link to={`/schedule/${e.id}`} className={`home-carousel-card ${tone}`}>
+    <Link to={`/schedule/${e.id}`} className={`home-carousel-card is-${eventKind(e)}`}>
       <span className="home-carousel-top">
         <span className="home-carousel-date">
           <span className="home-carousel-num">{e.day}</span>

@@ -2,7 +2,8 @@
 
 .ev-page { color: var(--c-ink); }
 
-/* Цвета панели по типу события: богослужение, разовое событие, регулярная встреча. */
+/* Цвета панели по типу события (eventKind), те же, что у карточек карусели на главной:
+   встреча — тёплый серый, богослужение — тёмный, важное разовое событие — винный. */
 .ev-layout {
   --ev-bg: var(--c-warm);
   --ev-fg: var(--c-ink);
@@ -10,9 +11,11 @@
   --ev-line: var(--c-line);
   --ev-cta-bg: var(--c-main);
   --ev-cta-fg: var(--c-ink);
+  --ev-hover-bg: var(--c-main);
+  --ev-hover-fg: var(--c-ink);
 }
-.ev-layout.is-oneoff { --ev-bg: var(--c-main); --ev-muted: #1f3a42; --ev-line: rgba(35, 31, 32, .2); --ev-cta-bg: var(--c-ink); --ev-cta-fg: #fff; }
-.ev-layout.is-regular { --ev-bg: var(--c-ink); --ev-fg: #fff; --ev-muted: rgba(255, 255, 255, .65); --ev-line: rgba(255, 255, 255, .16); }
+.ev-layout.is-service, .ev-layout.is-oneoff { --ev-bg: var(--c-ink); --ev-fg: #fff; --ev-muted: rgba(255, 255, 255, .65); --ev-line: rgba(255, 255, 255, .16); }
+.ev-layout.is-oneoff { --ev-bg: var(--c-third); --ev-muted: rgba(255, 255, 255, .75); --ev-cta-bg: var(--c-ink); --ev-cta-fg: #fff; }
 
 .ev-back { display: inline-block; padding: 6px 8px; font: 400 12px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-ink); }
 .ev-back:hover { color: var(--c-ink); text-decoration: underline; text-underline-offset: 3px; }
@@ -23,23 +26,32 @@
 .ev-head { display: flex; flex-direction: column; gap: 14px; padding: 20px 18px 0; border-radius: 28px 28px 0 0; background: var(--ev-bg); color: var(--ev-fg); }
 .ev-tags { --tag-h: 26px; --tag-px: 10px; --tag-fs: 11px; --tag-line: var(--ev-muted); display: flex; flex-wrap: wrap; gap: 6px; }
 .ev-tags:empty { display: none; }
+/* На телефоне теги стоят на цветной карточке: на винной красные плашки становятся белыми с тёмным текстом. */
+.ev-layout.is-oneoff .ev-tags { --tag-alert-bg: #fff; --tag-alert-fg: var(--c-ink); --tag-alert-dot: var(--c-signal); }
 .ev-title { margin: 0; font: 700 46px/.9 var(--f-sans); letter-spacing: -.06em; text-wrap: balance; overflow-wrap: anywhere; }
 
 .ev-panel { position: relative; display: flex; flex-direction: column; gap: 22px; margin-top: -12px; padding: 22px 18px 18px; border-radius: 0 0 28px 28px; background: var(--ev-bg); color: var(--ev-fg); }
 
-/* Число слева, справа месяц с днём недели и под ними время. */
-.ev-when { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 14px; row-gap: 6px; align-items: end; }
+/* Число слева, справа столбиком месяц, день недели и время: месяц — вровень с верхом цифр,
+   время — с их низом. */
+.ev-when { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 14px; row-gap: 12px; align-items: end; }
 .ev-date { display: contents; }
 .ev-day { grid-row: 1 / 3; font: 400 80px/.9 var(--f-num); letter-spacing: -.06em; }
-.ev-date-side { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.ev-date-side { align-self: start; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; margin-top: -8px; }
 .ev-mon { font: 400 20px/1 var(--f-mono); letter-spacing: .02em; text-transform: uppercase; }
-.ev-dow { min-width: 0; font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ev-muted); }
+.ev-dow { min-width: 0; font: 400 11px/1 var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ev-muted); }
 .ev-time { padding-bottom: 2px; font: 400 26px/1 var(--f-num); letter-spacing: -.04em; }
 
-.ev-place { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+/* Место — одна ссылка на карту: нажимается весь блок, белая плашка «Маршрут» подсказывает, что будет. */
+.ev-place { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--ev-fg); }
+.ev-place:hover { color: var(--ev-fg); }
 .ev-place-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .ev-place-name { font: 700 18px var(--f-sans); letter-spacing: -.04em; }
 .ev-place-addr { font: 400 14px var(--f-sans); color: var(--ev-muted); }
+
+.ev-route { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px; border-radius: var(--radius-pill); background: #fff; color: var(--c-ink); font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; transition: background .2s, color .2s; }
+.ev-route span { font-size: 13px; }
+.ev-place:hover .ev-route, .ev-place:focus-visible .ev-route { background: var(--ev-hover-bg); color: var(--ev-hover-fg); }
 
 .ev-round {
   flex: 0 0 auto;
@@ -98,6 +110,9 @@
 .ev-btn.is-primary { flex: none; height: 52px; background: var(--ev-cta-bg); color: var(--ev-cta-fg); font-size: 17px; letter-spacing: -.03em; }
 .ev-btn.is-primary:hover { background: var(--ev-cta-bg); color: var(--ev-cta-fg); opacity: .88; }
 .ev-share { width: 46px; height: 46px; }
+/* Главная кнопка без второй: «Поделиться» рядом с ней и той же высоты. */
+.ev-actions-row .ev-btn.is-primary { flex: 1; }
+.ev-actions-row:has(.is-primary) .ev-share { width: 52px; height: 52px; }
 
 /* ===== О событии, проповедь, гимны ===== */
 .ev-body { display: flex; flex-direction: column; gap: 20px; }
@@ -181,14 +196,14 @@
   }
 
   .ev-head { grid-area: head; gap: 22px; padding: 6px 0 0; border-radius: 0; background: none; color: var(--c-ink); }
-  .ev-tags { --tag-h: 34px; --tag-px: 14px; --tag-fs: 13px; --tag-line: var(--c-stroke); gap: 8px; }
+  .ev-tags, .ev-layout.is-oneoff .ev-tags { --tag-h: 34px; --tag-px: 14px; --tag-fs: 13px; --tag-line: var(--c-stroke); --tag-alert-bg: var(--c-signal); --tag-alert-fg: #fff; --tag-alert-dot: #fff; gap: 8px; }
   .ev-title { font-size: clamp(64px, 7.8vw, 112px); line-height: .88; letter-spacing: -.065em; }
 
   .ev-panel { grid-area: panel; gap: 30px; margin-top: 0; padding: 42px 30px 24px; border-radius: 30px; }
   .ev-when { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
   .ev-date { display: flex; align-items: flex-end; gap: 18px; }
   .ev-day { font-size: 160px; letter-spacing: -.065em; }
-  .ev-date-side { flex-direction: column; align-items: flex-start; gap: 8px; padding-bottom: 6px; }
+  .ev-date-side { align-self: auto; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 0; padding-bottom: 6px; }
   .ev-mon { font-size: 30px; }
   .ev-dow { font-size: 12px; }
   .ev-time { margin-top: 30px; padding: 0; font-size: 46px; }
@@ -197,13 +212,15 @@
   .ev-place-text { gap: 5px; }
   .ev-place-name { font-size: 24px; letter-spacing: -.045em; }
   .ev-place-addr { font-size: 16px; }
+  .ev-route { height: 44px; padding: 0 18px; gap: 8px; font-size: 13px; }
+  .ev-route span { font-size: 15px; }
   .ev-round { width: 48px; height: 48px; font-size: 18px; }
 
   .ev-actions { flex-direction: row; }
   .ev-actions-row { display: contents; }
   .ev-btn { height: 58px; font-size: 16px; }
   .ev-btn.is-primary { flex: 1.4; height: 58px; font-size: 18px; }
-  .ev-share { flex: 0 0 58px; width: 58px; height: 58px; }
+  .ev-share, .ev-actions-row:has(.is-primary) .ev-share { flex: 0 0 58px; width: 58px; height: 58px; }
 
   .ev-body { grid-area: body; gap: 44px; margin-top: 44px; }
   .ev-section { gap: 14px; }

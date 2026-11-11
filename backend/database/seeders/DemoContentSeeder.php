@@ -112,7 +112,7 @@ class DemoContentSeeder extends Seeder
             'Вера' => ['#ffffff', '#0d0d0d'],
             'Новичкам' => ['var(--c-main)', '#0d0d0d'],
             'Вопросы' => ['#ffffff', '#0d0d0d'],
-            'Церковь' => ['#f9c9a5', '#0d0d0d'],
+            'Церковь' => ['var(--c-third)', '#ffffff'],
             'Семья' => ['#ffffff', '#0d0d0d'],
             'Отношения' => ['var(--c-second)', '#ffffff'],
         ] as $name => [$color, $textColor]) {

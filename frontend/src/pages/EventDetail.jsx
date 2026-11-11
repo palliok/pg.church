@@ -7,18 +7,12 @@ import { ShareIcon } from '../components/Icons.jsx';
 import LiveModal from '../components/LiveModal.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
 import LongArrow from '../components/LongArrow.jsx';
-import { categoryLabel, useEvent, useEvents } from '../api/events.js';
+import { categoryLabel, eventKind, useEvent, useEvents } from '../api/events.js';
 import { useLive } from '../api/live.js';
 import { useChurch } from '../api/church.js';
+import { monthLabel } from '../api/dates.js';
 import { placeMapUrl } from '../api/maps.js';
 import './EventDetail.css';
-
-// Тип события задаёт цвет панели с датой и кнопки (макет design_handoff_overview, блоки 08–09, вариант 1A):
-// богослужение — тёплый серый, важное разовое событие — голубой, остальные встречи — чёрный.
-function eventKind(event) {
-  if (event.category === 'Богослужение') return 'service';
-  return event.main ? 'oneoff' : 'regular';
-}
 
 // Дата «2026-10-01» со сдвигом на days дней — границы запроса «Рядом по датам».
 function shiftDate({ year, month, day }, days) {
@@ -108,7 +102,7 @@ export default function EventDetail() {
   );
 }
 
-// Панель с датой, временем, местом и кнопками; цвет — по типу события (класс is-… у .ev-layout).
+// Панель с датой, временем, местом и кнопками; цвет — по типу события (eventKind, класс is-… у .ev-layout).
 // На телефоне вместе с заголовком над ней это одна карточка-«билет».
 function InfoPanel({ event: ev }) {
   const live = useLive();
@@ -156,7 +150,19 @@ function InfoPanel({ event: ev }) {
     : mainLink ? mainLinkButton(true) : calendarButton(true);
   const secondaryButton = canWatch
     ? (mainLink ? mainLinkButton(false) : calendarButton(false))
-    : mainLink ? calendarButton(false) : routeUrl && <a href={routeUrl} target="_blank" rel="noreferrer" className="ev-btn">Как добраться</a>;
+    : mainLink && calendarButton(false);
+  // Маршрут открывает весь блок места (плашка «Маршрут» — подсказка), отдельной кнопки в ряду нет.
+  const placeText = (
+    <span className="ev-place-text">
+      {ev.place && <span className="ev-place-name">{ev.place}</span>}
+      {ev.addr && <span className="ev-place-addr">{ev.addr}</span>}
+    </span>
+  );
+  const shareButton = (
+    <button type="button" className="ev-round ev-share" onClick={share} title={t('Поделиться')} aria-label={t('Поделиться')}>
+      <ShareIcon />
+    </button>
+  );
 
   return (
     <div className="ev-panel">
@@ -164,7 +170,8 @@ function InfoPanel({ event: ev }) {
         <div className="ev-date">
           <span className="ev-day">{ev.day}</span>
           <span className="ev-date-side">
-            <span className="ev-mon">{ev.mon}</span>
+            {/* Месяц целиком: «ноября»; сокращение «нояб» остаётся в плашках списков. */}
+            <span className="ev-mon">{monthLabel(ev)}</span>
             <span className="ev-dow">{ev.dowLabel}</span>
           </span>
         </div>
@@ -172,23 +179,27 @@ function InfoPanel({ event: ev }) {
       </div>
 
       {(ev.place || ev.addr) && (
-        <div className="ev-place">
-          <span className="ev-place-text">
-            {ev.place && <span className="ev-place-name">{ev.place}</span>}
-            {ev.addr && <span className="ev-place-addr">{ev.addr}</span>}
-          </span>
-          {routeUrl && <a href={routeUrl} target="_blank" rel="noreferrer" className="ev-round" title={t('Как добраться')} aria-label={t('Как добраться')}>↗</a>}
-        </div>
+        routeUrl
+          ? <a href={routeUrl} target="_blank" rel="noreferrer" className="ev-place">{placeText}<span className="ev-route">Маршрут<span aria-hidden="true">↗</span></span></a>
+          : <div className="ev-place">{placeText}</div>
       )}
 
+      {/* Без второй кнопки «Поделиться» встаёт в ряд с главной, а не одна под ней. */}
       <div className="ev-actions">
-        {primaryButton}
-        <div className="ev-actions-row">
-          {secondaryButton}
-          <button type="button" className="ev-round ev-share" onClick={share} title={t('Поделиться')} aria-label={t('Поделиться')}>
-            <ShareIcon />
-          </button>
-        </div>
+        {secondaryButton ? (
+          <>
+            {primaryButton}
+            <div className="ev-actions-row">
+              {secondaryButton}
+              {shareButton}
+            </div>
+          </>
+        ) : (
+          <div className="ev-actions-row">
+            {primaryButton}
+            {shareButton}
+          </div>
+        )}
       </div>
 
       {calendarOpen && (

@@ -36,7 +36,7 @@ class TagCrudController extends CrudController
     {
         CRUD::field('name')->label('Название')->validationRules('required|string|max:255');
         CRUD::field('color')->label('Цвет фона')->default('#ffffff')
-            ->hint('Цвет в CSS-формате: #f9c9a5 или переменная темы, например var(--c-main)')
+            ->hint('Цвет в CSS-формате: #742a2a или переменная темы, например var(--c-main)')
             ->validationRules('required|string|max:255');
         CRUD::field('text_color')->label('Цвет текста')->default('#0d0d0d')
             ->validationRules('required|string|max:255');

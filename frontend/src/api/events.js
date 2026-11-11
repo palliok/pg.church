@@ -62,6 +62,13 @@ function eventCategory(raw) {
   return CATEGORY_HINTS.find(([, pattern]) => pattern.test(text))?.[0] ?? (raw.main ? 'Богослужение' : null);
 }
 
+// Тип события задаёт цвет его карточки — одинаково в карусели на главной и на странице события:
+// богослужение — тёмная, важное разовое событие (main) — винная, остальные встречи — тёплые серые.
+export function eventKind(event) {
+  if (event.category === 'Богослужение') return 'service';
+  return event.main ? 'oneoff' : 'regular';
+}
+
 // Время события: «11:00 – 13:00», «19:00» без окончания или «Весь день».
 function timeRange(raw) {
   if (raw.allDay) return t('Весь день');

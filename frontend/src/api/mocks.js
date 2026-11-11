@@ -319,6 +319,23 @@ const REGULAR = [
   }],
 ];
 
+// Разовое главное событие на этой неделе: [через сколько дней, часы, минуты, длительность в минутах, событие].
+// Нужно, чтобы в карусели на главной была видна карточка главного события (не богослужения).
+const ONE_OFF = [
+  [2, 18, 0, 120, {
+    title: 'Концерт хора',
+    tag: 'Праздник',
+    category: 'Общение',
+    place: 'Главный зал',
+    desc: [
+      'Вечер музыки и свидетельств: хор и оркестр церкви исполняют гимны и песни прославления.',
+      'Приходите с друзьями и родными — после концерта чай в фойе.',
+    ],
+    notice: 'Вход свободный',
+    main: true,
+  }],
+];
+
 // Расписание от трёх недель назад до шести недель вперёд, чтобы листать месяцы.
 // Проповедь и гимны — у ближайшего воскресного богослужения.
 function buildEvents() {
@@ -343,6 +360,10 @@ function buildEvents() {
         hymnNums: nextSunday ? [60, 88, 214] : [],
       });
     }
+  }
+
+  for (const [days, hours, minutes, duration, props] of ONE_OFF) {
+    list.push({ ...props, startsAt: fromToday(days, hours, minutes), minutes: duration, withSermon: false, hymnNums: [] });
   }
 
   return list
@@ -460,7 +481,7 @@ const TAGS = {
   Вера: { label: 'Вера', color: '#ffffff', text: '#0d0d0d' },
   Новичкам: { label: 'Новичкам', color: 'var(--c-main)', text: '#0d0d0d' },
   Вопросы: { label: 'Вопросы', color: '#ffffff', text: '#0d0d0d' },
-  Церковь: { label: 'Церковь', color: '#f9c9a5', text: '#0d0d0d' },
+  Церковь: { label: 'Церковь', color: 'var(--c-third)', text: '#ffffff' },
   Семья: { label: 'Семья', color: '#ffffff', text: '#0d0d0d' },
   Отношения: { label: 'Отношения', color: 'var(--c-second)', text: '#ffffff' },
 };
