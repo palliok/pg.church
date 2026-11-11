@@ -92,6 +92,7 @@ function toAnnouncement(raw) {
     id: raw.id,
     publishedAt: raw.publishedAt ?? null,
     important: Boolean(raw.important),
+    isMain: Boolean(raw.isMain),
     title: t(raw.title),
     body: raw.body ? t(raw.body) : null,
     eventDate: toEventDate(eventDate),

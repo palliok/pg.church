@@ -38,6 +38,7 @@ class AnnouncementCrudController extends CrudController
         CRUD::column('title')->label('Заголовок');
         CRUD::column('when_summary')->label('Когда');
         CRUD::column('important')->label('Важно')->type('boolean');
+        CRUD::column('is_main')->label('На главной')->type('boolean');
         CRUD::column('is_published')->label('Опубликовано')->type('boolean');
         CRUD::column('published_at')->label('Дата публикации')->type('datetime');
         CRUD::column('visible_until')->label('Показывать до')->type('date');
@@ -112,6 +113,8 @@ class AnnouncementCrudController extends CrudController
             ->hint('Включительно. Пусто — снимется само после своей даты, а регулярное и без даты — когда снимете с публикации')
             ->validationRules('nullable|date');
         CRUD::field('is_published')->label('Опубликовано')->type('switch')->default(true)->tab('Публикация');
+        CRUD::field('is_main')->label('На главной')->type('switch')->tab('Публикация')
+            ->hint('Это объявление покажется на главной вместо последнего. Можно выбрать только одно: выбор у другого объявления снимется. Пока выбранное снято с публикации или истекло, на главной — последнее');
 
         CRUD::setValidation([
             'links_text' => ['nullable', 'string', 'max:2000', new LinkPerLine],

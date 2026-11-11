@@ -387,7 +387,7 @@ function nextEvent(title) {
   return found ? eventSummary(found) : null;
 }
 
-function announcement(id, daysAgo, title, body, { important = false, eventIn = null, eventDays = 1, deadlineIn = null, weekly = null, event = null, when = null, where = null, links = [], contact = null } = {}) {
+function announcement(id, daysAgo, title, body, { important = false, isMain = false, eventIn = null, eventDays = 1, deadlineIn = null, weekly = null, event = null, when = null, where = null, links = [], contact = null } = {}) {
   const tel = contact ? `tel:+${contact.phone.replace(/\D/g, '')}` : null;
 
   return {
@@ -395,6 +395,7 @@ function announcement(id, daysAgo, title, body, { important = false, eventIn = n
     title,
     body,
     important,
+    isMain,
     publishedAt: iso(fromToday(-daysAgo)),
     eventDate: eventIn === null ? null : isoDay(fromToday(eventIn)),
     eventDateEnd: eventIn === null || eventDays < 2 ? null : isoDay(fromToday(eventIn + eventDays - 1)),
@@ -417,6 +418,7 @@ const announcements = [
   }),
   announcement(2, 2, 'Запись в детский лагерь', 'Открыта запись на летнюю смену для детей 7–12 лет. Мест: 30.', {
     important: true,
+    isMain: true,
     eventIn: 20,
     eventDays: 7,
     where: 'База «Сосновый бор», Ленобласть',

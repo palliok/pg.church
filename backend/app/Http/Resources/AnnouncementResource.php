@@ -28,6 +28,7 @@ class AnnouncementResource extends JsonResource
             'title' => $this->title,
             'body' => $this->body,
             'important' => $this->important,
+            'isMain' => $this->is_main,
             'publishedAt' => $this->published_at->toIso8601String(),
             'eventDate' => $this->event_date?->toDateString(),
             'eventDateEnd' => $this->event_date_end?->toDateString(),

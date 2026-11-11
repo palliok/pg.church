@@ -39,6 +39,7 @@ class AnnouncementApiTest extends TestCase
                 'title' => 'Запись в детский лагерь',
                 'body' => 'Мест: 30.',
                 'important' => true,
+                'isMain' => false,
                 'publishedAt' => '2026-11-01T10:00:00+03:00',
                 'eventDate' => '2026-11-15',
                 'eventDateEnd' => '2026-11-21',
@@ -194,6 +195,31 @@ class AnnouncementApiTest extends TestCase
             ['text' => 'Анкета', 'url' => 'https://forms.yandex.ru/'],
         ], $announcement->links);
         $this->assertSame('link:1', $announcement->main_choice);
+    }
+
+    public function test_only_one_announcement_is_main(): void
+    {
+        $this->actingAs(User::factory()->create(), backpack_guard_name());
+
+        $first = Announcement::query()->create(['title' => 'Лагерь', 'is_main' => true, 'published_at' => '2026-11-01 10:00']);
+        $second = Announcement::query()->create(['title' => 'Пикник', 'published_at' => '2026-11-02 10:00']);
+
+        $this->put("/admin/announcement/{$second->id}", [
+            'id' => $second->id,
+            'title' => 'Пикник',
+            'when_type' => 'none',
+            'main_choice' => 'none',
+            'published_at' => '2026-11-02 10:00',
+            'is_published' => '1',
+            'is_main' => '1',
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $this->assertFalse($first->fresh()->is_main);
+        $this->assertTrue($second->fresh()->is_main);
+
+        $this->getJson('/api/v1/announcements')
+            ->assertJsonPath('data.*.title', ['Пикник', 'Лагерь'])
+            ->assertJsonPath('data.*.isMain', [true, false]);
     }
 
     public function test_admin_requires_what_main_action_points_to(): void

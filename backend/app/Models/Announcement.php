@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'title', 'body', 'important', 'when_type', 'event_date', 'event_date_end', 'deadline', 'weekday', 'weekly_time',
+    'title', 'body', 'important', 'is_main', 'when_type', 'event_date', 'event_date_end', 'deadline', 'weekday', 'weekly_time',
     'when_note', 'event_id', 'place', 'links', 'links_text', 'main_action', 'main_link', 'main_choice', 'contact_name', 'contact_phone',
     'published_at', 'visible_until', 'is_published',
 ])]
@@ -31,6 +31,7 @@ class Announcement extends Model
     {
         return [
             'important' => 'boolean',
+            'is_main' => 'boolean',
             'when_type' => AnnouncementWhen::class,
             'event_date' => 'date',
             'event_date_end' => 'date',
@@ -50,6 +51,13 @@ class Announcement extends Model
      */
     protected static function booted(): void
     {
+        // На главной — только одно объявление: выбрали это — с прежнего выбор снимается.
+        static::saved(function (Announcement $announcement) {
+            if ($announcement->is_main && ($announcement->wasRecentlyCreated || $announcement->wasChanged('is_main'))) {
+                static::query()->whereKeyNot($announcement->getKey())->where('is_main', true)->update(['is_main' => false]);
+            }
+        });
+
         static::saving(function (Announcement $announcement) {
             $type = $announcement->when_type ?? AnnouncementWhen::None;
             $announcement->published_at ??= now();
