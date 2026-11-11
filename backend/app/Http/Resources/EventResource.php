@@ -29,9 +29,17 @@ class EventResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'tag' => $this->tag,
+            // Красная плашка: «Нужна регистрация», «Осталось 20 мест».
+            'notice' => $this->notice,
             'main' => $this->is_main,
             'live' => $this->has_stream,
             'streamUrl' => $this->stream_url,
+            // Ссылки события, например регистрация: [{text, url, primary}]. Основная — крупной кнопкой.
+            'links' => array_map(fn (array $link, int $index) => [
+                'text' => $link['text'],
+                'url' => $link['url'],
+                'primary' => $index === $this->main_link,
+            ], $this->links ?? [], array_keys($this->links ?? [])),
             'startsAt' => $this->starts_at->toIso8601String(),
             'endsAt' => $this->ends_at?->toIso8601String(),
             'allDay' => $this->all_day,

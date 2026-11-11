@@ -58,6 +58,23 @@
 }
 .ev-round:hover { background: var(--c-main); color: var(--c-ink); }
 
+.ev-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.ev-out {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 1px var(--c-ink);
+  color: var(--c-ink);
+  font: 400 11px var(--f-mono);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  transition: background .2s, color .2s, box-shadow .2s;
+}
+.ev-out span { font-size: 13px; }
+.ev-out:hover { background: var(--c-ink); color: #fff; box-shadow: none; }
 .ev-actions { display: flex; flex-direction: column; gap: 8px; }
 .ev-actions-row { display: flex; gap: 8px; }
 .ev-btn {
@@ -86,7 +103,7 @@
 .ev-body { display: flex; flex-direction: column; gap: 20px; }
 .ev-section { display: flex; flex-direction: column; gap: 10px; }
 .ev-label { font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-gray-text); }
-.ev-section > .ev-label, .ev-section > .ev-lead, .ev-section > .ev-text, .ev-section > .ev-more { margin-inline: 8px; }
+.ev-section > .ev-label, .ev-section > .ev-lead, .ev-section > .ev-text, .ev-section > .ev-more, .ev-section > .ev-links { margin-inline: 8px; }
 .ev-section:first-child { padding-top: 14px; }
 .ev-lead { margin: 0; font: 400 18px/1.4 var(--f-sans); letter-spacing: -.02em; text-wrap: pretty; }
 .ev-text { margin: 0; font: 400 16px/1.5 var(--f-sans); color: var(--c-body); text-wrap: pretty; }
@@ -190,7 +207,7 @@
 
   .ev-body { grid-area: body; gap: 44px; margin-top: 44px; }
   .ev-section { gap: 14px; }
-  .ev-section > .ev-label, .ev-section > .ev-lead, .ev-section > .ev-text, .ev-section > .ev-more { margin-inline: 0; }
+  .ev-section > .ev-label, .ev-section > .ev-lead, .ev-section > .ev-text, .ev-section > .ev-more, .ev-section > .ev-links { margin-inline: 0; }
   .ev-section:first-child { padding-top: 0; }
   .ev-label { font-size: 12px; }
   .ev-lead { max-width: 760px; font-size: 24px; line-height: 1.35; letter-spacing: -.03em; }

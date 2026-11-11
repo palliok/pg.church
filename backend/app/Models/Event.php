@@ -15,8 +15,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 #[Fillable([
-    'title', 'tag', 'starts_at', 'ends_at', 'all_day', 'place', 'address', 'description',
-    'is_main', 'has_stream', 'stream_url', 'is_published', 'calendar_source_id', 'external_uid',
+    'title', 'tag', 'notice', 'starts_at', 'ends_at', 'all_day', 'place', 'address', 'description',
+    'is_main', 'has_stream', 'stream_url', 'links', 'links_text', 'main_link', 'main_choice', 'is_published', 'calendar_source_id', 'external_uid',
 ])]
 class Event extends Model
 {
@@ -36,15 +36,24 @@ class Event extends Model
             'is_main' => 'boolean',
             'has_stream' => 'boolean',
             'is_published' => 'boolean',
+            'links' => 'array',
+            'main_link' => 'integer',
         ];
     }
 
     /**
+     * Основной ссылкой может быть только одна из существующих, иначе её нет.
      * Удалённое событие (например, пропавшее из календаря при синхронизации) обнуляет связь у объявлений.
      * Объявлениям без своей даты срок показа ставится по дню события, иначе они висели бы бессрочно.
      */
     protected static function booted(): void
     {
+        static::saving(function (Event $event) {
+            if (! isset(($event->links ?? [])[$event->main_link ?? -1])) {
+                $event->main_link = null;
+            }
+        });
+
         static::deleting(function (Event $event) {
             $event->announcements()
                 ->where('when_type', AnnouncementWhen::None)
@@ -108,6 +117,29 @@ class Event extends Model
     public function scopePublished(Builder $query): void
     {
         $query->where('is_published', true);
+    }
+
+    /**
+     * Ссылки в админке — по одной на строку: «Текст | https://…». В базе — [{text, url}].
+     */
+    protected function linksText(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => collect($this->links ?? [])->map(fn (array $link) => $link['text'].' | '.$link['url'])->implode("\n"),
+            set: fn (?string $value) => ['links' => json_encode(Announcement::parseLinks($value ?? ''), JSON_UNESCAPED_UNICODE)],
+        );
+    }
+
+    /**
+     * Основная ссылка одним значением для поля в админке: «none» или «link:N», N — номер ссылки с нуля.
+     * Формат тот же, что у основного действия объявлений, чтобы работало правило ExistingLink.
+     */
+    protected function mainChoice(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->main_link === null ? 'none' : 'link:'.$this->main_link,
+            set: fn (?string $value) => ['main_link' => preg_match('/^link:(\d+)$/', (string) $value, $match) ? (int) $match[1] : null],
+        );
     }
 
     /**

@@ -6,7 +6,7 @@ import { useChurch } from '../api/church.js';
 import { churchToday, dayLabel, daysFromToday } from '../api/dates.js';
 import { EVENT_CATEGORIES, categoryLabel, useEvents } from '../api/events.js';
 import CalendarOptions from '../components/CalendarOptions.jsx';
-import { EventTag, LiveTag } from '../components/EventVisuals.jsx';
+import { EventTag, LiveTag, NoticeTag } from '../components/EventVisuals.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
 import './Schedule.css';
 
@@ -332,7 +332,7 @@ function ListView({ byDay, ym, todayNum, hiddenDayCount, showPast, hasFilters, o
   );
 }
 
-// Событие ленты: название, время, первый абзац описания и теги — эфир, направление, место.
+// Событие ленты: название, время, первый абзац описания и теги — плашка, эфир, направление, место.
 // На телефоне теги — под описанием, на десктопе — справа.
 function FeedEvent({ event: e }) {
   return (
@@ -343,6 +343,7 @@ function FeedEvent({ event: e }) {
         {e.desc[0] && <span className="sched-feed-desc">{e.desc[0]}</span>}
       </span>
       <span className="sched-feed-tags">
+        {e.notice && <NoticeTag>{e.notice}</NoticeTag>}
         {e.live && <LiveTag />}
         {e.category && <EventTag>{categoryLabel(e.category)}</EventTag>}
         {e.place && <EventTag>{e.place}</EventTag>}

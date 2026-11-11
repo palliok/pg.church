@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { t } from '../i18n.js';
 import CalendarOptions from '../components/CalendarOptions.jsx';
-import { EventTag, LiveTag } from '../components/EventVisuals.jsx';
+import { EventTag, LiveTag, NoticeTag } from '../components/EventVisuals.jsx';
 import { ShareIcon } from '../components/Icons.jsx';
 import LiveModal from '../components/LiveModal.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
@@ -77,6 +77,9 @@ export default function EventDetail() {
     );
   }
 
+  // Основная ссылка — кнопкой в панели, остальные — плашками под описанием.
+  const otherLinks = ev.links.filter((link) => !link.primary);
+
   return (
     <div className="page-enter container ev-page">
       <Link to="/schedule" className="ev-back">← Расписание</Link>
@@ -84,6 +87,7 @@ export default function EventDetail() {
       <div className={`ev-layout is-${eventKind(ev)}`}>
         <div className="ev-head">
           <div className="ev-tags">
+            {ev.notice && <NoticeTag>{ev.notice}</NoticeTag>}
             {ev.live && <LiveTag />}
             {ev.category && <EventTag>{categoryLabel(ev.category)}</EventTag>}
           </div>
@@ -93,7 +97,7 @@ export default function EventDetail() {
         <InfoPanel event={ev} />
 
         <div className="ev-body">
-          {ev.desc.length > 0 && <About paragraphs={ev.desc} />}
+          {(ev.desc.length > 0 || otherLinks.length > 0) && <About paragraphs={ev.desc} links={otherLinks} />}
           {ev.sermon && <Sermon eventId={ev.id} sermon={ev.sermon} />}
           {ev.hymns?.length > 0 && <Hymns hymns={ev.hymns} />}
         </div>
@@ -139,6 +143,21 @@ function InfoPanel({ event: ev }) {
     </button>
   );
 
+  // Основная ссылка (например, регистрация) — крупной кнопкой вместо «В календарь»; во время эфира
+  // главная кнопка — «Смотреть», а основная ссылка встаёт рядом вместо «В календарь».
+  const mainLink = ev.links.find((link) => link.primary);
+  const mainLinkButton = (primary) => (
+    <a href={mainLink.url} target="_blank" rel="noopener noreferrer" className={primary ? 'ev-btn is-primary' : 'ev-btn'}>{mainLink.text}</a>
+  );
+  const primaryButton = canWatch
+    ? (ev.streamUrl
+      ? <a href={ev.streamUrl} target="_blank" rel="noreferrer" className="ev-btn is-primary">Смотреть</a>
+      : <button type="button" className="ev-btn is-primary" onClick={() => setLiveOpen(true)} aria-haspopup="dialog">Смотреть</button>)
+    : mainLink ? mainLinkButton(true) : calendarButton(true);
+  const secondaryButton = canWatch
+    ? (mainLink ? mainLinkButton(false) : calendarButton(false))
+    : mainLink ? calendarButton(false) : routeUrl && <a href={routeUrl} target="_blank" rel="noreferrer" className="ev-btn">Как добраться</a>;
+
   return (
     <div className="ev-panel">
       <div className="ev-when">
@@ -163,15 +182,9 @@ function InfoPanel({ event: ev }) {
       )}
 
       <div className="ev-actions">
-        {canWatch ? (
-          ev.streamUrl
-            ? <a href={ev.streamUrl} target="_blank" rel="noreferrer" className="ev-btn is-primary">Смотреть</a>
-            : <button type="button" className="ev-btn is-primary" onClick={() => setLiveOpen(true)} aria-haspopup="dialog">Смотреть</button>
-        ) : calendarButton(true)}
+        {primaryButton}
         <div className="ev-actions-row">
-          {canWatch
-            ? calendarButton(false)
-            : routeUrl && <a href={routeUrl} target="_blank" rel="noreferrer" className="ev-btn">Как добраться</a>}
+          {secondaryButton}
           <button type="button" className="ev-round ev-share" onClick={share} title={t('Поделиться')} aria-label={t('Поделиться')}>
             <ShareIcon />
           </button>
@@ -194,21 +207,31 @@ function InfoPanel({ event: ev }) {
   );
 }
 
-// «О событии»: первый абзац крупно, остальные раскрываются кнопкой «Читать полностью».
-function About({ paragraphs }) {
+// «О событии»: первый абзац крупно, остальные раскрываются кнопкой «Читать полностью»; ниже — ссылки события.
+function About({ paragraphs, links = [] }) {
   const [open, setOpen] = useState(false);
   const [lead, ...rest] = paragraphs;
 
   return (
     <section className="ev-section">
       <span className="ev-label">О событии</span>
-      <p className="ev-lead">{lead}</p>
+      {lead && <p className="ev-lead">{lead}</p>}
       {open && rest.map((text, i) => <p key={i} className="ev-text">{text}</p>)}
       {rest.length > 0 && (
         <button type="button" className="ev-more" onClick={() => setOpen((value) => !value)} aria-expanded={open}>
           {/* Через t(): React меняет текст в том же узле, а translatePage() такие правки не видит. */}
           {open ? t('Свернуть ↑') : t('Читать полностью ↓')}
         </button>
+      )}
+      {links.length > 0 && (
+        <div className="ev-links">
+          {links.map((link) => (
+            <a key={link.url + link.text} href={link.url} target="_blank" rel="noopener noreferrer" className="ev-out">
+              {link.text}
+              <span aria-hidden="true">↗</span>
+            </a>
+          ))}
+        </div>
       )}
     </section>
   );

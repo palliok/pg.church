@@ -192,7 +192,7 @@ const sermon = {
 
 // category — направление (тег в ленте и фильтр расписания); бэкенд его пока не отдаёт
 // (описано в README фронтенда, раздел «Моки»).
-function event(id, { title, tag, category, startsAt, minutes, place, desc, main = false, live: hasStream = false, withSermon = false, hymnNums = [] }) {
+function event(id, { title, tag, category, startsAt, minutes, place, desc, notice = null, links = [], main = false, live: hasStream = false, withSermon = false, hymnNums = [] }) {
   const weekday = WEEKDAYS[startsAt.getDay()];
   const time = `${pad(startsAt.getHours())}:${pad(startsAt.getMinutes())}`;
   // Гимны — песни с буквой выбранного варианта, если он не основной: у песни 60 — «б».
@@ -202,9 +202,11 @@ function event(id, { title, tag, category, startsAt, minutes, place, desc, main 
     id,
     title,
     tag,
+    notice,
     category,
     main,
     live: hasStream,
+    links,
     streamUrl: null,
     startsAt: iso(startsAt),
     endsAt: minutes ? iso(new Date(startsAt.getTime() + minutes * 60_000)) : null,
@@ -254,6 +256,7 @@ const REGULAR = [
     category: 'Общение',
     place: 'Кафе церкви',
     desc: ['После богослужения остаёмся на простой обед — познакомиться и поговорить без спешки.'],
+    notice: 'Запись закрыта',
   }],
   [1, 19, 0, null, 'week', {
     title: 'Хор',
@@ -297,6 +300,11 @@ const REGULAR = [
     category: 'Дети',
     place: 'Детская комната',
     desc: ['Истории из Библии, поделки и игры для детей от 5 до 11 лет.'],
+    notice: 'Осталось 20 мест',
+    links: [
+      { text: 'Регистрация', url: 'https://forms.example.com/kids-club', primary: true },
+      { text: 'Программа занятий', url: 'https://example.com/kids-club', primary: false },
+    ],
     main: true,
   }],
   [6, 12, 0, null, 'month', {
@@ -305,6 +313,8 @@ const REGULAR = [
     category: 'Таинство',
     place: 'Главный зал',
     desc: ['Водное крещение по вере. Если хотите креститься, напишите пастору — перед крещением проходят несколько встреч.'],
+    notice: 'Нужна регистрация',
+    links: [{ text: 'Записаться', url: 'https://forms.example.com/baptism', primary: true }],
     main: true,
   }],
 ];

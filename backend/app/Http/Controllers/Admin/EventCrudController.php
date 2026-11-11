@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\Concerns\ValidatesFromFields;
 use App\Models\CalendarSource;
 use App\Models\Event;
 use App\Models\SongVariant;
+use App\Rules\ExistingLink;
+use App\Rules\LinkPerLine;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
@@ -89,6 +91,9 @@ class EventCrudController extends CrudController
             ->hint('Время начала и окончания не учитывается, только даты');
         CRUD::field('tag')->label('Метка')->hint('Например: «Воскресенье», «Будни», «Молодёжь»')
             ->validationRules('nullable|string|max:255');
+        CRUD::field('notice')->label('Плашка')
+            ->hint('Красная пометка на карточке события, коротко: «Нужна регистрация», «Запись закрыта», «Осталось 20 мест». Пусто — без плашки')
+            ->validationRules('nullable|string|max:40');
         CRUD::field('place')->label('Место')->hint('Например: «Главный зал»')
             ->validationRules('nullable|string|max:255');
         CRUD::field('address')->label('Адрес')
@@ -103,11 +108,27 @@ class EventCrudController extends CrudController
             ->options(fn ($query) => $query->with(['song' => fn ($query) => $query->withCount('variants')])->orderBySong()->get())
             ->hint('У песни с несколькими вариантами текста выберите нужный: 214а, 214б')
             ->validationRules('nullable|array');
+        CRUD::field('links_text')->label('Ссылки')->type('textarea')->attributes(['rows' => 3])
+            ->hint('По одной на строку: «Текст кнопки | ссылка», например «Регистрация | https://…». Не больше пяти');
+        // Подписи вариантов по тексту ссылок ставит скрипт формы (admin.event-form) прямо при вводе.
+        CRUD::field('main_choice')->label('Основная ссылка')->type('select_from_array')
+            ->options([
+                'none' => 'Нет',
+                ...collect(range(0, LinkPerLine::MAX - 1))->mapWithKeys(fn (int $index) => ['link:'.$index => 'Ссылка '.($index + 1)])->all(),
+            ])->allows_null(false)
+            ->default('none')
+            ->hint('Крупная кнопка в карточке события, например «Регистрация». Остальные ссылки — плашками в описании');
+        CRUD::field('form_script')->type('view')->view('admin.event-form');
         CRUD::field('is_main')->label('Главное событие')->type('switch');
         CRUD::field('has_stream')->label('Есть трансляция')->type('switch');
         CRUD::field('stream_url')->label('Ссылка на трансляцию')->type('url')
             ->validationRules('nullable|url|max:255');
         CRUD::field('is_published')->label('Опубликовано')->type('switch')->default(true);
+
+        CRUD::setValidation([
+            'links_text' => ['nullable', 'string', 'max:2000', new LinkPerLine],
+            'main_choice' => ['nullable', 'regex:/^(none|link:\d)$/', new ExistingLink(request()->input('links_text'))],
+        ]);
 
         $this->useFieldLabelsInValidationErrors();
     }

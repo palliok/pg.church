@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { getLang, t } from '../i18n.js';
 import { daysFromToday, startsIn } from '../api/dates.js';
-import { EventTag, LiveTag } from './EventVisuals.jsx';
+import { EventTag, LiveTag, NoticeTag } from './EventVisuals.jsx';
 import { PlaceIcon } from './Icons.jsx';
 import LongArrow from './LongArrow.jsx';
 import './HomeSchedule.css';
@@ -118,6 +118,7 @@ function CarouselCard({ event: e, now }) {
           <span className="home-carousel-label">{[e.dowShort, dayWord(e)].filter(Boolean).join(' · ')}</span>
         </span>
         <span className="home-carousel-badges">
+          {e.notice && <NoticeTag>{e.notice}</NoticeTag>}
           {e.live && <LiveTag />}
           {soon && <span className="home-carousel-soon">{soon}</span>}
         </span>

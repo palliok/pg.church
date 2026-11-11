@@ -6,6 +6,11 @@ export function EventTag({ children }) {
   return <span className="ev-tag">{children}</span>;
 }
 
+// Плашка события из админки — красная: «Нужна регистрация», «Осталось 20 мест».
+export function NoticeTag({ children }) {
+  return <span className="ev-tag ev-tag--notice">{children}</span>;
+}
+
 // Тег «Эфир» — у события есть трансляция.
 export function LiveTag() {
   return <span className="ev-tag ev-tag--live">Эфир</span>;

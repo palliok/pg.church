@@ -1,4 +1,4 @@
-/* Теги макета 2b: контурная пилюля капсом, «Эфир» — красная с белой точкой. */
+/* Теги макета 2b: контурная пилюля капсом, «Эфир» — красная с белой точкой, плашка из админки — красная. */
 .ev-tag {
   display: inline-flex;
   align-items: center;
@@ -12,5 +12,6 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
+.ev-tag--notice { box-shadow: none; background: var(--c-signal); color: #fff; }
 .ev-tag--live { box-shadow: none; background: var(--c-signal); color: #fff; }
 .ev-tag--live::before { content: ''; width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: #fff; }

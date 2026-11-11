@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { getLang, t } from '../i18n.js';
-import { dayLabel, formatDate, isoTime } from './dates.js';
+import { dayLabel, formatDate, isoDate, isoTime, shortDate } from './dates.js';
 import { useApi } from './useApi.js';
 
 function toSermon(sermon) {
@@ -19,19 +19,18 @@ function toSermon(sermon) {
   };
 }
 
-// Месяц и день недели на языке сайта. Русские отдаёт API, английские строит Intl,
-// а для киргизского в Chrome нет данных Intl — берём переводы из словаря.
+// Месяц и день недели на языке сайта. Месяц — тем же сокращением, что и в объявлениях (shortDate);
+// английский день недели строит Intl, а для киргизского в Chrome нет данных Intl — берём из словаря.
 function dateLabels(raw) {
+  const { mon } = shortDate(isoDate(raw.startsAt));
+
   switch (getLang()) {
     case 'en':
-      return {
-        mon: formatDate(raw, 'en', { month: 'short' }).toUpperCase(),
-        dowLabel: formatDate(raw, 'en', { weekday: 'long' }),
-      };
+      return { mon, dowLabel: formatDate(isoDate(raw.startsAt), 'en', { weekday: 'long' }) };
     case 'ky':
-      return { mon: raw.mon, dowLabel: t(raw.dowLabel) };
+      return { mon, dowLabel: t(raw.dowLabel) };
     default:
-      return { mon: raw.mon, dowLabel: raw.dowLabel };
+      return { mon, dowLabel: raw.dowLabel };
   }
 }
 
@@ -91,6 +90,7 @@ export function toEvent(raw) {
     dateLabel: dayLabel(raw),
     title: t(raw.title),
     tag: t(raw.tag),
+    notice: t(raw.notice),
     place,
     addr: t(raw.addr),
     desc: raw.desc.map(t),

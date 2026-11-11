@@ -23,6 +23,34 @@ class EventApiTest extends TestCase
         Carbon::setTestNow('2026-10-14 15:00:00');
     }
 
+    public function test_links_are_saved_from_text_and_returned_with_main_link(): void
+    {
+        $event = Event::query()->create([
+            'title' => 'Ретрит',
+            'starts_at' => '2026-10-18 11:00',
+            'links_text' => "Регистрация | https://example.com/reg\n\nПрограмма | https://example.com/plan",
+            'main_choice' => 'link:0',
+            'notice' => 'Осталось 20 мест',
+        ]);
+        Event::query()->create(['title' => 'Без ссылок', 'starts_at' => '2026-10-19 11:00']);
+
+        $this->getJson('/api/v1/events')
+            ->assertOk()
+            ->assertJsonPath('data.0.links', [
+                ['text' => 'Регистрация', 'url' => 'https://example.com/reg', 'primary' => true],
+                ['text' => 'Программа', 'url' => 'https://example.com/plan', 'primary' => false],
+            ])
+            ->assertJsonPath('data.0.notice', 'Осталось 20 мест')
+            ->assertJsonPath('data.1.links', [])
+            ->assertJsonPath('data.1.notice', null);
+
+        $this->assertSame("Регистрация | https://example.com/reg\nПрограмма | https://example.com/plan", $event->fresh()->links_text);
+
+        // Ссылки стёрли — основной ссылки больше нет.
+        $event->update(['links_text' => '']);
+        $this->assertNull($event->fresh()->main_link);
+    }
+
     public function test_index_lists_upcoming_published_events_in_chronological_order(): void
     {
         Event::query()->create(['title' => 'Прошедшее', 'starts_at' => '2026-10-13 19:00']);
