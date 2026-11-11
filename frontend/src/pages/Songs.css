@@ -56,4 +56,6 @@
   .sb-preview { position: sticky; top: 6px; }
   .sb-preview .song-card { display: flex; flex-direction: column; max-height: calc(100vh - 12px); box-shadow: 0 0 0 1px rgba(35, 31, 32, .08); }
   .sb-preview .song-card-text { min-height: 0; overflow-y: auto; }
+  /* Сжимается и прокручивается только текст, иначе длинный текст (с аккордами) сплющивает плашки вариантов. */
+  .sb-preview .song-card > :not(.song-card-text) { flex: none; }
 }

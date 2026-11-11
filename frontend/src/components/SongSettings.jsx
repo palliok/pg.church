@@ -18,8 +18,8 @@ function Toggle({ label, on, onChange }) {
 }
 
 // Шторка настроек песни (resources/design_handoff_songbook_mobile, экран 04): тема карточки, аккорды,
-// тональность и «Не гасить экран». В body — поверх нижнего меню; тап по затемнению или Esc закрывает.
-export default function SongSettings({ dark, onDark, hasChords, chords, onChords, songKey, steps, onSteps, wake, onClose }) {
+// тональность. В body — поверх нижнего меню; тап по затемнению или Esc закрывает.
+export default function SongSettings({ dark, onDark, hasChords, chords, onChords, songKey, steps, onSteps, onClose }) {
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose();
     document.addEventListener('keydown', onKey);
@@ -72,7 +72,6 @@ export default function SongSettings({ dark, onDark, hasChords, chords, onChords
           </>
         )}
 
-        {wake.supported && <Toggle label={t('Не гасить экран')} on={wake.on} onChange={wake.setOn} />}
 
         <button type="button" className="ss-done" onClick={onClose}>Готово</button>
       </div>

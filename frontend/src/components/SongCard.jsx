@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useHref } from 'react-router-dom';
 import { songKey, transposeSections } from '../chords.js';
-import useWakeLock from '../hooks/useWakeLock.js';
 import { t } from '../i18n.js';
 import { SettingsIcon, ShareIcon, TextDecreaseIcon, TextIncreaseIcon } from './Icons.jsx';
 import SongSettings from './SongSettings.jsx';
@@ -97,7 +96,6 @@ export default function SongCard({ song, nav, variant, onVariant }) {
   const [chords, setChords] = useState(() => readFlag(CHORDS_KEY, '1'));
   const [dark, setDark] = useState(() => readFlag(THEME_KEY, 'dark', true));
   const [sheetOpen, setSheetOpen] = useState(false);
-  const wake = useWakeLock();
   const { share, toast } = useShareSong();
   const variants = song.variants;
   const current = variants.find((item) => item.letter === variant) ?? variants[0] ?? NO_TEXT;
@@ -199,7 +197,6 @@ export default function SongCard({ song, nav, variant, onVariant }) {
           songKey={key}
           steps={steps}
           onSteps={(next) => setTranspose({ id: transposeId, steps: next })}
-          wake={wake}
           onClose={closeSheet}
         />
       )}
