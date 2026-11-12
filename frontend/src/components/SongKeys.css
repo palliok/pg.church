@@ -1,0 +1,42 @@
+/* Тональность и каподастр в заголовке карточки песни: две плашки с выпадающими меню.
+   Цвета плашек — из переменных карточки (SongCard.css), меню всегда светлое. */
+.song-keys { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 12px 22px 0; }
+.song-keys-item { position: relative; }
+
+.song-keys-pill { display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 10px 0 4px; border: none; border-radius: 99px; background: var(--sc-chip); color: var(--sc-fg); cursor: pointer; transition: background .2s, color .2s; }
+.song-keys-pill[aria-expanded='true'] { background: var(--sc-fg); color: var(--sc-bg); }
+.song-keys-capo { padding-left: 14px; }
+.song-keys-key { display: flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; padding: 0 6px; box-sizing: border-box; border-radius: 99px; background: #fff; color: var(--c-ink); box-shadow: inset 0 0 0 1px rgba(35, 31, 32, .1); font: 700 15px/1 var(--f-sans); letter-spacing: -.03em; transition: background .2s; }
+.song-keys-key.is-changed { background: var(--c-main); box-shadow: none; }
+.song-keys-label { font: 500 11px/1 var(--f-mono); letter-spacing: .04em; text-transform: uppercase; opacity: .6; }
+.song-keys-fret { font: 700 16px/1 var(--f-sans); letter-spacing: -.03em; }
+.song-keys-fret span { font: 500 9px/1 var(--f-mono); letter-spacing: .02em; text-transform: uppercase; }
+.song-keys-note { font: 700 13px/1 var(--f-sans); letter-spacing: -.02em; color: var(--sc-chord); }
+.song-keys-pill[aria-expanded='true'] .song-keys-note { color: var(--c-main); }
+.song-card.is-dark .song-keys-pill[aria-expanded='true'] .song-keys-note { color: #02809f; }
+.song-keys-chevron { opacity: .6; transition: transform .2s; }
+.song-keys-pill[aria-expanded='true'] .song-keys-chevron { transform: rotate(180deg); }
+
+.song-keys-chip { display: flex; align-items: center; height: 40px; padding: 0 12px; border-radius: 99px; box-shadow: inset 0 0 0 1px var(--sc-hair); font: 11px/1 var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--sc-label); }
+
+/* Меню — вертикальный список под плашкой, поверх текста; всегда светлое. Высоту по месту на экране задаёт fitMenu, лишнее прокручивается. */
+.song-keys-menu { position: absolute; z-index: 5; top: calc(100% + 6px); left: 0; display: flex; flex-direction: column; gap: 2px; min-width: 100%; overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; padding: 6px; border-radius: 22px; background: #fff; color: var(--c-ink); box-shadow: 0 20px 50px rgba(35, 31, 32, .22), inset 0 0 0 1px rgba(35, 31, 32, .08); scrollbar-width: none; animation: song-keys-in .15s ease; }
+.song-keys-menu::-webkit-scrollbar { display: none; }
+/* Внизу не хватает места — меню над плашкой (SongKeys.jsx, fitMenu). */
+.song-keys-menu.is-up { top: auto; bottom: calc(100% + 6px); }
+.song-card.is-dark .song-keys-menu { background: #f4f4f1; box-shadow: 0 20px 50px rgba(0, 0, 0, .5); }
+.song-keys-menu button { flex: none; display: flex; align-items: center; height: 40px; padding: 0 14px; border: none; border-radius: 14px; background: transparent; color: inherit; cursor: pointer; }
+.song-keys-menu button:hover { background: rgba(35, 31, 32, .06); }
+
+.song-keys-menu-keys button { justify-content: center; font: 500 15px/1 var(--f-sans); letter-spacing: -.03em; }
+/* Исходная тональность — в обводке, выбранная — голубая. */
+.song-keys-menu-keys button.is-origin { box-shadow: inset 0 0 0 1.5px var(--c-ink); font-weight: 700; }
+.song-keys-menu-keys button[aria-pressed='true'] { background: var(--c-main); box-shadow: none; font-weight: 700; }
+
+/* Лады: номер слева, справа — тональность аккордов. */
+.song-keys-menu-capos button { justify-content: space-between; gap: 14px; }
+.song-keys-menu-capos .song-keys-note { font-size: 13px; color: #02809f; }
+.song-keys-menu-capos button[aria-pressed='true'] { background: var(--c-ink); color: #fff; }
+.song-keys-menu-capos button[aria-pressed='true'] .song-keys-note { color: var(--c-main); }
+
+@keyframes song-keys-in { from { opacity: 0; transform: translateY(-4px); } }

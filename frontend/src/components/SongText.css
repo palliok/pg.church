@@ -58,10 +58,12 @@
 
 .song-text .song-bar { font-size: .85em; opacity: .55; }
 
-/* Число повторов секции («Припев x2») — яркой плашкой рядом с заголовком, в цвет аккордов. */
+/* Число повторов секции («Припев x2») — яркой плашкой рядом с заголовком, в цвет аккордов.
+   Плашка выше строки заголовка: отрицательные поля сверху и снизу, чтобы секция из-за неё не становилась выше. */
 .song-text .song-label { display: flex; align-items: center; gap: 10px; }
 
 .song-text .song-repeat {
+  margin-block: -6px;
   padding: 4px 10px;
   border-radius: 99px;
   background: var(--sc-chord, var(--c-second));

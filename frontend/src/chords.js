@@ -28,6 +28,9 @@ function parse(chord) {
   return { root: pitch(match[1], match[2]), minor: /^m(?!aj)/.test(match[3]) };
 }
 
+// Высота основного тона аккорда 0–11 (C — 0); null — не аккорд.
+export const pitchOf = (chord) => parse(chord)?.root ?? null;
+
 // Тональность песни: из карточки песни, иначе по первому аккорду.
 export function songKey(song) {
   if (parse(song.key)) return song.key;

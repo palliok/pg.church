@@ -30,9 +30,19 @@
 .song-card-chip { display: flex; align-items: center; gap: 2px; padding: 3px; border: none; border-radius: 99px; background: var(--sc-chip); color: var(--sc-fg); }
 .song-card-chip button { width: 36px; height: 36px; padding: 0; border: none; border-radius: 99px; background: transparent; color: var(--sc-fg); cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .song-card-chip button:disabled { opacity: .35; cursor: default; }
-.song-card-chip .song-card-gear { background: #fff; color: var(--c-ink); }
-.song-card-chip .song-card-gear.is-active { background: var(--c-main); }
+.song-card-chip .song-card-toggle[aria-pressed='true'] { background: var(--c-main); color: var(--c-ink); }
+/* Колонки — только на десктопе: на телефоне текст всегда в одну. */
+.song-card-chip .song-card-columns { display: none; }
+@media (min-width: 861px) {
+  .song-card-chip .song-card-columns { display: flex; }
+}
 .song-card-share { width: 42px; height: 42px; padding: 0; justify-content: center; cursor: pointer; }
+/* На узких телефонах (360–400px) ссылка «Сборник песен», пять кнопок и «Поделиться» помещаются в строку только помельче. */
+@media (max-width: 400px) {
+  .song-card-bar { padding: 4px 10px 0; gap: 6px; }
+  .song-card-chip button { width: 34px; height: 34px; }
+  .song-card-share { width: 40px; height: 40px; }
+}
 
 .song-card-head { display: flex; align-items: baseline; gap: 12px; margin: 10px 22px 0; padding: 6px 0 14px; border-bottom: 1px solid var(--sc-hair); }
 .song-card-num { flex: none; font: 40px/.85 var(--f-num); letter-spacing: -.05em; }
@@ -49,9 +59,6 @@
 
 /* Текст песни (SongText): секции через одну на подложке, чтобы глаз не терял, где кончается одна и начинается другая. */
 .song-card-text { padding: 14px 14px 0; }
-
-/* Каподастр, темп и размер — над текстом, только в режиме с аккордами. */
-.song-card-capo { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 8px 6px; font: 12px/1.4 var(--f-mono); letter-spacing: .04em; color: var(--sc-chord); }
 
 /* Авторы — под текстом, мелко: подпись роли и имя. */
 .song-card-credits { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 18px 22px 0; padding-top: 14px; border-top: 1px solid var(--sc-hair); }
