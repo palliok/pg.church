@@ -7,12 +7,12 @@
 .ann-tile {
   width: 100%;
   display: grid;
-  /* Колонка даты узкая, чтобы заголовок стоял к ней поближе и в одну линию на всех плитках; самая широкая дата («31 окт») чуть заходит в отступ. */
-  grid-template-columns: 68px minmax(0, 1fr) auto;
-  gap: 10px;
+  /* Заголовок, дата, play */
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 14px;
   align-items: center;
   min-height: 96px;
-  padding: 16px 18px;
+  padding: 18px 18px 18px 20px;
   border: 0;
   border-radius: 26px;
   /* Непрочитанная — тёмно-серая, между --c-ink и --c-body */
@@ -26,14 +26,26 @@
 .ann-tile.is-read { background: #e2e3da; color: var(--c-ink); }
 .ann-tile.is-undated { grid-template-columns: minmax(0, 1fr) auto; }
 
-.ann-tile-date { display: flex; flex-direction: column; gap: 6px; }
-.ann-tile-label { font: 400 11px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; opacity: .6; }
-.ann-tile-day { display: flex; align-items: baseline; gap: 5px; }
-.ann-tile-num { font: 400 46px/.9 var(--f-num); letter-spacing: -.055em; white-space: nowrap; }
-.ann-tile-mon { font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
-
 .ann-tile-text { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .ann-tile-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Дата столбиком: «до» или день недели, число, месяц. */
+.ann-tile-date {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  /* Одна ширина у «2» и «26», чтобы даты на всех плитках стояли ровным столбцом */
+  box-sizing: border-box;
+  min-width: 50px;
+  white-space: nowrap;
+}
+.ann-tile-label,
+.ann-tile-mon { font: 400 11px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; }
+.ann-tile-label { opacity: .6; }
+.ann-tile-num { font: 400 36px/.85 var(--f-num); letter-spacing: -.055em; }
 .ann-tile .ann-important,
 .ann-tile-pill { height: 20px; padding: 0 8px; font-size: 11px; }
 /* Время или уточнение: полупрозрачная на тёмной плитке, белая на прочитанной. */

@@ -19,8 +19,8 @@ function tileDate(item) {
   return null;
 }
 
-// Плитка объявления на телефоне (макет design_handoff_stories_26c): дата, «Важно» и пилюли с длительностью
-// и временем или уточнением, заголовок и значок play.
+// Плитка объявления на телефоне (по макету design_handoff_stories_26c): слева «Важно», пилюли с длительностью
+// и временем или уточнением и заголовок, справа дата столбиком и значок play.
 // Непрочитанная — тёмная, прочитанная — светлая. Нажатие открывает сторис.
 export function AnnouncementTile({ item, read = false, onOpen }) {
   const date = tileDate(item);
@@ -29,15 +29,6 @@ export function AnnouncementTile({ item, read = false, onOpen }) {
 
   return (
     <button type="button" className={`ann-tile ${read ? 'is-read' : ''} ${date ? '' : 'is-undated'}`} onClick={onOpen}>
-      {date && (
-        <span className="ann-tile-date">
-          <span className="ann-tile-label">{date.label}</span>
-          <span className="ann-tile-day">
-            <span className="ann-tile-num">{date.day}</span>
-            <span className="ann-tile-mon">{date.mon}</span>
-          </span>
-        </span>
-      )}
       <span className="ann-tile-text">
         {hasPills && (
           <span className="ann-tile-pills">
@@ -48,6 +39,13 @@ export function AnnouncementTile({ item, read = false, onOpen }) {
         )}
         <span className="ann-tile-title">{item.title}</span>
       </span>
+      {date && (
+        <span className="ann-tile-date">
+          <span className="ann-tile-label">{date.label}</span>
+          <span className="ann-tile-num">{date.day}</span>
+          <span className="ann-tile-mon">{date.mon}</span>
+        </span>
+      )}
       <PlayCircleIcon />
     </button>
   );
