@@ -48,6 +48,8 @@ class Announcement extends Model
 
     /**
      * Поля дат другого типа «когда» обнуляются, чтобы после смены типа в базе не оставались старые даты.
+     * Со связанным событием дата, время и место берутся из него: свои «когда» и место не хранятся,
+     * остаётся только уточнение («После служения»).
      */
     protected static function booted(): void
     {
@@ -59,8 +61,15 @@ class Announcement extends Model
         });
 
         static::saving(function (Announcement $announcement) {
-            $type = $announcement->when_type ?? AnnouncementWhen::None;
             $announcement->published_at ??= now();
+
+            if ($announcement->event_id) {
+                $announcement->when_type = AnnouncementWhen::None;
+
+                $announcement->place = null;
+            }
+
+            $type = $announcement->when_type ?? AnnouncementWhen::None;
 
             if ($type !== AnnouncementWhen::Date) {
                 $announcement->event_date = null;

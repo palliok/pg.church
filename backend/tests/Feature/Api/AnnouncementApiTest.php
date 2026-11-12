@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Enums\AnnouncementWhen;
 use App\Models\Announcement;
 use App\Models\Event;
 use App\Models\User;
@@ -76,21 +77,23 @@ class AnnouncementApiTest extends TestCase
             ->assertJsonPath('data.1.contact.primary', true);
     }
 
-    public function test_returns_weekly_announcement_with_linked_event(): void
+    public function test_linked_event_replaces_own_day_and_place(): void
     {
         $this->travelTo('2026-11-03 12:00');
 
-        $event = Event::query()->create(['title' => 'Молодёжная встреча', 'starts_at' => '2026-11-06 19:00']);
+        $event = Event::query()->create(['title' => 'Молодёжная встреча', 'starts_at' => '2026-11-06 19:00', 'place' => 'Молодёжный зал']);
         Announcement::query()->create([
-            'title' => 'Изучение Библии', 'when_type' => 'weekly', 'weekday' => 5, 'weekly_time' => '19:00', 'event_id' => $event->id,
+            'title' => 'Изучение Библии', 'when_type' => 'weekly', 'weekday' => 5, 'weekly_time' => '19:00',
+            'when_note' => 'После служения', 'place' => 'Малый зал', 'event_id' => $event->id,
         ]);
 
         $this->getJson('/api/v1/announcements')
             ->assertOk()
-            ->assertJsonPath('data.0.weekly', ['dow' => 5, 'time' => '19:00'])
+            ->assertJsonPath('data.0.weekly', null)
+            ->assertJsonPath('data.0.eventDate', null)
             ->assertJsonPath('data.0.event.id', $event->id)
             ->assertJsonPath('data.0.event.title', 'Молодёжная встреча')
-            ->assertJsonPath('data.0.details', [])
+            ->assertJsonPath('data.0.details', [['type' => 'when', 'text' => 'После служения']])
             ->assertJsonPath('data.0.contact', null);
     }
 
@@ -130,28 +133,12 @@ class AnnouncementApiTest extends TestCase
         $response->assertJsonPath('data.5.event', null);
     }
 
-    public function test_weekly_announcement_hides_past_linked_event(): void
-    {
-        $this->travelTo('2026-11-03 12:00');
-
-        $event = Event::query()->create(['title' => 'Молодёжная встреча', 'starts_at' => '2026-10-31 19:00']);
-        Announcement::query()->create([
-            'title' => 'Изучение Библии', 'when_type' => 'weekly', 'weekday' => 5, 'weekly_time' => '19:00', 'event_id' => $event->id,
-        ]);
-
-        $this->getJson('/api/v1/announcements')
-            ->assertOk()
-            ->assertJsonPath('data.0.weekly', ['dow' => 5, 'time' => '19:00'])
-            ->assertJsonPath('data.0.event', null);
-    }
-
     public function test_announcement_without_date_expires_after_deleted_event_day(): void
     {
         $this->travelTo('2026-11-03 12:00');
 
         $event = Event::query()->create(['title' => 'Богослужение', 'starts_at' => '2026-11-08 11:00']);
         $announcement = Announcement::query()->create(['title' => 'Собрание', 'event_id' => $event->id]);
-        $dated = Announcement::query()->create(['title' => 'Уборка', 'when_type' => 'date', 'event_date' => '2026-11-07', 'event_id' => $event->id]);
 
         // Событие пропало из календаря при синхронизации.
         $event->delete();
@@ -159,7 +146,6 @@ class AnnouncementApiTest extends TestCase
         $announcement->refresh();
         $this->assertNull($announcement->event_id);
         $this->assertSame('2026-11-08', $announcement->visible_until->toDateString());
-        $this->assertNull($dated->fresh()->visible_until);
 
         $this->travelTo('2026-11-09 12:00');
         $this->getJson('/api/v1/announcements')->assertOk()->assertJsonCount(0, 'data');
@@ -195,6 +181,27 @@ class AnnouncementApiTest extends TestCase
             ['text' => 'Анкета', 'url' => 'https://forms.yandex.ru/'],
         ], $announcement->links);
         $this->assertSame('link:1', $announcement->main_choice);
+    }
+
+    public function test_admin_keeps_only_note_with_linked_event(): void
+    {
+        // В списке событий админки — только будущие.
+        $this->travelTo('2026-11-03 12:00');
+        $this->actingAs(User::factory()->create(), backpack_guard_name());
+        $event = Event::query()->create(['title' => 'Богослужение', 'starts_at' => '2026-11-08 11:00']);
+
+        // Свои «когда» и место остались в скрытой части формы: с событием они не проверяются и не сохраняются.
+        $this->post('/admin/announcement', [
+            'title' => 'Членское собрание', 'event_id' => (string) $event->id, 'main_choice' => 'none',
+            'when_type' => 'until', 'deadline' => '', 'when_note' => 'После служения', 'place' => 'Главный зал',
+            'published_at' => '2026-11-03 10:00', 'is_published' => '1',
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $announcement = Announcement::query()->sole();
+        $this->assertSame(AnnouncementWhen::None, $announcement->when_type);
+        $this->assertNull($announcement->deadline);
+        $this->assertNull($announcement->place);
+        $this->assertSame('После служения', $announcement->when_note);
     }
 
     public function test_only_one_announcement_is_main(): void

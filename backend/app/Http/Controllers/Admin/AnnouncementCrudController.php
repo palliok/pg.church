@@ -52,40 +52,42 @@ class AnnouncementCrudController extends CrudController
         CRUD::field('important')->label('Важно')->type('switch')->tab('Основное')
             ->hint('Красная метка «Важно»; важные объявления всегда попадают в сторис');
 
-        CRUD::field('when_type')->label('Когда')->type('radio')->tab('Когда')
-            ->options(AnnouncementWhen::options())->default(AnnouncementWhen::None->value)
-            ->validationRules($this->rules('required', Rule::enum(AnnouncementWhen::class)));
-        CRUD::field('event_date')->label('День')->type('date')->tab('Когда')
-            ->hint('Если событие на несколько дней — первый день')
-            ->validationRules('exclude_unless:when_type,date|required|date');
-        CRUD::field('event_date_end')->label('Последний день')->type('date')->tab('Когда')
-            ->hint('Только для событий на несколько дней')
-            ->validationRules('exclude_unless:when_type,date|nullable|date|after:event_date');
-        CRUD::field('deadline')->label('До какого числа')->type('date')->tab('Когда')
-            ->hint('Например, сбор вещей до 4 ноября')
-            ->validationRules('exclude_unless:when_type,until|required|date');
-        CRUD::field('weekday')->label('День недели')->type('select_from_array')->tab('Когда')
-            ->options(RuDate::WEEKDAYS)->allows_null(true)
-            ->validationRules('exclude_unless:when_type,weekly|required|integer|between:1,7');
-        CRUD::field('weekly_time')->label('Время')->type('time')->tab('Когда')
-            ->validationRules('exclude_unless:when_type,weekly|required|date_format:H:i');
-        CRUD::field('when_note')->label('Время или уточнение')->tab('Когда')
-            ->hint('Коротко: «С 10:00», «После служений»')
-            ->validationRules('nullable|string|max:60');
+        // Связанное событие — первым: с ним дата, время и место берутся из события. Свои «Когда» и место скрыты
+        // (announcement-form) и при сохранении не проверяются и не хранятся (Announcement::booted); уточнение остаётся.
         CRUD::field('event_id')->label('Событие из расписания')->type('select_search')->tab('Когда')
             ->entity('event')->model(Event::class)->attribute('display_name')
             ->options(fn ($query) => $query->where(fn ($query) => $query->published()->where('starts_at', '>=', today()))
                 // Уже прошедшее связанное событие остаётся в списке, иначе сохранение молча сбросит связь.
                 ->orWhere('id', CRUD::getCurrentEntry() ? CRUD::getCurrentEntry()->event_id : null)
                 ->orderBy('starts_at')->limit(300)->get())
-            ->hint('В сторис появится карточка события. Если у объявления нет своей даты, оно снимется после этого события')
+            ->hint('Дата, время и место возьмутся из события, можно добавить уточнение. Объявление снимется после события')
             ->validationRules($this->rules('nullable', Rule::exists('events', 'id')));
+        CRUD::field('when_type')->label('Когда')->type('radio')->tab('Когда')
+            ->options(AnnouncementWhen::options())->default(AnnouncementWhen::None->value)
+            ->validationRules($this->rules('exclude_with:event_id', 'required', Rule::enum(AnnouncementWhen::class)));
+        CRUD::field('event_date')->label('День')->type('date')->tab('Когда')
+            ->hint('Если событие на несколько дней — первый день')
+            ->validationRules('exclude_with:event_id|exclude_unless:when_type,date|required|date');
+        CRUD::field('event_date_end')->label('Последний день')->type('date')->tab('Когда')
+            ->hint('Только для событий на несколько дней')
+            ->validationRules('exclude_with:event_id|exclude_unless:when_type,date|nullable|date|after:event_date');
+        CRUD::field('deadline')->label('До какого числа')->type('date')->tab('Когда')
+            ->hint('Например, сбор вещей до 4 ноября')
+            ->validationRules('exclude_with:event_id|exclude_unless:when_type,until|required|date');
+        CRUD::field('weekday')->label('День недели')->type('select_from_array')->tab('Когда')
+            ->options(RuDate::WEEKDAYS)->allows_null(true)
+            ->validationRules('exclude_with:event_id|exclude_unless:when_type,weekly|required|integer|between:1,7');
+        CRUD::field('weekly_time')->label('Время')->type('time')->tab('Когда')
+            ->validationRules('exclude_with:event_id|exclude_unless:when_type,weekly|required|date_format:H:i');
+        CRUD::field('when_note')->label('Время или уточнение')->tab('Когда')
+            ->hint('Коротко: «С 10:00», «После служений»')
+            ->validationRules('nullable|string|max:60');
         CRUD::field('form_script')->type('view')->view('admin.announcement-form')->tab('Когда')
             ->wrapper(['class' => 'd-none']);
 
         CRUD::field('place')->label('Где')->tab('Где и контакт')
-            ->hint('Например: «Малый зал»')
-            ->validationRules('nullable|string|max:120');
+            ->hint('Например: «Малый зал». Со связанным событием — его место')
+            ->validationRules('exclude_with:event_id|nullable|string|max:120');
         CRUD::field('links_text')->label('Ссылки')->type('textarea')->tab('Где и контакт')
             ->attributes(['rows' => 4, 'placeholder' => 'Анкета для записи | https://forms.yandex.ru/…'])
             ->hint('По одной на строку: «Текст кнопки | ссылка». Не больше пяти');

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { t } from '../i18n.js';
-import { DatePart, ImportantPill, Megaphone } from './AnnouncementCards.jsx';
+import { ownPlace } from '../api/announcements.js';
+import { DatePart, ImportantPill, LinkedEvent, Megaphone } from './AnnouncementCards.jsx';
 import { CloseIcon, PauseIcon, PhoneIcon, PlaceIcon, PlayCircleIcon, PlayIcon, ShareIcon } from './Icons.jsx';
 import LongArrow from './LongArrow.jsx';
 import './AnnouncementStories.css';
@@ -11,10 +12,11 @@ const STORY_MS = 7000;
 // Дольше — уже не нажатие, а удержание: сторис стоит на паузе, пока палец на экране.
 const HOLD_MS = 250;
 
-// Дата на плитке: срок «до» или первый день события. У объявления без даты колонки нет.
+// Дата на плитке: срок «до» или первый день события — число и месяц, у срока перед числом «до».
+// У объявления без даты колонки нет.
 function tileDate(item) {
-  if (item.deadline) return { ...item.deadline, label: t('До') };
-  if (item.eventDate) return { ...item.eventDate, label: item.eventDate.dow };
+  if (item.deadline) return { ...item.deadline, until: true };
+  if (item.eventDate) return item.eventDate;
 
   return null;
 }
@@ -40,9 +42,11 @@ export function AnnouncementTile({ item, read = false, onOpen }) {
         <span className="ann-tile-title">{item.title}</span>
       </span>
       {date && (
-        <span className="ann-tile-date">
-          <span className="ann-tile-label">{date.label}</span>
-          <span className="ann-tile-num">{date.day}</span>
+        <span className={`ann-tile-date${date.until ? ' is-until' : ''}`}>
+          <span className="ann-tile-day">
+            {date.until && <span className="ann-tile-until">До</span>}
+            <span className="ann-tile-num">{date.day}</span>
+          </span>
           <span className="ann-tile-mon">{date.mon}</span>
         </span>
       )}
@@ -142,7 +146,7 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
     swipeStart.current = null;
   };
 
-  const where = item.details.find((detail) => detail.type === 'where');
+  const where = ownPlace(item);
   const when = item.details.find((detail) => detail.type === 'when');
   const links = item.details.filter((detail) => detail.type === 'link');
   // Основное действие — крупной кнопкой внизу: ссылка с primary или звонок, если основной выбран контакт.
@@ -151,7 +155,8 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
   const other = links.filter((link) => link !== main);
   const call = item.contact?.primary && !main ? item.contact : null;
   const contact = item.contact && !call ? item.contact : null;
-  const hasDates = Boolean(item.deadline || item.eventDate);
+  // Со связанным событием дата — в его карточке, своих дат нет (админка их не сохраняет).
+  const hasDates = !item.event && Boolean(item.deadline || item.eventDate);
   const hasPills = Boolean(item.days || when);
 
   // Портал в body: у страницы анимация появления с transform, внутри неё position: fixed не встал бы на весь экран.
@@ -180,9 +185,13 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
       </div>
 
       <div className="ann-story-top">
-        <span className="ann-story-pos">
-          {index + 1} / {items.length}
-          {paused && <> · <span>Пауза</span></>}
+        {/* «Важно» — в верхней строке, чтобы заголовок у всех сторис начинался на одной высоте */}
+        <span className="ann-story-lead">
+          <span className="ann-story-pos">
+            {index + 1} / {items.length}
+            {paused && <> · <span>Пауза</span></>}
+          </span>
+          {item.important && <ImportantPill />}
         </span>
         <span className="ann-story-actions">
           <button type="button" className="ann-story-btn" aria-label={paused ? 'Продолжить' : 'Пауза'} onClick={() => setPaused(!paused)}>
@@ -197,21 +206,22 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
       {/* key — новая сторис начинается с верха, даже если предыдущую прокрутили */}
       <div key={item.id} className="ann-story-content" aria-live="polite">
         <div className="ann-story-head">
-          {item.important && <ImportantPill />}
           <h2 className="ann-story-title">{item.title}</h2>
         </div>
 
         {item.body && <p className="ann-story-body">{item.body}</p>}
 
         {/* Даты и белые пилюли (длительность, время или уточнение) — одной строкой, пилюли по низу цифр */}
+        {/* Связанное событие — компактной плашкой на месте даты */}
+        {item.event && <LinkedEvent event={item.event} compact className="ann-story-event" />}
         {(hasDates || hasPills) && (
           <div className={`ann-dates ann-story-dates ${item.eventEnd ? 'is-range' : ''}`}>
-            {item.deadline && <DatePart label={t('До')} date={item.deadline} />}
-            {item.eventDate && <DatePart label={item.eventDate.dow} date={item.eventDate} />}
-            {item.eventEnd && (
+            {hasDates && item.deadline && <DatePart until date={item.deadline} />}
+            {hasDates && item.eventDate && <DatePart date={item.eventDate} />}
+            {hasDates && item.eventEnd && (
               <>
                 <span className="ann-dates-arrow"><LongArrow width={34} stroke={2} /></span>
-                <DatePart label={item.eventEnd.dow} date={item.eventEnd} />
+                <DatePart date={item.eventEnd} />
               </>
             )}
             {hasPills && (
@@ -226,7 +236,7 @@ export default function AnnouncementStories({ items, index, onIndex, onClose, on
         {where && (
           <span className="ann-story-place">
             <PlaceIcon size={16} />
-            <span>{where.text}</span>
+            <span>{where}</span>
           </span>
         )}
 

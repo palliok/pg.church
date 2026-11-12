@@ -1,4 +1,5 @@
-{{-- Форма объявления: поля дат только выбранного типа «Когда» и варианты «Основного действия» по введённым ссылкам и контакту --}}
+{{-- Форма объявления: поля дат только выбранного типа «Когда» (со связанным событием — ни одного и без места)
+     и варианты «Основного действия» по введённым ссылкам и контакту --}}
 @include('admin.phone-mask')
 @push('crud_fields_scripts')
 <script>
@@ -9,11 +10,21 @@
             weekly: ['weekday', 'weekly_time'],
         };
 
-        crud.field('when_type').onChange(function (field) {
-            for (const [type, names] of Object.entries(fieldsByType)) {
-                names.forEach((name) => crud.field(name).show(field.value === type));
+        // Со связанным событием дата, время и место — из него: «Когда» с датами и «Где» скрыты, сервер их не сохранит.
+        // Уточнение остаётся.
+        function updateWhen() {
+            const linked = Boolean(crud.field('event_id').value);
+            const type = crud.field('when_type').value;
+
+            ['when_type', 'place'].forEach((name) => crud.field(name).show(!linked));
+            for (const [fieldType, names] of Object.entries(fieldsByType)) {
+                names.forEach((name) => crud.field(name).show(!linked && type === fieldType));
             }
-        }).change();
+        }
+
+        crud.field('event_id').onChange(updateWhen);
+        crud.field('when_type').onChange(updateWhen);
+        updateWhen();
 
         // Тексты ссылок — как их разбирает Announcement::parseLinks(): строки с «|», текст до последней «|».
         const linkTexts = () => (crud.field('links_text').value ?? '')

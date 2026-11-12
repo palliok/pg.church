@@ -106,6 +106,12 @@ function toAnnouncement(raw) {
   };
 }
 
+// Место объявления на карточке. Со связанным событием своего места нет (админка его не сохраняет):
+// дату, время и место показывает карточка события (LinkedEvent).
+export function ownPlace(item) {
+  return item.event ? null : item.details.find((entry) => entry.type === 'where')?.text || null;
+}
+
 // Новые сверху; без даты публикации — в порядке ответа API.
 const byPublished = (a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? '');
 

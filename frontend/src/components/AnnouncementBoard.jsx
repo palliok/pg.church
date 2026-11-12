@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { t } from '../i18n.js';
-import { ImportantPill, Megaphone } from './AnnouncementCards.jsx';
+import { ownPlace } from '../api/announcements.js';
+import { ImportantPill, LinkedEvent, Megaphone } from './AnnouncementCards.jsx';
 import { CampaignIcon, DoneAllIcon, EventIcon, PhoneIcon, PlaceIcon, ScheduleIcon, ShareIcon } from './Icons.jsx';
 import LongArrow from './LongArrow.jsx';
 import './AnnouncementBoard.css';
@@ -20,17 +20,18 @@ function dateKind(item) {
 
 const detail = (item, type) => item.details.find((entry) => entry.type === type);
 
-// Плитка даты в строке списка: три строки — «Вс–Сб / 15–21 / нояб», «До / 4 / нояб», «Кажд. / Пт / 19:00».
+// Плитка даты в строке списка: число и месяц без дня недели — «15–21 / нояб», «До / 4 / нояб»; у регулярного — «Кажд. / Пт / 19:00».
+// Первая строка — подпись сверху, null — без неё.
 function tileLines(item, kind) {
   switch (kind) {
     case 'event':
-      return [item.event.dowShort, item.event.day, item.event.mon];
+      return [null, item.event.day, item.event.mon];
     case 'range': {
       const { eventDate: from, eventEnd: to } = item;
-      return [`${from.dow}–${to.dow}`, `${from.day}–${to.day}`, from.mon === to.mon ? from.mon : `${from.mon}–${to.mon}`];
+      return [null, `${from.day}–${to.day}`, from.mon === to.mon ? from.mon : `${from.mon}–${to.mon}`];
     }
     case 'date':
-      return [item.eventDate.dow, item.eventDate.day, item.eventDate.mon];
+      return [null, item.eventDate.day, item.eventDate.mon];
     case 'until':
       return [t('До'), item.deadline.day, item.deadline.mon];
     case 'regular':
@@ -74,7 +75,7 @@ function AnnouncementRow({ item, active, read, unread, onOpen }) {
       <span className="ann7-tile">
         {lines ? (
           <>
-            <span className="ann7-tile-label">{lines[0]}</span>
+            {lines[0] && <span className="ann7-tile-label">{lines[0]}</span>}
             <span className="ann7-tile-big">{lines[1]}</span>
             <span className="ann7-tile-bottom">{lines[2]}</span>
           </>
@@ -120,10 +121,11 @@ function AnnouncementRow({ item, active, read, unread, onOpen }) {
   );
 }
 
-// Число с месяцем справа от него: «15 нояб».
-function BigDate({ date }) {
+// Число с месяцем справа от него: «15 нояб»; у срока перед числом — «До».
+function BigDate({ date, until = false }) {
   return (
     <span className="ann7-big-date">
+      {until && <span className="ann7-big-until">До</span>}
       <span className="ann7-big-num">{date.day}</span>
       <span className="ann7-big-mon">{date.mon}</span>
     </span>
@@ -135,36 +137,13 @@ function StoryWhen({ item }) {
   const kind = dateKind(item);
   const when = detail(item, 'when')?.text;
 
+  // У связанного события — его карточка; уточнение под ней, как под датой.
   if (kind === 'event') {
-    const { event } = item;
     return (
-      <Link to={`/schedule/${event.id}`} className="ann7-event">
-        <span className="ann7-event-head">
-          <EventIcon size={15} />
-          <span>Событие в расписании</span>
-        </span>
-        <span className="ann7-event-body">
-          <span className="ann7-event-tile">
-            <span className="ann7-event-dow">{event.dowShort}</span>
-            <span className="ann7-event-day">{event.day}</span>
-            <span className="ann7-event-mon">{event.mon}</span>
-          </span>
-          <span className="ann7-event-text">
-            <span className="ann7-event-title">{event.title}</span>
-            <span className="ann7-event-time">{event.timeRange}</span>
-            {event.place && (
-              <span className="ann7-event-place">
-                <PlaceIcon size={14} />
-                {event.place}
-              </span>
-            )}
-          </span>
-        </span>
-        <span className="ann7-event-foot">
-          <span>Открыть в расписании</span>
-          <LongArrow width={28} stroke={2.6} />
-        </span>
-      </Link>
+      <div className="ann7-when">
+        <LinkedEvent event={item.event} />
+        {when && <span className="ann7-pill">{when}</span>}
+      </div>
     );
   }
 
@@ -172,17 +151,11 @@ function StoryWhen({ item }) {
     return (
       <div className="ann7-when">
         <div className="ann7-range">
-          <span className="ann7-range-part">
-            <span className="ann7-when-note">{item.eventDate.dow}</span>
-            <BigDate date={item.eventDate} />
-          </span>
+          <BigDate date={item.eventDate} />
           <span className="ann7-range-arrow"><LongArrow width={28} stroke={2.6} /></span>
-          <span className="ann7-range-part">
-            <span className="ann7-when-note">{item.eventEnd.dow}</span>
-            <BigDate date={item.eventEnd} />
-          </span>
+          <BigDate date={item.eventEnd} />
         </div>
-        <span className="ann7-days">{item.days}</span>
+        <span className="ann7-pill">{item.days}</span>
       </div>
     );
   }
@@ -191,9 +164,8 @@ function StoryWhen({ item }) {
     const date = kind === 'date' ? item.eventDate : item.deadline;
     return (
       <div className="ann7-when">
-        <span className="ann7-when-note">{kind === 'date' ? date.dow : t('До')}</span>
-        <BigDate date={date} />
-        {when && <span className="ann7-when-note">{when}</span>}
+        <BigDate date={date} until={kind === 'until'} />
+        {when && <span className="ann7-pill">{when}</span>}
       </div>
     );
   }
@@ -215,7 +187,7 @@ function StoryWhen({ item }) {
 // дата или связанное событие справа. Основное действие — основная ссылка или звонок — белой плашкой последним,
 // остальные ссылки и неосновной телефон — пилюлями с обводкой.
 function StoryCard({ item, onPrev, onNext, onShare }) {
-  const where = placeOf(item);
+  const where = item.event ? ownPlace(item) : placeOf(item);
   const links = item.details.filter((entry) => entry.type === 'link');
   const main = links.find((link) => link.primary);
   const other = links.filter((link) => link !== main);
@@ -237,9 +209,10 @@ function StoryCard({ item, onPrev, onNext, onShare }) {
       <button type="button" className="ann7-tap is-prev" aria-label="Предыдущее объявление" onClick={onPrev} />
       <button type="button" className="ann7-tap is-next" aria-label="Следующее объявление" onClick={onNext} />
 
+      {/* Заголовок — на всю ширину карточки, над текстом и датой или событием справа */}
       <div key={item.id} className="ann7-story-main" aria-live="polite">
+        <h2 className="ann7-story-title">{item.title}</h2>
         <div className="ann7-story-text">
-          <h2 className="ann7-story-title">{item.title}</h2>
           {item.body && <p className="ann7-story-body">{item.body}</p>}
           {where && (
             <span className="ann7-story-place">

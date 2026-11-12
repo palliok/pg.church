@@ -29,7 +29,7 @@
 .ann-tile-text { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .ann-tile-pills { display: flex; flex-wrap: wrap; gap: 6px; }
 
-/* Дата столбиком: «до» или день недели, число, месяц. */
+/* Дата столбиком: число (у срока — «до» перед ним) и месяц. */
 .ann-tile-date {
   align-self: stretch;
   display: flex;
@@ -42,10 +42,13 @@
   min-width: 50px;
   white-space: nowrap;
 }
-.ann-tile-label,
 .ann-tile-mon { font: 400 11px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; }
-.ann-tile-label { opacity: .6; }
 .ann-tile-num { font: 400 36px/.85 var(--f-num); letter-spacing: -.055em; }
+.ann-tile-day { position: relative; }
+/* «До» — слева от числа, но не сдвигает его: числа на всех плитках стоят ровным столбцом.
+   Место под него колонка резервирует отступом слева, чтобы заголовок не наезжал. */
+.ann-tile-date.is-until { min-width: 74px; padding-left: 24px; }
+.ann-tile-until { position: absolute; right: 100%; bottom: 3px; margin-right: 5px; font: 400 15px/1 var(--f-mono); letter-spacing: .02em; text-transform: uppercase; opacity: .6; }
 .ann-tile .ann-important,
 .ann-tile-pill { height: 20px; padding: 0 8px; font-size: 11px; }
 /* Время или уточнение: полупрозрачная на тёмной плитке, белая на прочитанной. */
@@ -113,13 +116,18 @@
 .ann-story-content::-webkit-scrollbar { display: none; }
 
 .ann-story-head { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding-top: 34px; }
-.ann-story-head .ann-important { height: 28px; padding: 0 11px; font-size: 11px; }
-.ann-story-title { margin: 0; font: 700 46px/1 var(--f-sans); letter-spacing: -.055em; text-wrap: balance; overflow-wrap: anywhere; }
+.ann-story-lead { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.ann-story-lead .ann-important { height: 26px; padding: 0 10px; font-size: 11px; }
+/* На узких экранах кегль меньше, чтобы длинное слово («богослужения») не рвалось посередине. */
+.ann-story-title { margin: 0; font: 700 min(46px, 11.5vw)/1 var(--f-sans); letter-spacing: -.055em; text-wrap: balance; overflow-wrap: anywhere; }
+
+/* Плашка связанного события — на месте даты; пилюли (уточнение) — под ней. */
+.ann-story-event { flex: 0 0 auto; margin-top: 26px; }
+.ann-story-event + .ann-story-dates { padding-top: 12px; }
 
 .ann-story-dates { --d-num: 56px; --d-label: 11px; --d-mon: 12px; --d-gap: 14px; --d-arrow: 34px; padding-top: 26px; }
 .ann-story-dates.is-range { --d-num: 44px; }
 .ann-story-dates .ann-date { gap: 10px; }
-.ann-story-dates .ann-date-label { line-height: 1; letter-spacing: .06em; color: rgba(255, 255, 255, .6); }
 .ann-story-dates .ann-date-day { gap: 8px; }
 .ann-story-dates .ann-date-num { line-height: 1; letter-spacing: -.06em; }
 .ann-story-dates .ann-date-mon { letter-spacing: .06em; }
@@ -128,7 +136,7 @@
 /* После даты пилюли приподняты на 4px — по низу цифр. */
 .ann-story-pills { display: flex; flex-wrap: wrap; gap: 6px; }
 .ann-story-pills.is-after-date { padding-bottom: 4px; }
-.ann-story-pills .ann-pill { height: 28px; margin: 0; padding: 0 11px; font-size: 11px; }
+.ann-story-pills .ann-pill { height: 32px; margin: 0; padding: 0 13px; font-size: 13px; }
 
 .ann-story-body { margin: 0; padding-top: 14px; font: 400 17px/1.45 var(--f-sans); color: rgba(255, 255, 255, .75); white-space: pre-line; text-wrap: pretty; }
 

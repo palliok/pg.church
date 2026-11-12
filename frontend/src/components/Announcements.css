@@ -29,7 +29,8 @@
 /* ===== Даты: «до 30 июн», один день или «14 июл → 20 июл · 7 дней», рядом пилюля со временем ===== */
 .ann-dates { --d-num: 34px; --d-label: 11px; --d-mon: 11px; --d-gap: 12px; --d-arrow: 30px; --d-pill-h: 26px; --d-pill-fs: 11px; position: relative; display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--d-gap); }
 .ann-date { display: flex; flex-direction: column; gap: 6px; }
-.ann-date-label { font: 400 var(--d-label) var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: rgba(255, 255, 255, .55); }
+/* «До» перед числом — как месяц: тот же размер, по низу цифр. */
+.ann-date-until { font: 400 var(--d-mon) var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
 .ann-date-day { display: flex; align-items: baseline; gap: 6px; }
 .ann-date-num { font: 400 var(--d-num)/.85 var(--f-num); letter-spacing: -.05em; }
 .ann-date-mon { font: 400 var(--d-mon) var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
@@ -146,3 +147,35 @@
 @media (prefers-reduced-motion: reduce) {
   .ann-toast { animation: none; }
 }
+
+/* Связанное событие (LinkedEvent) — белая карточка, ведёт на страницу события. На десктопе и в сторис на телефоне. */
+.ann-event {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 16px 14px;
+  border-radius: 24px;
+  background: #fff;
+  color: var(--c-ink);
+  transition: background .2s;
+}
+.ann-event:hover { background: var(--c-main); color: var(--c-ink); }
+.ann-event-body { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: center; }
+.ann-event-tile { width: 72px; height: 72px; border-radius: 18px; background: #f4f4f1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+.ann-event-day { font: 400 26px/1 var(--f-num); letter-spacing: -.04em; }
+.ann-event-mon { font: 400 11px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; }
+.ann-event-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ann-event-title { font: 700 19px/1.1 var(--f-sans); letter-spacing: -.04em; }
+.ann-event-time { font: 400 18px/1 var(--f-num); }
+.ann-event-place { display: flex; align-items: center; gap: 4px; font: 400 11px var(--f-mono); letter-spacing: .02em; text-transform: uppercase; }
+.ann-event-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid rgba(35, 31, 32, .12); font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
+
+/* Компактная карточка события — в сторис на телефоне, на месте даты. */
+.ann-event.is-compact { flex-direction: row; align-items: center; gap: 14px; padding: 12px 18px 12px 12px; border-radius: 24px; }
+.ann-event.is-compact .ann-event-tile { flex: 0 0 auto; width: 64px; height: 64px; border-radius: 16px; gap: 4px; }
+.ann-event.is-compact .ann-event-day { font-size: 24px; }
+.ann-event.is-compact .ann-event-text { flex: 1; gap: 5px; }
+.ann-event.is-compact .ann-event-title { font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ann-event.is-compact .ann-event-time { font-size: 17px; }
+.ann-event.is-compact .ann-event-place { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ann-event.is-compact svg { flex: 0 0 auto; }
