@@ -9,6 +9,7 @@ import { daysFromToday } from '../api/dates.js';
 import { useEvents } from '../api/events.js';
 import gospelTitle from '../assets/gospel-title.png';
 import './Home.css';
+import { HomeCarouselSkeleton } from '../components/Skeletons.jsx';
 
 // Текущее время, обновляется раз в минуту: «через 3 ч» и прошедшие события на главной.
 function useNow() {
@@ -50,8 +51,9 @@ export default function Home() {
           )}
         </Link>
 
-        {/* Второстепенный блок: пока грузится и при ошибке не показываем. Без событий на неделе
+        {/* Пока грузится — заготовки карточек; при ошибке блока нет. Без событий на неделе
             остаётся карточка «В календарь». */}
+        {eventsLoading && !eventsError && <HomeCarouselSkeleton />}
         {!eventsLoading && !eventsError && <ScheduleCarousel events={week} now={now} />}
 
         <Announcements />

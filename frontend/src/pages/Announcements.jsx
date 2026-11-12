@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAnnouncements } from '../api/announcements.js';
 import AnnouncementBoard from '../components/AnnouncementBoard.jsx';
 import AnnouncementStories, { AnnouncementTile } from '../components/AnnouncementStories.jsx';
+import { AnnouncementBoardSkeleton, AnnouncementTilesSkeleton } from '../components/Skeletons.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
 import { t } from '../i18n.js';
 import useReadAnnouncements from '../components/useReadAnnouncements.js';
@@ -53,7 +54,9 @@ export default function Announcements() {
       <h1 className="page-title page-title--bg">Объявления</h1>
 
       <div className="ann12-panel">
-        {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
+        {/* Пока грузятся — серые плитки или доска; не загрузились — сообщение с «Повторить». */}
+        {loading && !error && (isPhone ? <AnnouncementTilesSkeleton /> : <AnnouncementBoardSkeleton />)}
+        {error && <LoadStatus error={error} onRetry={retry} />}
 
         {!loading && !error && items.length === 0 && (
           <div className="ann-empty">

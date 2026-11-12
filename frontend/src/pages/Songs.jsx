@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSong, useSongs, useSongSearch } from '../api/songs.js';
 import LoadStatus from '../components/LoadStatus.jsx';
+import { SongCardSkeleton, SongListSkeleton } from '../components/Skeletons.jsx';
 import SongCard from '../components/SongCard.jsx';
 import { CloseIcon, SearchIcon } from '../components/Icons.jsx';
 import './Songs.css';
@@ -219,7 +220,9 @@ export default function Songs() {
                 variant={foundLines.get(row.song.id)?.variant} words={words} isNum={isNum}
                 active={row.song.id === preview?.id} onPick={setPicked} onOpen={remember} />
             )))}
-            {(loading || error) && <LoadStatus error={error} onRetry={retry} />}
+            {/* Пока сборник грузится — серые строки; не загрузился — сообщение с «Повторить». */}
+            {loading && !error && songs.length === 0 && <SongListSkeleton />}
+            {error && <LoadStatus error={error} onRetry={retry} />}
             {!loading && !error && matched.length === 0 && (
               <div className="sb-empty">
                 <span className="sb-empty-title">Ничего не нашлось</span>
@@ -230,6 +233,7 @@ export default function Songs() {
         </div>
 
         <div className="desktop-only sb-preview">
+          {!shown && !error && <SongCardSkeleton />}
           {shown && (
             <SongCard
               song={shown}

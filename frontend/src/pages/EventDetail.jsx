@@ -6,6 +6,7 @@ import { EventTag, LiveTag, NoticeTag } from '../components/EventVisuals.jsx';
 import { ShareIcon } from '../components/Icons.jsx';
 import LiveModal from '../components/LiveModal.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
+import { EventSkeleton } from '../components/Skeletons.jsx';
 import LongArrow from '../components/LongArrow.jsx';
 import { categoryLabel, eventKind, useEvent, useEvents } from '../api/events.js';
 import { useLive } from '../api/live.js';
@@ -57,7 +58,7 @@ export default function EventDetail() {
   if (loading || error) {
     return (
       <div className="page-enter container ev-page">
-        <LoadStatus error={error} onRetry={retry} />
+        {error ? <LoadStatus error={error} onRetry={retry} /> : <EventSkeleton />}
       </div>
     );
   }

@@ -1,5 +1,6 @@
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import LoadStatus from '../components/LoadStatus.jsx';
+import { SongCardSkeleton } from '../components/Skeletons.jsx';
 import SongCard from '../components/SongCard.jsx';
 import { useSong } from '../api/songs.js';
 import './SongDetail.css';
@@ -12,7 +13,16 @@ export default function SongDetail() {
   const pickVariant = (letter) => setParams(letter ? { v: letter } : {}, { replace: true });
   const { song, loading, error, retry } = useSong(id);
 
-  if (loading || error) {
+  // Пока песня грузится — заготовка карточки на её месте.
+  if (loading && !error) {
+    return (
+      <div className="page-enter song-page">
+        <SongCardSkeleton />
+      </div>
+    );
+  }
+
+  if (error) {
     return (
       <div className="page-enter container" style={{ padding: '40px 16px' }}>
         <LoadStatus error={error} onRetry={retry} />

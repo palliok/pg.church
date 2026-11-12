@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { t } from '../i18n.js';
 import LoadStatus from '../components/LoadStatus.jsx';
+import { DonateDetailsSkeleton, DonateQrSkeleton } from '../components/Skeletons.jsx';
 import { CheckIcon, CopyIcon } from '../components/Icons.jsx';
 import { useDonation } from '../api/donation.js';
 import './Donate.css';
@@ -113,6 +114,7 @@ export default function Donate() {
           </p>
         </figure>
 
+        {loading && !error && <DonateQrSkeleton />}
         {accounts.length > 0 && (
           <div className="donate-qrs">
             {/* Реквизитов может быть несколько: у каждых свой QR-код. */}
@@ -133,7 +135,9 @@ export default function Donate() {
         )}
       </section>
 
-      {(loading || error) && (
+      {/* Пока грузятся — заготовки QR-кода и реквизитов; не загрузились — сообщение с «Повторить». */}
+      {loading && !error && <DonateDetailsSkeleton />}
+      {error && (
         <div className="donate-status"><LoadStatus error={error} onRetry={retry} /></div>
       )}
 

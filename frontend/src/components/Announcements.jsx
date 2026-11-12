@@ -2,16 +2,19 @@ import { Link } from 'react-router-dom';
 import { useAnnouncements } from '../api/announcements.js';
 import { AnnouncementDates, Megaphone } from './AnnouncementCards.jsx';
 import LongArrow from './LongArrow.jsx';
+import { HomeAnnouncementSkeleton } from './Skeletons.jsx';
 import './Announcements.css';
 
 // Блок объявлений на главной (макет design_handoff_overview, блоки 02 и 03): объявление, выбранное
 // в админке («На главной»), а если не выбрано — последнее, чёрной карточкой.
 // Карточка ведёт на это объявление: на телефоне открываются его сторис, на десктопе — его карточка справа;
 // закрыл сторис — остаёшься в списке объявлений.
-// Пока объявлений нет, блок не показывается.
+// Пока грузятся — заготовка карточки; если объявлений нет или не загрузились, блок не показывается.
 export default function Announcements({ className = '' }) {
-  const { items } = useAnnouncements();
+  const { items, loading } = useAnnouncements();
   const shown = items.find((item) => item.isMain) ?? items[0];
+
+  if (loading) return <HomeAnnouncementSkeleton className={className} />;
 
   if (!shown) return null;
 

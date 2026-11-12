@@ -5,6 +5,7 @@ import { eventKind } from '../api/events.js';
 import { EventTag, LiveTag, NoticeTag } from './EventVisuals.jsx';
 import { PlaceIcon } from './Icons.jsx';
 import LongArrow from './LongArrow.jsx';
+import { HomeScheduleSkeleton } from './Skeletons.jsx';
 import './HomeSchedule.css';
 
 // Строк в списке с запасом: сколько из них видно, решает высота блока, остальные уходят под кнопку.
@@ -19,6 +20,7 @@ export default function HomeSchedule({ events, loading, error, now, className = 
 
   return (
     <div className={`home-sched ${className}`}>
+      {loading && !next && <HomeScheduleSkeleton />}
       {next && <NextCard event={next} now={now} />}
 
       <div className="home-sched-list">

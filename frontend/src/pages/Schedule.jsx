@@ -8,6 +8,7 @@ import { EVENT_CATEGORIES, categoryLabel, useEvents } from '../api/events.js';
 import CalendarOptions from '../components/CalendarOptions.jsx';
 import { EventTag, LiveTag, NoticeTag } from '../components/EventVisuals.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
+import { ScheduleFeedSkeleton, ScheduleMonthSkeleton } from '../components/Skeletons.jsx';
 import './Schedule.css';
 
 const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
@@ -181,8 +182,11 @@ export default function Schedule() {
         </div>
       )}
 
-      {(loading || error) ? (
+      {/* Пока грузится — заготовка ленты или календаря; не загрузилось — сообщение с «Повторить». */}
+      {error ? (
         <div style={{ marginTop: 24 }}><LoadStatus error={error} onRetry={retry} /></div>
+      ) : loading ? (
+        view === 'list' ? <ScheduleFeedSkeleton /> : <ScheduleMonthSkeleton />
       ) : view === 'list' ? (
         <ListView key={monthPrefix} byDay={byDay} ym={ym} todayNum={todayNum} hiddenDayCount={showPast ? 0 : hiddenDays.length} showPast={showPast} hasFilters={filterCount > 0} onReset={resetFilters} />
       ) : (

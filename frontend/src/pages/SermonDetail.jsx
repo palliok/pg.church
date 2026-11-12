@@ -2,6 +2,7 @@ import { t } from '../i18n.js';
 import { Link, useParams } from 'react-router-dom';
 import ArrowKnob from '../components/ArrowKnob.jsx';
 import LoadStatus from '../components/LoadStatus.jsx';
+import { SermonSkeleton } from '../components/Skeletons.jsx';
 import { useEvent } from '../api/events.js';
 
 export default function SermonDetail() {
@@ -11,8 +12,8 @@ export default function SermonDetail() {
 
   if (loading || error) {
     return (
-      <div className="page-enter container" style={{ padding: '40px 16px' }}>
-        <LoadStatus error={error} onRetry={retry} />
+      <div className="page-enter container" style={{ padding: error ? '40px 16px' : '20px 16px 48px' }}>
+        {error ? <LoadStatus error={error} onRetry={retry} /> : <SermonSkeleton />}
       </div>
     );
   }

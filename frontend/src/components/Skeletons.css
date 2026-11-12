@@ -1,0 +1,122 @@
+/* Заготовки на время загрузки (Skeletons.jsx): серые формы с бликом, который проходит слева направо. */
+.skel {
+  display: block;
+  background-color: #dcdcd7;
+  background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, .55) 50%, rgba(255, 255, 255, 0) 70%);
+  background-size: 250% 100%;
+  background-repeat: no-repeat;
+  animation: skel-shine 1.5s ease-in-out infinite;
+}
+.skel-bar { border-radius: 6px; }
+.skel-pill { border-radius: 99px; }
+/* Детали внутри большой серой карточки — чуть темнее её. */
+.skel-mark { display: block; border-radius: 8px; background: rgba(35, 31, 32, .1); }
+
+/* Сборник: строки как .sb-row. */
+.skel-song { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px 4px; border-bottom: 1px solid rgba(35, 31, 32, .1); }
+.skel-song-num { width: 34px; height: 24px; border-radius: 6px; }
+.skel-song-text { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.skel-song-key { width: 34px; height: 26px; border-radius: 99px; }
+@media (min-width: 861px) {
+  .skel-song { padding-inline: 12px; }
+}
+
+/* Карточка песни в превью. */
+.skel-song-card { display: flex; flex-direction: column; gap: 18px; padding: 20px 22px 32px; border-radius: 32px; background: #fff; box-shadow: 0 0 0 1px rgba(35, 31, 32, .08); }
+.skel-row { display: flex; align-items: center; gap: 12px; }
+.skel-row.is-between { justify-content: space-between; }
+.skel-block { display: flex; flex-direction: column; gap: 12px; padding: 16px 0 6px; }
+/* Тёмная тема карточки песни: формы светлее фона, блик слабее. */
+.skel-song-card.is-dark { background: var(--c-ink); box-shadow: none; }
+.skel-song-card.is-dark .skel {
+  background-color: rgba(255, 255, 255, .1);
+  background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, .12) 50%, rgba(255, 255, 255, 0) 70%);
+}
+
+/* Объявления на телефоне: плитки как .ann-tile. */
+.skel-tiles { display: flex; flex-direction: column; gap: 8px; }
+.skel-tile { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 14px; align-items: center; min-height: 96px; padding: 18px 18px 18px 20px; border-radius: 26px; box-sizing: border-box; }
+.skel-tile-text { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+
+/* Плитки и большая карточка объявления на самом деле тёмные — заготовки тоже: формы светлее фона, блик слабее. */
+.skel-tile, .skel-story {
+  background-color: #363233;
+  background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, .08) 50%, rgba(255, 255, 255, 0) 70%);
+}
+.skel-story { background-color: var(--c-ink); }
+:is(.skel-tile, .skel-story) .skel-mark { background: rgba(255, 255, 255, .1); }
+
+/* Объявления на десктопе: как .ann7-board. */
+.skel-board { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 28px; align-items: start; }
+.skel-story { min-height: 600px; display: flex; flex-direction: column; justify-content: space-between; padding: 26px 34px 32px; border-radius: 30px; box-sizing: border-box; }
+.skel-story-bottom { display: flex; flex-direction: column; gap: 10px; }
+.skel-list { display: flex; flex-direction: column; gap: 4px; padding-top: 4px; }
+.skel-ann-row { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 16px; align-items: center; padding: 12px; }
+.skel-ann-tile { width: 76px; height: 76px; border-radius: 20px; }
+@media (max-width: 1180px) {
+  .skel-board { grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; }
+}
+
+@keyframes skel-shine {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
+}
+
+/* Без анимаций — просто серые формы. */
+@media (prefers-reduced-motion: reduce) {
+  .skel { animation: none; background-image: none; }
+}
+
+/* ===== Общие тёмные заготовки: карточки, которые на самом деле тёмные ===== */
+.skel-ann-home, .skel-next, .skel-qr {
+  background-color: var(--c-ink);
+  background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, .08) 50%, rgba(255, 255, 255, 0) 70%);
+}
+:is(.skel-ann-home, .skel-next) .skel-mark { background: rgba(255, 255, 255, .1); }
+/* QR лежит на тёмной сцене — плитка светлее сцены. */
+.skel-qr { width: 100%; max-width: 330px; aspect-ratio: 1; border-radius: 22px; background-color: rgba(255, 255, 255, .1); }
+.skel-row { display: flex; align-items: center; gap: 8px; }
+
+/* Главная: объявление. */
+.skel-ann-home { display: flex; flex-direction: column; gap: 10px; min-height: 190px; padding: 20px; border-radius: 26px; box-sizing: border-box; }
+
+/* Главная: карусель событий (телефон). */
+.skel-carousel-card { flex: 0 0 270px; height: 310px; display: flex; flex-direction: column; gap: 8px; padding: 18px; border-radius: 30px; box-sizing: border-box; }
+.skel-carousel-bottom { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+
+/* Главная: расписание (десктоп). */
+.skel-home-sched { display: flex; flex-direction: column; gap: 6px; }
+.skel-next { display: flex; flex-direction: column; gap: 4px; min-height: 170px; padding: 16px; border-radius: 22px; box-sizing: border-box; }
+.skel-sched-item { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 14px; align-items: center; padding: 6px 12px 6px 8px; }
+.skel-sched-date { width: 56px; height: 56px; border-radius: 16px; }
+
+/* Расписание: событие в ленте и сетка месяца. */
+.skel-feed-event { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; }
+.skel-month { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 24px; }
+.skel-month-cell { aspect-ratio: 1; border-radius: 14px; }
+
+/* Страница события. */
+.skel-ev { display: flex; flex-direction: column; gap: 12px; padding-top: 6px; }
+.skel-ev-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.skel-ev-head { display: flex; flex-direction: column; gap: 12px; }
+.skel-ev-title { height: 42px; border-radius: 10px; }
+.skel-ev-panel { display: flex; flex-direction: column; gap: 14px; min-height: 320px; padding: 22px 18px 18px; border-radius: 28px; box-sizing: border-box; }
+.skel-ev-body { display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 861px) {
+  .skel-ev-layout { grid-template-columns: minmax(0, 1fr) 460px; grid-template-areas: 'head panel' 'body panel'; column-gap: 64px; row-gap: 32px; align-items: start; margin-top: 18px; }
+  .skel-ev-head { grid-area: head; gap: 20px; }
+  .skel-ev-title { height: 90px; border-radius: 16px; }
+  .skel-ev-panel { grid-area: panel; min-height: 420px; padding: 28px; }
+  .skel-ev-body { grid-area: body; max-width: 680px; }
+}
+
+/* Проповедь. */
+.skel-sermon { display: flex; flex-direction: column; gap: 12px; max-width: 760px; }
+
+/* Медиа: новости и блог. */
+.skel-news { display: flex; flex-direction: column; gap: 10px; padding: 20px; border-radius: 22px; background: var(--c-panel); }
+.skel-blog { display: flex; flex-direction: column; }
+.skel-blog-row { display: flex; align-items: center; gap: 12px; padding: 16px 0; border-top: 1px solid var(--c-line-soft); }
+
+/* Пожертвование: поле реквизитов. */
+.skel-field { display: flex; flex-direction: column; gap: 8px; padding: 14px 0; }

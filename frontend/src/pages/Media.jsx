@@ -1,5 +1,6 @@
 import { usePosts } from '../api/posts.js';
 import LoadStatus from '../components/LoadStatus.jsx';
+import { BlogSkeleton, NewsSkeleton } from '../components/Skeletons.jsx';
 
 // Обложка записи без картинки — один из градиентов по кругу.
 const GRADIENTS = [
@@ -41,7 +42,8 @@ export default function Media() {
       {!isEmpty(news) && (
       <div style={{ marginTop: 30 }}>
         <div className="eyebrow" style={{ marginBottom: 14 }}>Новости</div>
-        {(news.loading || news.error) && <LoadStatus error={news.error} onRetry={news.retry} />}
+        {news.loading && !news.error && <NewsSkeleton />}
+        {news.error && <LoadStatus error={news.error} onRetry={news.retry} />}
         <div className="news-grid">
           {news.posts.map((n, i) => (
             <article key={n.id} style={{ borderRadius: 22, background: 'var(--c-panel)', padding: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -61,7 +63,8 @@ export default function Media() {
       {!isEmpty(blog) && (
       <div style={{ marginTop: 40 }}>
         <div className="eyebrow" style={{ marginBottom: 14 }}>Блог</div>
-        {(blog.loading || blog.error) && <LoadStatus error={blog.error} onRetry={blog.retry} />}
+        {blog.loading && !blog.error && <BlogSkeleton />}
+        {blog.error && <LoadStatus error={blog.error} onRetry={blog.retry} />}
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {blog.posts.map((b, i) => (
             <div key={b.id} className="card-row" style={{ padding: '16px 0', borderTop: '1px solid var(--c-line-soft)' }}>
