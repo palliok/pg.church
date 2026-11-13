@@ -111,6 +111,7 @@ export default function SongCard({ song, nav, variant, onVariant }) {
   // Сдвиг звучания в полутонах и лад каподастра; у другой песни или другого варианта они начинаются заново.
   // Аккорды в тексте записаны под каподастр варианта (songCapo): звучат на songCapo полутонов выше.
   // Свой каподастр сдвигает аппликатуру в обратную сторону, звучание остаётся прежним.
+  // Выбор тональности снимает каподастр (как на holychord): аккорды сразу в выбранной тональности, без пересчёта.
   const transposeId = `${song.id}:${current.letter}`;
   const songCapo = Math.min(Math.max(current.capo ?? 0, 0), MAX_CAPO);
   const [transpose, setTranspose] = useState({ id: transposeId, steps: 0, capo: songCapo });
@@ -214,7 +215,7 @@ export default function SongCard({ song, nav, variant, onVariant }) {
           <SongKeys
             keys={keys}
             steps={steps}
-            onSteps={(next) => changeTranspose({ steps: next })}
+            onSteps={(next) => changeTranspose({ steps: next, capo: 0 })}
             capos={capos}
             capo={capo}
             onCapo={(next) => changeTranspose({ capo: next })}

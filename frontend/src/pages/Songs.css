@@ -1,17 +1,32 @@
 /* Сборник (resources/design_handoff_songbook_mobile, экраны 01–02): поиск и список одни и те же на телефоне и десктопе. */
 
 /* Поиск закреплён при прокрутке; белый фон на всю ширину экрана — поверх отступов контейнера. */
-.sb-bar { position: sticky; top: 0; z-index: 2; display: flex; gap: 8px; margin: 0 -14px; padding: 6px 14px 12px; background: #fff; }
+.sb-bar { position: sticky; top: 0; z-index: 2; margin: 0 -14px; padding: 6px 14px 12px; background: #fff; }
+.sb-bar-row { display: flex; gap: 8px; }
 .sb-search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 6px 0 16px; border-radius: 99px; background: #f2f2f3; color: var(--c-ink); }
 .sb-search-icon { color: var(--c-gray-text); }
 .sb-search input { flex: 1; min-width: 0; height: 100%; border: none; outline: none; background: none; font: 16px var(--f-sans); color: var(--c-ink); }
 .sb-search input::placeholder { color: var(--c-gray-text-soft); }
 .sb-clear { flex: none; width: 40px; height: 40px; border: none; border-radius: 99px; background: #fff; color: var(--c-ink); cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .sb-sort { flex: none; min-width: 64px; height: 52px; padding: 0 14px; border: none; border-radius: 99px; background: #f2f2f3; color: var(--c-ink); cursor: pointer; font: 12px var(--f-mono); letter-spacing: .04em; }
-.sb-sort.is-alpha { background: var(--c-ink); color: #fff; }
+/* Обычный порядок — по алфавиту; тёмная кнопка значит, что включён другой — по номерам. */
+.sb-sort.is-num { background: var(--c-ink); color: #fff; }
 
-/* Заголовок-буква в режиме «А—Я» закрепляется под поиском (52px поля + 18px отступов). */
-.sb-letter { position: sticky; top: 70px; z-index: 1; display: flex; align-items: center; gap: 12px; padding: 16px 4px 8px; background: #fff; }
+/* Колонка списка не растягивается по ширине полоски букв: та прокручивается внутри. */
+.songs-layout > :first-child { min-width: 0; }
+
+/* Полоска букв под поиском: прокручивается вбок, на краях тает; к краю экрана — без отступа контейнера. */
+.sb-abc { display: flex; gap: 2px; margin: 8px -14px 0; padding: 0 10px; overflow-x: auto; overscroll-behavior-x: contain;
+  mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent); }
+.sb-abc button { flex: none; min-width: 34px; height: 34px; padding: 0 6px; border: none; border-radius: 99px; background: none; color: var(--c-ink); cursor: pointer;
+  font: 15px/1 var(--f-mono); -webkit-tap-highlight-color: transparent; }
+.sb-abc button.is-active { background: var(--c-main); }
+@media (hover: hover) {
+  .sb-abc button:not(.is-active):hover { background: #f2f2f3; }
+}
+
+/* Заголовок-буква в режиме «А—Я» закрепляется под шапкой: её высоту (поиск и полоска букв) меряет Songs.jsx. */
+.sb-letter { position: sticky; top: var(--sb-bar-h, 70px); z-index: 1; display: flex; align-items: center; gap: 12px; padding: 16px 4px 8px; background: #fff; }
 .sb-letter span { font: 26px/1 var(--f-num); color: var(--c-main); }
 .sb-letter::after { content: ''; flex: 1; height: 1px; background: rgba(35, 31, 32, .12); }
 
@@ -39,9 +54,13 @@
   .songs-layout { margin-top: 66px; } /* как .ann12-panel: низ фонового заголовка закрывает поиск */
   /* Белая подложка поиска лежит поверх фонового заголовка: скруглена вокруг полей, а не обрезана прямыми углами. */
   .sb-bar { margin: 0 -6px 6px; padding: 6px; border-radius: 32px; }
+  /* Закреплённая — без скруглений: под ней проезжают строки (и тёмная выбранная), углы их не должны показывать. */
+  .sb-bar.is-stuck { border-radius: 0; }
   /* Подсветка строки — скруглённая плашка; разделитель под ней и над ней прячем, чтобы не резал скругление. */
   .sb-row { padding-inline: 12px; border-radius: 18px; }
-  .sb-letter { top: 64px; padding-inline: 12px; }
+  .sb-letter { top: var(--sb-bar-h, 64px); padding-inline: 12px; }
+  /* Полоска букв — по ширине колонки; все буквы обычно влезают, прокрутка остаётся на узком окне. */
+  .sb-abc { margin-inline: 0; padding-inline: 6px; }
 
   /* Под курсором — голубая, выбранная — тёмная. */
   .sb-row:hover { background: var(--c-main); }
