@@ -1,64 +1,69 @@
-/* Логотип по макету design_handoff_overview, блок 01 (там 44 / 18, на телефоне 32 / 13), увеличен:
-   Arimo 700 50 / 20, город — Mono капсом; на телефоне 36 / 14,5.
-   Расстояние до «на поклонной горе» — 0.225 кегля слова (resources/poklonnaya-logo-dev). */
+/* Логотип: знак ПГ-храм (resources/poklonnaya-logo-pg) + прежняя надпись Arimo без уголка.
+   Десктоп — «церковь» 35 px, подпись 16, город Mono 9; на телефоне 24 / 11 / 7,5.
+   Все размеры знака — в em от кегля «церковь», поэтому медиазапросы меняют только font-size. */
 .church-brand {
   display: inline-flex;
   align-items: center;
-  gap: 11px;
+  gap: 9px;
   min-width: 0;
   white-space: nowrap;
   color: var(--c-ink);
 }
 
+/* Слева место под знак: его ширина плюс отступ .24em (≈ 1,6 толщины ножки знака). */
 .church-brand-word {
-  font: 700 50px/.85 var(--f-sans);
+  position: relative;
+  padding-left: 1.3em;
+  font: 700 35px/.85 var(--f-sans);
   letter-spacing: -.07em;
 }
 
-/* Уголок из logo-9b: квадрат 0.42em с толщиной 0.12em, низ поднят над базовой линией на 0.3em
-   и придвинут к слову на 0.06em. В em от кегля слова — масштабируется вместе с ним. */
-.church-brand-corner {
-  display: inline-block;
-  box-sizing: border-box;
-  width: .42em;
-  height: .42em;
-  margin-left: -.06em;
-  vertical-align: .3em;
-  border-top: .12em solid var(--c-main);
-  border-right: .12em solid var(--c-main);
+/* Знак в 1,5 раза выше строчных (1,25em) и стоит низом на хвостах «ц» и «р»:
+   базовая линия строки .85 — на .0785em над её низом, хвосты — на .21em ниже базовой линии,
+   и ещё 2 px вверх на глаз. Знак абсолютный, чтобы не раздувать строку: крест выходит над словом. */
+.church-brand-mark {
+  position: absolute;
+  left: 0;
+  bottom: calc(2px - .1315em);
+  height: 1.25em;
+  width: 1.06em;
 }
+
+.church-brand-mark--small { display: none; width: 1.1em; }
 
 .church-brand-side {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: 2px;
 }
 
 .church-brand-name {
-  font: 700 20px/1 var(--f-sans);
+  font: 700 16px/1 var(--f-sans);
   letter-spacing: -.04em;
 }
 
 .church-brand-city {
-  font: 400 11px/1 var(--f-mono);
+  font: 400 9px/1 var(--f-mono);
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--c-gray-text);
 }
 
+/* Знак ниже 40 px — mark-small с толстым крестом. */
 @media (max-width: 860px) {
-  .church-brand { gap: 8px; }
-  .church-brand-word { font-size: 36px; }
-  .church-brand-side { gap: 3px; }
-  .church-brand-name { font-size: 14.5px; }
-  .church-brand-city { font-size: 9px; }
+  .church-brand { gap: 7px; }
+  .church-brand-word { font-size: 26px; padding-left: 1.34em; }
+  .church-brand-mark--full { display: none; }
+  .church-brand-mark--small { display: block; }
+  .church-brand-name { font-size: 12px; }
+  .church-brand-city { font-size: 8px; }
 }
 
 /* На узких телефонах рядом с логотипом стоит свёрнутый переключатель языка: логотип чуть меньше, чтобы влезть в строку. */
 @media (max-width: 420px) {
-  .church-brand { gap: 7px; }
-  .church-brand-word { font-size: 32px; }
-  .church-brand-name { font-size: 13px; }
-  .church-brand-city { font-size: 8px; }
+  .church-brand { gap: 6px; }
+  .church-brand-word { font-size: 24px; }
+  .church-brand-name { font-size: 11px; }
+  .church-brand-city { font-size: 7.5px; }
 }
