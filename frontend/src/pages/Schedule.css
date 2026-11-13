@@ -94,8 +94,6 @@
 .sched-feed-date { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding-top: 12px; }
 .sched-feed-num { font: 400 44px/.85 var(--f-num); letter-spacing: -.05em; }
 .sched-feed-dow { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
-.sched-feed-today { padding: 4px 9px; border-radius: var(--radius-pill); background: var(--c-main); font-size: 11px; }
-.sched-feed-today-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c-main); }
 .sched-feed-items { display: flex; flex-direction: column; min-width: 0; }
 
 /* Событие */

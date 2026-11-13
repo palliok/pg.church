@@ -276,7 +276,7 @@ function MonthNav({ ym, onChange }) {
 }
 
 // Лента (макет resources/design_handoff_schedule_2b): слева крупное число и день недели, справа события дня.
-// Прошедшие дни бледнее, сегодняшний — на серой подложке. Первые hiddenDayCount дней спрятаны под кнопку
+// Прошедшие дни бледнее, сегодняшний — на тёплой подложке, без отдельной метки «Сегодня». Первые hiddenDayCount дней спрятаны под кнопку
 // «Показать прошедшие» — она в строке над лентой. key у ListView — месяц.
 function ListView({ byDay, ym, todayNum, hiddenDayCount, showPast, hasFilters, onReset }) {
   const feedRef = useRef(null);
@@ -311,18 +311,12 @@ function ListView({ byDay, ym, todayNum, hiddenDayCount, showPast, hasFilters, o
           const classes = ['sched-feed-day', day === todayNum && 'is-today', daysFromToday({ ...ym, day }) < 0 && 'is-past'].filter(Boolean).join(' ');
 
           return (
-            <section key={day} className={classes}>
+            <section key={day} className={classes} aria-current={day === todayNum ? 'date' : undefined}>
               <div className="sched-feed-date">
                 <span className="sched-feed-num">{day}</span>
                 <span className="sched-feed-dow">
                   <span className="sched-d">{items[0].dowLabel}</span>
                   <span className="sched-m">{items[0].dowShort}</span>
-                  {day === todayNum && (
-                    <>
-                      <span className="sched-d sched-feed-today">Сегодня</span>
-                      <span className="sched-m sched-feed-today-dot" role="img" aria-label={t('Сегодня')} />
-                    </>
-                  )}
                 </span>
               </div>
               <div className="sched-feed-items">
