@@ -1,10 +1,10 @@
-/* Логотип: знак ПГ-храм (resources/poklonnaya-logo-pg) + прежняя надпись Arimo без уголка.
-   Десктоп — «церковь» 35 px, подпись 16, город Mono 9; на телефоне 24 / 11 / 7,5.
+/* Логотип: знак ПГ-храм (resources/poklonnaya-logo-pg-b) + прежняя надпись Arimo без уголка.
+   Десктоп — «церковь» 38,5 px, подпись 17,6, город Mono 9,9; на телефоне 28 / 13 / 8,5, на узком — 26 / 12 / 8.
    Все размеры знака — в em от кегля «церковь», поэтому медиазапросы меняют только font-size. */
 .church-brand {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   min-width: 0;
   white-space: nowrap;
   color: var(--c-ink);
@@ -13,8 +13,8 @@
 /* Слева место под знак: его ширина плюс отступ .24em (≈ 1,6 толщины ножки знака). */
 .church-brand-word {
   position: relative;
-  padding-left: 1.3em;
-  font: 700 35px/.85 var(--f-sans);
+  padding-left: 1.31em;
+  font: 700 38.5px/.85 var(--f-sans);
   letter-spacing: -.07em;
 }
 
@@ -26,10 +26,10 @@
   left: 0;
   bottom: calc(2px - .1315em);
   height: 1.25em;
-  width: 1.06em;
+  width: 1.07em;
 }
 
-.church-brand-mark--small { display: none; width: 1.1em; }
+.church-brand-mark--small { display: none; width: 1.12em; }
 
 .church-brand-side {
   display: flex;
@@ -39,12 +39,12 @@
 }
 
 .church-brand-name {
-  font: 700 16px/1 var(--f-sans);
+  font: 700 17.6px/1 var(--f-sans);
   letter-spacing: -.04em;
 }
 
 .church-brand-city {
-  font: 400 9px/1 var(--f-mono);
+  font: 400 9.9px/1 var(--f-mono);
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--c-gray-text);
@@ -52,18 +52,18 @@
 
 /* Знак ниже 40 px — mark-small с толстым крестом. */
 @media (max-width: 860px) {
-  .church-brand { gap: 7px; }
-  .church-brand-word { font-size: 26px; padding-left: 1.34em; }
+  .church-brand { gap: 8px; }
+  .church-brand-word { font-size: 28px; padding-left: 1.36em; }
   .church-brand-mark--full { display: none; }
   .church-brand-mark--small { display: block; }
-  .church-brand-name { font-size: 12px; }
-  .church-brand-city { font-size: 8px; }
+  .church-brand-name { font-size: 13px; }
+  .church-brand-city { font-size: 8.5px; }
 }
 
 /* На узких телефонах рядом с логотипом стоит свёрнутый переключатель языка: логотип чуть меньше, чтобы влезть в строку. */
 @media (max-width: 420px) {
-  .church-brand { gap: 6px; }
-  .church-brand-word { font-size: 24px; }
-  .church-brand-name { font-size: 11px; }
-  .church-brand-city { font-size: 7.5px; }
+  .church-brand { gap: 7px; }
+  .church-brand-word { font-size: 26px; }
+  .church-brand-name { font-size: 12px; }
+  .church-brand-city { font-size: 8px; }
 }
