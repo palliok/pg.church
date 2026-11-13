@@ -86,16 +86,19 @@ class AnnouncementCrudController extends CrudController
             ->wrapper(['class' => 'd-none']);
 
         CRUD::field('place')->label('Где')->tab('Где и контакт')
-            ->hint('Например: «Малый зал». Со связанным событием — его место')
+            ->hint('Например: «Малый зал». Подсказки — из справочника «Места». Со связанным событием — его место')
+            ->attributes(['list' => 'directory-places', 'autocomplete' => 'off'])
             ->validationRules('exclude_with:event_id|nullable|string|max:120');
         CRUD::field('links_text')->label('Ссылки')->type('textarea')->tab('Где и контакт')
             ->attributes(['rows' => 4, 'placeholder' => 'Анкета для записи | https://forms.yandex.ru/…'])
             ->hint('По одной на строку: «Текст кнопки | ссылка». Не больше пяти');
         CRUD::field('contact_name')->label('Контакт: имя')->tab('Где и контакт')
+            ->hint('Подсказки — из справочника «Контакты», телефон подставится сам')
+            ->attributes(['list' => 'directory-contacts', 'autocomplete' => 'off'])
             ->validationRules('nullable|string|max:60');
         CRUD::field('contact_phone')->label('Контакт: телефон')->tab('Где и контакт')
             ->hint('На сайте — номер с кнопкой звонка; крупной кнопкой внизу — если выбрать звонок основным действием')
-            ->attributes(Phone::INPUT_ATTRIBUTES);
+            ->attributes([...Phone::INPUT_ATTRIBUTES, 'list' => 'directory-phones', 'autocomplete' => 'off']);
         // Варианты — «Нет», ссылки по номеру и звонок; подписи по тексту ссылок и имени контакта
         // ставит скрипт формы (admin.announcement-form) прямо при вводе.
         CRUD::field('main_choice')->label('Основное действие')->type('select_from_array')->tab('Где и контакт')

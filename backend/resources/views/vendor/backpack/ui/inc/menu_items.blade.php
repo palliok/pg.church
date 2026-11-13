@@ -15,6 +15,11 @@
 
 <x-backpack::menu-item title="Объявления" icon="la la-bullhorn" :link="backpack_url('announcement')" />
 
+<x-backpack::menu-dropdown title="Справочники" icon="la la-address-book">
+    <x-backpack::menu-dropdown-item title="Места" icon="la la-map-marker" :link="backpack_url('place')" />
+    <x-backpack::menu-dropdown-item title="Контакты" icon="la la-phone" :link="backpack_url('contact')" />
+</x-backpack::menu-dropdown>
+
 <x-backpack::menu-dropdown title="Медиа" icon="la la-newspaper">
     <x-backpack::menu-dropdown-item title="Новости и блог" icon="la la-pen" :link="backpack_url('post')" />
     <x-backpack::menu-dropdown-item title="Теги" icon="la la-tags" :link="backpack_url('tag')" />

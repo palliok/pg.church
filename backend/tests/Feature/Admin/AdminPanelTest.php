@@ -5,10 +5,12 @@ namespace Tests\Feature\Admin;
 use App\Enums\PostType;
 use App\Models\Announcement;
 use App\Models\CalendarSource;
+use App\Models\Contact;
 use App\Models\DonationAccount;
 use App\Models\DutyShift;
 use App\Models\Event;
 use App\Models\Minister;
+use App\Models\Place;
 use App\Models\Post;
 use App\Models\Sermon;
 use App\Models\Setting;
@@ -63,6 +65,8 @@ class AdminPanelTest extends TestCase
             'story' => ['story', Story::class, true],
             'story-panel' => ['story-panel', StoryPanel::class, true],
             'announcement' => ['announcement', Announcement::class, true],
+            'place' => ['place', Place::class, true],
+            'contact' => ['contact', Contact::class, true],
             'donation-account' => ['donation-account', DonationAccount::class, true],
             'setting' => ['setting', Setting::class, false],
             'user' => ['user', User::class, true],
@@ -108,6 +112,8 @@ class AdminPanelTest extends TestCase
         Song::query()->create(['number' => 214, 'title' => 'Свят, свят, свят', 'song_category_id' => $category->id])
             ->variants()->create(['letter' => 'а', 'is_default' => true, 'key' => 'E', 'chordpro' => '[E]Свят, свят, свят Гос[A]подь']);
         CalendarSource::query()->create(['name' => 'Календарь служений', 'url' => 'https://calendar.google.com/calendar/ical/secret/basic.ics']);
+        Place::query()->create(['name' => 'Главный зал']);
+        Contact::query()->create(['name' => 'Андрей', 'phone' => '89522265592']);
         $this->actingAsAdmin();
 
         $this->get("/admin/{$route}")->assertOk();
@@ -167,6 +173,40 @@ class AdminPanelTest extends TestCase
                 'title' => 'Поле «Название» обязательно для заполнения.',
                 'starts_at' => 'Поле «Дата и время начала» должно быть датой.',
             ]);
+    }
+
+    public function test_places_and_contacts_are_suggested_in_event_and_announcement_forms(): void
+    {
+        $this->actingAsAdmin();
+        Place::query()->create(['name' => 'Лагерь «Сосновый бор»', 'address' => 'Ленинградская обл., пос. Сосново']);
+        Contact::query()->create(['name' => 'Мамы в молитве', 'phone' => '8 981 725 88 09']);
+
+        $this->get('/admin/event/create')->assertOk()
+            ->assertSee('list="directory-places"', false)
+            ->assertSee('<option value="Лагерь «Сосновый бор»" label="Ленинградская обл., пос. Сосново"></option>', false);
+
+        $this->get('/admin/announcement/create')->assertOk()
+            ->assertSee('list="directory-contacts"', false)
+            ->assertSee('list="directory-phones"', false)
+            ->assertSee('<option value="Мамы в молитве" label="+7 (981) 725-88-09"></option>', false);
+    }
+
+    public function test_directory_place_names_are_unique_and_contact_phones_are_formatted(): void
+    {
+        $this->actingAsAdmin();
+        $place = Place::query()->create(['name' => 'Чайная']);
+
+        $this->post('/admin/place', ['name' => 'Чайная'])
+            ->assertSessionHasErrors(['name' => 'Такое значение поля «Название» уже используется.']);
+        $this->put("/admin/place/{$place->id}", ['id' => $place->id, 'name' => 'Чайная', 'address' => 'ул. Пример, 1'])
+            ->assertSessionHasNoErrors();
+        $this->assertSame('ул. Пример, 1', $place->fresh()->address);
+
+        $this->post('/admin/contact', ['name' => 'Андрей', 'phone' => 'позвоните мне'])
+            ->assertSessionHasErrors('phone');
+        $this->post('/admin/contact', ['name' => 'Андрей', 'phone' => '89522265592'])
+            ->assertSessionHasNoErrors();
+        $this->assertSame('+7 (952) 226-55-92', Contact::query()->sole()->phone);
     }
 
     public function test_song_number_must_be_unique_but_can_stay_on_update(): void

@@ -94,7 +94,8 @@ class EventCrudController extends CrudController
         CRUD::field('notice')->label('Плашка')
             ->hint('Красная пометка на карточке события, коротко: «Нужна регистрация», «Запись закрыта», «Осталось 20 мест». Пусто — без плашки')
             ->validationRules('nullable|string|max:40');
-        CRUD::field('place')->label('Место')->hint('Например: «Главный зал»')
+        CRUD::field('place')->label('Место')->hint('Например: «Главный зал». Подсказки — из справочника «Места», адрес подставится сам')
+            ->attributes(['list' => 'directory-places', 'autocomplete' => 'off'])
             ->validationRules('nullable|string|max:255');
         CRUD::field('address')->label('Адрес')
             ->hint('Если не заполнено, на сайте показывается адрес церкви из настроек')

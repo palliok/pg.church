@@ -1,6 +1,7 @@
 {{-- Форма объявления: поля дат только выбранного типа «Когда» (со связанным событием — ни одного и без места)
      и варианты «Основного действия» по введённым ссылкам и контакту --}}
 @include('admin.phone-mask')
+@include('admin.directory-suggest')
 @push('crud_fields_scripts')
 <script>
     jQuery(function () {

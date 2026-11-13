@@ -1,4 +1,5 @@
 {{-- Форма события: варианты «Основной ссылки» подписываются текстами введённых ссылок --}}
+@include('admin.directory-suggest')
 @push('crud_fields_scripts')
 <script>
     jQuery(function () {

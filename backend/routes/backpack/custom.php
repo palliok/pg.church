@@ -31,6 +31,8 @@ Route::group([
     Route::crud('story', 'StoryCrudController');
     Route::crud('story-panel', 'StoryPanelCrudController');
     Route::crud('announcement', 'AnnouncementCrudController');
+    Route::crud('place', 'PlaceCrudController');
+    Route::crud('contact', 'ContactCrudController');
     Route::crud('donation-account', 'DonationAccountCrudController');
     Route::crud('setting', 'SettingCrudController');
     Route::crud('user', 'UserCrudController');
