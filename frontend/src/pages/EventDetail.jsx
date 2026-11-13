@@ -15,7 +15,7 @@ import { monthLabel } from '../api/dates.js';
 import { placeMapUrl } from '../api/maps.js';
 import './EventDetail.css';
 
-// Дата «2026-10-01» со сдвигом на days дней — границы запроса «Рядом по датам».
+// Дата «2026-10-01» со сдвигом на days дней — границы запроса «События рядом».
 function shiftDate({ year, month, day }, days) {
   return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
 }
@@ -297,14 +297,14 @@ function Hymns({ hymns }) {
   );
 }
 
-// «Рядом по датам» — ближайшие события строками с плашкой даты. Пока грузятся или их нет — блока нет.
+// «События рядом» — ближайшие события строками с плашкой даты. Пока грузятся или их нет — блока нет.
 function Nearby({ event }) {
   const events = useNearby(event);
   if (events.length === 0) return null;
 
   return (
     <section className="ev-nearby">
-      <span className="ev-label">Рядом по датам</span>
+      <span className="ev-label">События рядом</span>
       <div className="ev-nearby-list">
         {events.map((e) => (
           <Link key={e.id} to={`/schedule/${e.id}`} className="ev-near">

@@ -148,7 +148,7 @@
 .ev-hymn-word { display: none; font: 400 11px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c-gray-text); }
 .ev-hymn-title { font: 700 17px/1.1 var(--f-sans); letter-spacing: -.035em; }
 
-/* ===== Рядом по датам ===== */
+/* ===== События рядом ===== */
 .ev-nearby { display: flex; flex-direction: column; gap: 2px; padding-top: 14px; }
 .ev-nearby > .ev-label { padding: 0 8px 4px; }
 .ev-nearby-list { display: flex; flex-direction: column; gap: 2px; }
@@ -176,7 +176,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
 }
 
-/* ===== Десктоп: слева заголовок, описание, проповедь и гимны; справа панель и «Рядом по датам» ===== */
+/* ===== Десктоп: слева заголовок, описание, проповедь и гимны; справа панель и «События рядом» ===== */
 @media (min-width: 861px) {
   .ev-back { padding: 6px 10px 4px; font-size: 13px; }
 
